@@ -6,7 +6,6 @@
  */
 
 import os from 'os';
-import { TextEditor, Workbench, sleep } from 'wdio-vscode-service';
 import { EnvironmentSettings } from '../environmentSettings.ts';
 import { attemptToFindOutputPanelText, clearOutputView } from './outputView.ts';
 import { executeQuickPick, findQuickPickItem } from './commandPrompt.ts';
@@ -14,6 +13,9 @@ import { notificationIsPresentWithTimeout } from './notifications.ts';
 import * as DurationKit from '@salesforce/kit';
 import path from 'path';
 import { PredicateWithTimeout } from './predicates.ts';
+import { By, TextEditor, WebElement, Workbench } from 'vscode-extension-tester';
+import { getBrowser, getWorkbench } from './workbench.ts';
+import { expect } from 'chai';
 
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {
   await sleep(duration.milliseconds);
@@ -73,22 +75,24 @@ export async function findElementByText(
     reverse?: boolean;
     timeoutMsg?: string;
   }
-): Promise<WebdriverIO.Element> {
+): Promise<WebElement> {
   if (!labelText) {
     throw new Error('labelText must be defined');
   }
   debug(`findElementByText ${type}[${attribute}="${labelText}"]`);
-  const element = await $(`${type}[${attribute}="${labelText}"]`);
+  const element = await getWorkbench().findElement(By.xpath(`${type}[${attribute}="${labelText}"]`));
   if (!element) {
     throw new Error(`Element with selector: "${type}[${attribute}=\"${labelText}\"]" not found}`);
   }
   if (waitForClickable) {
-    await element.waitForClickable({
-      timeout: waitOptions?.timeout?.milliseconds ?? Duration.seconds(5).milliseconds,
-      interval: waitOptions?.interval?.milliseconds ?? Duration.milliseconds(500).milliseconds,
-      reverse: waitOptions?.reverse,
-      timeoutMsg: waitOptions?.timeoutMsg
-    });
+    await getBrowser().wait(async () => {
+      const isDisplayedAndEnabled = await element.isDisplayed() && await element.isEnabled();
+      return waitOptions?.reverse ? !isDisplayedAndEnabled : isDisplayedAndEnabled;
+    },
+      waitOptions?.timeout?.milliseconds ?? Duration.seconds(5).milliseconds,
+      waitOptions?.timeoutMsg,
+      waitOptions?.interval?.milliseconds ?? Duration.milliseconds(500).milliseconds,
+    );
   }
 
   return element;
@@ -130,16 +134,16 @@ export async function createCommand(
     `SFDX: Create ${type} successfully ran`,
     Duration.minutes(10)
   );
-  await expect(successNotificationWasFound).toBe(true);
+  expect(successNotificationWasFound).to.be.true;
 
   const outputPanelText = await attemptToFindOutputPanelText(
     `Salesforce CLI`,
     `Finished SFDX: Create ${type}`,
     10
   );
-  await expect(outputPanelText).not.toBeUndefined();
+  expect(outputPanelText).not.to.be.ok;
   const typePath = path.join(`force-app`, `main`, `default`, folder, `${name}.${extension}`);
-  await expect(outputPanelText).toContain(`create ${typePath}`);
+  expect(outputPanelText).to.include(`create ${typePath}`);
 
   const metadataPath = path.join(
     `force-app`,
@@ -148,7 +152,7 @@ export async function createCommand(
     folder,
     `${name}.${extension}-meta.xml`
   );
-  await expect(outputPanelText).toContain(`create ${metadataPath}`);
+  expect(outputPanelText).to.include(`create ${metadataPath}`);
   return outputPanelText;
 }
 
@@ -237,4 +241,10 @@ export class Duration extends DurationKit.Duration {
   public static weeks(quantity: number): Duration {
     return new Duration(quantity, Unit.WEEKS);
   }
+}
+
+export async function sleep(duration: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
 }

@@ -1,4 +1,6 @@
+import { Locator } from 'vscode-extension-tester';
 import { Duration } from './miscellaneous.ts';
+import { getBrowser } from './workbench.ts';
 
 export interface PredicateWithTimeout {
   predicate: () => Promise<boolean>;
@@ -7,8 +9,8 @@ export interface PredicateWithTimeout {
 
 export const standardPredicates = {
   alwaysTrue: async () => true,
-  waitForElement: async (selector: string) => {
-    return await browser.$(selector).isDisplayed();
+  waitForElement: async (selector: Locator) => {
+    return await getBrowser().findElement(selector).isDisplayed();
   },
   waitForCondition: async (condition: () => boolean) => {
     while (!condition()) {

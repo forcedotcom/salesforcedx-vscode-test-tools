@@ -4,13 +4,13 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup.ts';
 import * as utilities from '../utilities/index.ts';
 import { EnvironmentSettings } from '../environmentSettings.ts';
+import { Key } from 'vscode-extension-tester';
+import { expect } from 'chai';
 
-import { Key } from 'webdriverio';
-const CMD_KEY = process.platform === 'darwin' ? Key.Command : Key.Control;
+const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
 describe('Apex LSP', async () => {
   let testSetup: TestSetup;
@@ -29,16 +29,16 @@ describe('Apex LSP', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify Extension is Running`);
 
     // Using the Command palette, run Developer: Show Running Extensions
-    await utilities.showRunningExtensions();
+    const re = await utilities.showRunningExtensions();
     await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
     // Verify Apex extension is present and running
     const foundExtensions = await utilities.verifyExtensionsAreRunning(
       utilities.getExtensionsToVerifyActive((ext) => ext.extensionId === 'salesforcedx-vscode-apex')
     );
     await utilities.zoomReset();
-    await expect(foundExtensions).toBe(true);
+    expect(foundExtensions).to.be.true;
     // Close running extensions view
-    await browser.keys([CMD_KEY, 'w']);
+    await re?.close();
   });
 
   step('Verify LSP finished indexing', async () => {
@@ -125,3 +125,7 @@ describe('Apex LSP', async () => {
     await testSetup?.tearDown();
   });
 });
+function step(arg0: string, arg1: () => Promise<void>) {
+  throw new Error('Function not implemented.');
+}
+

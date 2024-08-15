@@ -5,21 +5,22 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { InputBox, QuickOpenBox } from 'wdio-vscode-service';
 import { executeQuickPick } from './commandPrompt.ts';
 import { debug, Duration, findElementByText } from './miscellaneous.ts';
+import { By, InputBox, QuickOpenBox, WebElement } from 'vscode-extension-tester';
+import { getBrowser, getWorkbench } from './workbench.ts';
 
 async function findAndCheckSetting(
   id: string
-): Promise<{ checkButton: WebdriverIO.Element; checkButtonValue: string | null }> {
+): Promise<{ checkButton: WebElement; checkButtonValue: string | null }> {
   debug(`enter findAndCheckSetting for id: ${id}`);
   await browser.keys(id);
-  let checkButton: WebdriverIO.Element | null = null;
+  let checkButton: WebElement | null = null;
   let checkButtonValue: string | null = null;
 
   await browser.waitUntil(
     async () => {
-      checkButton = (await findElementByText('div', 'aria-label', id)) as WebdriverIO.Element;
+      checkButton = (await findElementByText('div', 'aria-label', id)) as WebElement;
       if (checkButton) {
         checkButtonValue = await checkButton.getAttribute('aria-checked');
         debug(`found setting checkbox with value "${checkButtonValue}"`);
@@ -47,17 +48,19 @@ async function openSettings<T>(
   timeout: Duration = Duration.seconds(5)
 ): Promise<T> {
   debug('openSettings - enter');
-  const settings = await executeQuickPick(command, Duration.seconds(1));
+  const settings = await getWorkbench().openSettings();
+  await settings.switchToPerspective('Workspace');
   debug('openSettings - after open');
 
+  const browser = getBrowser();
   // Clear the input box
   await browser.keys(['Escape', 'Escape']);
 
-  await browser.waitUntil(
+  await browser.wait(
     async () => {
-      const element = await browser.$(
+      const element = await browser.findElement(By.xpath(
         '//div[@class="monaco-tl-contents group-title"]//div[text()="Commonly Used"]'
-      );
+      ));
       return element.isDisplayed();
     },
     {

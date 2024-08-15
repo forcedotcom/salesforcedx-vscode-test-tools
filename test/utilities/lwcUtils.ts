@@ -5,12 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import { Key } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt.ts';
 import { Duration, getTextEditor, log, pause } from './miscellaneous.ts';
-import { getWorkbench } from './workbench.ts';
+import { getBrowser, getWorkbench } from './workbench.ts';
 
-import { Key } from 'webdriverio';
-const CMD_KEY = process.platform === 'darwin' ? Key.Command : Key.Control;
+const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
 export async function createLwc(name: string): Promise<void> {
   log('createLwc() - calling browser.getWorkbench()');
@@ -103,8 +103,9 @@ export async function createLwc(name: string): Promise<void> {
   await textEditor.save();
   await pause(Duration.seconds(1));
 
+  const browser = getBrowser();
   // Set breakpoints
-  await browser.keys([CMD_KEY, 'f']);
+  await browser.send([CMD_KEY, 'f']);
   await pause(Duration.seconds(1));
   await browser.keys(`await expect(div.textContent).toBe('Hello, World!');`);
   await browser.keys(['Escape']);

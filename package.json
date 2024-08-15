@@ -17,7 +17,16 @@
   },
   "homepage": "https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat#readme",
   "devDependencies": {
+    "@salesforce/kit": "^3.2.1",
+    "@types/chai": "^4.3.17",
+    "@types/cross-spawn": "^6.0.6",
+    "@types/mocha": "^10.0.7",
+    "@types/mocha-steps": "^1.3.3",
+    "chai": "^5.1.1",
+    "cross-spawn": "^7.0.3",
     "fast-glob": "^3.3.2",
+    "mocha": "^10.7.3",
+    "mocha-steps": "^1.3.0",
     "vscode-extension-tester": "^8.5.0"
   }
 }

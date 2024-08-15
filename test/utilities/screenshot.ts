@@ -27,7 +27,7 @@ export async function saveFailedTestScreenshot(
     mkdirSync(saveDir, { recursive: true });
   }
   const screenshotPath = getScreenshotSavePath(saveDir, testTitle);
-  await browser.saveScreenshot(screenshotPath);
+  // await browser.saveScreenshot(screenshotPath);
 }
 
 function getScreenshotSavePath(saveDir: string, testTitle: string): string {

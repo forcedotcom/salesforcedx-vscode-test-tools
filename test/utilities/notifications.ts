@@ -5,9 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Notification } from 'wdio-vscode-service';
 import { Duration } from './miscellaneous.ts';
-import { getWorkbench } from './workbench.ts';
+import { getBrowser, getWorkbench } from './workbench.ts';
 import { executeQuickPick } from './commandPrompt.ts';
 
 export async function waitForNotificationToGoAway(
@@ -60,7 +59,7 @@ export async function dismissNotification(
   timeout = Duration.seconds(1)
 ): Promise<void> {
   const notification = await findNotification(notificationMessage, true, timeout, true);
-  await notification?.dismiss();
+  notification?.close();
 }
 
 export async function acceptNotification(
@@ -90,10 +89,10 @@ async function findNotification(
   timeout: Duration = Duration.milliseconds(500),
   throwOnTimeout: boolean = false // New parameter to control throwing on timeout
 ): Promise<Notification | null> {
-  const workbench = await getWorkbench();
+  const workbench = getWorkbench();
 
   try {
-    const foundNotification = await browser.waitUntil(
+    const foundNotification = await getBrowser().wait(
       async () => {
         const notifications = await workbench.getNotifications();
         let bestMatch: Notification | null = null;
@@ -111,11 +110,8 @@ async function findNotification(
         } else {
           return bestMatch === null;
         }
-      },
-      {
-        timeout: timeout.milliseconds,
-        timeoutMsg: `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`
-      }
+      }, timeout.milliseconds,
+      `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`
     );
 
     return shouldBePresent ? foundNotification : null;

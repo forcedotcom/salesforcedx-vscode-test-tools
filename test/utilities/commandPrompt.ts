@@ -7,7 +7,7 @@
 
 import { debug, Duration, log, pause } from './miscellaneous.ts';
 import { getBrowser, getWorkbench } from './workbench.ts';
-import { By, InputBox, QuickOpenBox, Workbench } from 'vscode-extension-tester';
+import { By, InputBox, Key, QuickOpenBox, Workbench } from 'vscode-extension-tester';
 
 export async function openCommandPromptWithCommand(
   workbench: Workbench,
@@ -169,6 +169,8 @@ export async function clickFilePathOkButton(): Promise<void> {
   }
 
   await pause(Duration.milliseconds(500));
+  okButton.sendKeys(Key.ENTER);
+  await pause(Duration.seconds(1));
 
   const buttons = await browser.findElements(By.css('a.monaco-button.monaco-text-button'));
   for (const item of buttons) {

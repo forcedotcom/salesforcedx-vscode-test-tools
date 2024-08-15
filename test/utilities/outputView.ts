@@ -9,38 +9,32 @@ import clipboard from 'clipboardy';
 import { debug, Duration, pause } from './miscellaneous.ts';
 import { dismissAllNotifications } from './notifications.ts';
 import { executeQuickPick } from './commandPrompt.ts';
+import { BottomBarPanel, Key, OutputView } from 'vscode-extension-tester';
 
-import { Key } from 'webdriverio';
-const CMD_KEY = process.platform === 'darwin' ? Key.Command : Key.Control;
+const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
-export async function selectOutputChannel(name: string): Promise<void> {
+export async function selectOutputChannel(name: string): Promise<OutputView> {
   // Wait for all notifications to go away.  If there is a notification that is overlapping and hiding the Output channel's
   // dropdown menu, calling select.click() doesn't work, so dismiss all notifications first before clicking the dropdown
   // menu and opening it.
   await dismissAllNotifications();
 
   // Find the given channel in the Output view
-  await executeQuickPick('Output: Show Output Channels...', Duration.seconds(1));
-  await browser.keys([name, 'Enter']);
-  await pause(Duration.seconds(2));
+  const outputView = await new BottomBarPanel().openOutputView();
+  if (!!name) {
+    await outputView.selectChannel(name);
+  }
+  return outputView;
 }
 
 export async function getOutputViewText(outputChannelName: string = ''): Promise<string> {
   // Set the output channel, but only if the value is passed in.
-  if (outputChannelName) {
-    await selectOutputChannel(outputChannelName);
-  }
+  const outputView = await selectOutputChannel(outputChannelName);
 
   // Set focus to the contents in the Output panel.
   await executeQuickPick('Output: Focus on Output View', Duration.seconds(2));
 
-  // Select all of the text within the panel.
-  await browser.keys([CMD_KEY, 'a', 'c']);
-
-  // Get text from the clipboard
-  const outputPanelText = await clipboard.read();
-
-  return outputPanelText;
+  return await outputView.getText();
 }
 
 // If found, this function returns the entire text that's in the Output panel.
@@ -52,10 +46,8 @@ export async function attemptToFindOutputPanelText(
   debug(
     `attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`
   );
-  await selectOutputChannel(outputChannelName);
-
   while (attempts > 0) {
-    const outputViewText = await getOutputViewText();
+    const outputViewText = await getOutputViewText(outputChannelName);
     if (outputViewText.includes(searchString)) {
       return outputViewText;
     }

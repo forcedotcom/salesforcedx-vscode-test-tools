@@ -1,7 +1,7 @@
 import { getTextEditor, pause } from './miscellaneous.ts';
+import { getWorkbench } from './workbench.ts';
 
 export async function createSfdxProjectJsonWithAllFields(): Promise<void> {
-  const workbench = await (await browser.getWorkbench()).wait();
   const sfdxConfig = [
     `{`,
     `\t"packageDirectories": [`,
@@ -15,7 +15,7 @@ export async function createSfdxProjectJsonWithAllFields(): Promise<void> {
     `\t"sourceBehaviorOptions": ["decomposeCustomLabelsBeta", "decomposePermissionSetBeta", "decomposeWorkflowBeta", "decomposeSharingRulesBeta"]`,
     `}`
   ].join('\n');
-  const textEditor = await getTextEditor(workbench, 'sfdx-project.json');
+  const textEditor = await getTextEditor(getWorkbench(), 'sfdx-project.json');
   await textEditor.setText(sfdxConfig);
   await textEditor.save();
   await pause();
