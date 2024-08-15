@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "target": "es2022",
+        "module": "ESNext",
+        "esModuleInterop": true,
+        "allowImportingTsExtensions": true,
+        "noEmit": true, 
+        "strict": true,
+        "skipLibCheck": true
+    }
+}

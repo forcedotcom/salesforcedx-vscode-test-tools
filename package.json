@@ -1,0 +1,23 @@
+{
+  "name": "salesforcedx-vscode-automation-tests-redhat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat.git"
+  },
+  "author": "",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues"
+  },
+  "homepage": "https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat#readme",
+  "devDependencies": {
+    "fast-glob": "^3.3.2",
+    "vscode-extension-tester": "^8.5.0"
+  }
+}
