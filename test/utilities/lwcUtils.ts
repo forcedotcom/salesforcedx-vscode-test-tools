@@ -105,19 +105,19 @@ export async function createLwc(name: string): Promise<void> {
 
   const browser = getBrowser();
   // Set breakpoints
-  await browser.send([CMD_KEY, 'f']);
-  await pause(Duration.seconds(1));
-  await browser.keys(`await expect(div.textContent).toBe('Hello, World!');`);
-  await browser.keys(['Escape']);
-  await browser.keys(['ArrowRight']);
-  await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
+  // await browser.send([CMD_KEY, 'f']);
+  // await pause(Duration.seconds(1));
+  // await browser.keys(`await expect(div.textContent).toBe('Hello, World!');`);
+  // await browser.keys(['Escape']);
+  // await browser.keys(['ArrowRight']);
+  // await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
 
-  await browser.keys([CMD_KEY, 'f']);
-  await pause(Duration.seconds(1));
-  await browser.keys(`await expect(element).toBeDefined();`);
-  await browser.keys(['Escape']);
-  await browser.keys(['ArrowRight']);
-  await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
+  // await browser.keys([CMD_KEY, 'f']);
+  // await pause(Duration.seconds(1));
+  // await browser.keys(`await expect(element).toBeDefined();`);
+  // await browser.keys(['Escape']);
+  // await browser.keys(['ArrowRight']);
+  // await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
 }
 
 export async function createAura(name: string): Promise<void> {

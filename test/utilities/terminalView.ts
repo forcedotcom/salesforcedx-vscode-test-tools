@@ -5,13 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import clipboard from 'clipboardy';
-import { TerminalView, Workbench } from 'wdio-vscode-service';
 import { Duration, log, pause } from './miscellaneous.ts';
 import { executeQuickPick } from './commandPrompt.ts';
+import { Key, TerminalView, Workbench } from 'vscode-extension-tester';
 
-import { Key } from 'webdriverio';
-const CMD_KEY = process.platform === 'darwin' ? Key.Command : Key.Control;
+const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
+
 
 export async function getTerminalView(workbench: Workbench): Promise<TerminalView> {
   const bottomBar = await workbench.getBottomBar().wait();
@@ -24,14 +23,9 @@ export async function getTerminalViewText(
   workbench: Workbench,
   seconds: Duration
 ): Promise<string> {
-  await executeQuickPick('Terminal: Focus Terminal', Duration.seconds(1));
-  await pause(seconds);
+  const terminalView = await (await getTerminalView(workbench)).wait(seconds.milliseconds);
 
-  await browser.keys([process.platform == 'darwin' ? CMD_KEY : 'Control', 'a', 'c']);
-  // runCommandFromCommandPrompt(workbench, 'Terminal: Copy Last Command Output', 2);
-
-  const terminalText = await clipboard.read();
-  return terminalText;
+  return await terminalView.getText();
 }
 
 export async function executeCommand(workbench: Workbench, command: string): Promise<TerminalView> {

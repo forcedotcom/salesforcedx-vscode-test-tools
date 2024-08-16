@@ -10,6 +10,8 @@ import path from 'path';
 import { EnvironmentSettings as Env } from './environmentSettings.ts';
 import * as utilities from './utilities/index.ts';
 import { fileURLToPath } from 'url';
+import { expect } from 'chai';
+import { QuickOpenBox, InputBox, DefaultTreeItem } from 'vscode-extension-tester';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +36,6 @@ export class TestSetup {
   public async setUp(scratchOrgEdition: utilities.OrgEdition = 'developer'): Promise<void> {
     utilities.log('');
     utilities.log(`${this.testSuiteSuffixName} - Starting TestSetup.setUp()...`);
-    await utilities.installExtensions();
     await utilities.reloadAndEnableExtensions();
     await this.setUpTestingEnvironment();
     await this.createProject(scratchOrgEdition);
@@ -95,7 +96,7 @@ export class TestSetup {
       utilities.log(`Extension ${ext.extensionId}:${ext.version ?? 'unknown'} has a bug`);
     });
 
-    await expect(uncaughtErrors.length).toBe(0);
+    await expect(uncaughtErrors.length).to.equal(0);
   }
 
   public async setUpTestingEnvironment(): Promise<void> {
@@ -140,17 +141,21 @@ export class TestSetup {
       });
 
       // Enter the project's name.
-      await this.prompt.setText(projectName ?? this.tempProjectName);
+      let inputBox = await InputBox.create();
+      await inputBox.setText(projectName ?? this.tempProjectName);
+      await inputBox.confirm();
+
       await utilities.pause(utilities.Duration.seconds(2));
 
       // Press Enter/Return.
-      await this.prompt.confirm();
+      inputBox = await InputBox.create();
+      await inputBox.confirm();
 
       // Set the location of the project.
-      const input = await this.prompt.input$;
-      await input.setValue(this.tempFolderPath!);
+      inputBox = await InputBox.create();
+      await inputBox.setText(this.tempFolderPath!);
       await utilities.pause(utilities.Duration.seconds(2));
-      await utilities.clickFilePathOkButton();
+      inputBox.confirm();
 
       // Verify the project was created and was loaded.
       await this.verifyProjectCreated(projectName ?? this.tempProjectName);

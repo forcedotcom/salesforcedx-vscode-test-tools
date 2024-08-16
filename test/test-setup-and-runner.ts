@@ -3,11 +3,14 @@ import { EnvironmentSettings } from './environmentSettings.ts';
 import path from 'path'
 import fs from 'fs/promises';
 import * as utilities from './utilities/index.ts';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+import { extensions } from './utilities/index.ts';
 
 class TestSetupAndRunner extends ExTester {
     protected static _exTestor: TestSetupAndRunner;
 
-    constructor() {
+    constructor(private spec?: string | undefined) {
         super(EnvironmentSettings.getInstance().extensionPath);
     }
 
@@ -27,7 +30,7 @@ class TestSetupAndRunner extends ExTester {
     }
     public async installExtension(extension: string, extensionsDir: string): Promise<void> {
         utilities.log(`SetUp - Started Install extension ${path.basename(extension)}`);
-        this.installVsix({useYarn: false, vsixFile: extension });
+        this.installVsix({ useYarn: false, vsixFile: extension });
     }
 
     public async installExtensions(excludeExtensions: utilities.ExtensionId[] = []): Promise<void> {
@@ -64,14 +67,15 @@ class TestSetupAndRunner extends ExTester {
                 extensions.find((refExt) => refExt.extensionId === ext?.extensionId)
             )
         ) {
-            log(
+            utilities.log(
                 `Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`
             );
             foundInstalledExtensions.forEach((ext) => {
-                log(`Extension ${ext?.extensionId} version ${ext?.version}`);
+                utilities.log(`Extension ${ext?.extensionId} version ${ext?.version}`);
             });
             return;
         }
+    }
 
     static get exTester(): TestSetupAndRunner {
         if (TestSetupAndRunner.exTester) {
@@ -82,7 +86,18 @@ class TestSetupAndRunner extends ExTester {
     }
 }
 
-const testSetupAnRunner = new TestSetupAndRunner();
+// Parse command-line arguments
+const argv = yargs(hideBin(process.argv))
+    .option('spec', {
+        alias: 's',
+        type: 'string',
+        description: 'Glob pattern for test files',
+        demandOption: false,
+    })
+    .help()
+    .argv as { spec: string | undefined };
+
+const testSetupAnRunner = new TestSetupAndRunner(argv.spec);
 
 testSetupAnRunner
     .setup()

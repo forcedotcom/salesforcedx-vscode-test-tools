@@ -5,17 +5,16 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { runCommandFromCommandPrompt } from './commandPrompt.ts';
+import { executeQuickPick, runCommandFromCommandPrompt } from './commandPrompt.ts';
 import { Duration, getTextEditor, pause } from './miscellaneous.ts';
+import { getWorkbench } from './workbench.ts';
 
 export async function createVisualforcePage(): Promise<void> {
-  const workbench = await browser.getWorkbench();
+  const workbench = getWorkbench();
 
   // Using the Command palette, run SFDX: Create Visualforce Page
-  const inputBox = await runCommandFromCommandPrompt(
-    workbench,
+  const inputBox = await executeQuickPick(
     'SFDX: Create Visualforce Page',
-    Duration.seconds(1)
   );
 
   // Set the name of the new Visualforce Page

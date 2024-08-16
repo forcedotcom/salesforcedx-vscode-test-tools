@@ -7,72 +7,50 @@
 
 import { executeQuickPick } from './commandPrompt.ts';
 import { debug, Duration, findElementByText } from './miscellaneous.ts';
-import { By, InputBox, QuickOpenBox, WebElement } from 'vscode-extension-tester';
+import { By, InputBox, QuickOpenBox, Setting, SettingsEditor, WebElement } from 'vscode-extension-tester';
 import { getBrowser, getWorkbench } from './workbench.ts';
 
+
+type Perspective = 'Workspace' | 'User';
+
 async function findAndCheckSetting(
-  id: string
-): Promise<{ checkButton: WebElement; checkButtonValue: string | null }> {
-  debug(`enter findAndCheckSetting for id: ${id}`);
-  await browser.keys(id);
-  let checkButton: WebElement | null = null;
-  let checkButtonValue: string | null = null;
+  title: string,
+  categories: string[] = [],
+  perspective: Perspective = 'Workspace'
+): Promise<{ checkButton: Setting; checkButtonValue: string | boolean | null }> {
+  debug(`enter findAndCheckSetting for id: ${title}`);
+  const settings  = await openSettings(perspective);
+  debug(`openSettings - after open`);
+  const setting = await settings.findSetting(title, ...categories);
 
-  await browser.waitUntil(
-    async () => {
-      checkButton = (await findElementByText('div', 'aria-label', id)) as WebElement;
-      if (checkButton) {
-        checkButtonValue = await checkButton.getAttribute('aria-checked');
-        debug(`found setting checkbox with value "${checkButtonValue}"`);
-        return true;
-      }
-      return false;
-    },
-    {
-      timeout: Duration.seconds(5).milliseconds,
-      timeoutMsg: `Could not find setting with name: ${id}`
-    }
-  );
-
-  if (!checkButton) {
-    throw new Error(`Could not find setting with name: ${id}`);
+  if (!setting) {
+    throw new Error(`Could not find setting with name: ${title} in catagories: ${categories.join(', ')}`);
   }
 
-  debug(`findAndCheckSetting result for ${id} found ${!!checkButton} value: ${checkButtonValue}`);
-  return { checkButton, checkButtonValue };
+  const value = await setting.getValue();
+
+  debug(`findAndCheckSetting result for ${title} found ${!!setting} value: ${value}`);
+  return { checkButton: setting, checkButtonValue: value };
 }
 
-async function openSettings<T>(
-  command: string,
-  doThis?: (settings: InputBox | QuickOpenBox) => Promise<T | void>,
-  timeout: Duration = Duration.seconds(5)
-): Promise<T> {
+async function openSettings(perspective: Perspective): Promise<SettingsEditor> {
   debug('openSettings - enter');
   const settings = await getWorkbench().openSettings();
   await settings.switchToPerspective('Workspace');
   debug('openSettings - after open');
+  return settings;
+}
 
-  const browser = getBrowser();
-  // Clear the input box
-  await browser.keys(['Escape', 'Escape']);
-
-  await browser.wait(
-    async () => {
-      const element = await browser.findElement(By.xpath(
-        '//div[@class="monaco-tl-contents group-title"]//div[text()="Commonly Used"]'
-      ));
-      return element.isDisplayed();
-    },
-    {
-      timeout: Duration.seconds(20).milliseconds,
-      timeoutMsg: 'Expected element with text "Commonly Used" to be displayed'
-    }
-  );
-
+async function openSettingsAndMaybeDo<T>(
+  perspective: Perspective,
+  doThis?: (settings: SettingsEditor) => Promise<T | void>,
+  timeout: Duration = Duration.seconds(5)
+): Promise<T> {
+  debug('openSettings - enter');
+  const settings = await openSettings(perspective);
   if (!doThis) {
     return settings as T;
   }
-  debug('openSettings - after Commonly Used wait');
 
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
@@ -89,18 +67,19 @@ async function openSettings<T>(
   return (await Promise.race([doThisPromise, timeoutPromise])) as T;
 }
 
+// should not be needed
 export async function inWorkspaceSettings<T>(
-  doThis?: (settings: InputBox | QuickOpenBox) => Promise<T | void>,
+  doThis?: (settings: SettingsEditor) => Promise<T | void>,
   timeout: Duration = Duration.seconds(5)
 ): Promise<T> {
-  return openSettings('Preferences: Open Workspace Settings', doThis, timeout);
+  return openSettingsAndMaybeDo('Workspace', doThis, timeout);
 }
 
 export async function inUserSettings<T>(
-  doThis?: (settings: InputBox | QuickOpenBox) => Promise<T | void>,
+  doThis?: (settings: SettingsEditor) => Promise<T | void>,
   timeout: Duration = Duration.seconds(5)
 ): Promise<T> {
-  return openSettings('Preferences: Open User Settings', doThis, timeout);
+  return openSettingsAndMaybeDo('User', doThis, timeout);
 }
 
 async function toggleBooleanSetting(

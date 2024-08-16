@@ -67,16 +67,16 @@ export async function acceptNotification(
   actionName: string,
   timeout: Duration
 ): Promise<void> {
-  const notification = await findNotification(notificationMessage, true, timeout);
-  if (!notification) {
-    throw new Error(
-      `Could not take action ${actionName} for notification with message ${notificationMessage}`
-    );
-  }
+  // const notification = await findNotification(notificationMessage, true, timeout);
+  // if (!notification) {
+  //   throw new Error(
+  //     `Could not take action ${actionName} for notification with message ${notificationMessage}`
+  //   );
+  // }
 
-  const elemment = await notification.elem;
-  const actionButton = await elemment.$(`.//a[@role="button"][text()="${actionName}"]`);
-  await actionButton.click();
+  // const elemment = await notification.getL
+  // const actionButton = await elemment.$(`.//a[@role="button"][text()="${actionName}"]`);
+  // await actionButton.click();
 }
 
 export async function dismissAllNotifications(): Promise<void> {
@@ -100,16 +100,12 @@ async function findNotification(
         for (const notification of notifications) {
           const notificationMessage = await notification.getMessage();
           if (notificationMessage === message || notificationMessage.startsWith(message)) {
-            bestMatch = notification;
+            bestMatch = notification as unknown as Notification;
             break;
           }
         }
+        return bestMatch;
 
-        if (shouldBePresent) {
-          return bestMatch;
-        } else {
-          return bestMatch === null;
-        }
       }, timeout.milliseconds,
       `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`
     );

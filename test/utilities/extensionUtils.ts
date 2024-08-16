@@ -56,7 +56,7 @@ export type VerifyExtensionsOptions = {
 
 const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(30);
 
-const extensions: ExtensionType[] = [
+export const extensions: ExtensionType[] = [
   {
     extensionId: 'salesforcedx-vscode',
     name: 'Salesforce Extension Pack',

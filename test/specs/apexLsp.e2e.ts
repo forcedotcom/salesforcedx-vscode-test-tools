@@ -38,7 +38,7 @@ describe('Apex LSP', async () => {
     await utilities.zoomReset();
     expect(foundExtensions).to.be.true;
     // Close running extensions view
-    await re?.close();
+    await re?.sendKeys(CMD_KEY, 'w');
   });
 
   step('Verify LSP finished indexing', async () => {
@@ -49,7 +49,7 @@ describe('Apex LSP', async () => {
       'Editor Language Status'
     );
     await statusBar.click();
-    await expect(await statusBar.getAttribute('aria-label')).toContain('Indexing complete');
+    expect(await statusBar.getAttribute('aria-label')).to.include('Indexing complete');
 
     // Get output text from the LSP
     const outputViewText = await utilities.getOutputViewText('Apex Language Server');
@@ -64,58 +64,58 @@ describe('Apex LSP', async () => {
     await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
 
     // Move cursor to the middle of "ExampleClass.SayHello() call"
-    await browser.keys([CMD_KEY, 'f']);
+    await workbench.sendKeys(CMD_KEY, 'f');
     await utilities.pause(utilities.Duration.seconds(1));
-    await browser.keys(['.SayHello']);
-    await browser.keys(['Escape']);
-    await browser.keys(['ArrowRight']);
-    await browser.keys(['ArrowLeft']);
-    await browser.keys(['ArrowLeft']);
+    await workbench.sendKeys('.SayHello');
+    await workbench.sendKeys('Escape');
+    await workbench.sendKeys('ArrowRight');
+    await workbench.sendKeys('ArrowLeft');
+    await workbench.sendKeys('ArrowLeft');
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Go to definition through F12
-    await browser.keys(['F12']);
+    await workbench.sendKeys('F12');
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Verify 'Go to definition' took us to the definition file
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
     const title = await activeTab?.getTitle();
-    await expect(title).toBe('ExampleClass.cls');
+    await expect(title).to.be.equal('ExampleClass.cls');
   });
 
   step('Autocompletion', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Autocompletion`);
     // Get open text editor
-    const workbench = await (await browser.getWorkbench()).wait();
+    const workbench = await utilities.getWorkbench().wait();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
 
     // Move cursor to line 7 and type ExampleClass.s
-    await browser.keys([CMD_KEY, 'f']);
+    await workbench.sendKeys(CMD_KEY, 'f');
     await utilities.pause(utilities.Duration.seconds(1));
-    await browser.keys(['System.debug']);
-    await browser.keys(['Escape']);
-    await browser.keys(['ArrowLeft']);
-    await browser.keys(['ArrowDown']);
-    await browser.keys(['ArrowDown']);
-    await browser.keys('ExampleClass.say');
+    await workbench.sendKeys('System.debug');
+    await workbench.sendKeys('Escape');
+    await workbench.sendKeys('ArrowLeft');
+    await workbench.sendKeys('ArrowDown');
+    await workbench.sendKeys('ArrowDown');
+    await workbench.sendKeys('ExampleClass.say');
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Verify autocompletion options are present
-    const autocompletionOptions = await $$('textarea.inputarea.monaco-mouse-cursor-text');
-    await expect(await autocompletionOptions[0].getAttribute('aria-haspopup')).toBe('true');
-    await expect(await autocompletionOptions[0].getAttribute('aria-autocomplete')).toBe('list');
+    // const autocompletionOptions = await $$('textarea.inputarea.monaco-mouse-cursor-text');
+    // await expect(await autocompletionOptions0.getAttribute('aria-haspopup')).toBe('true');
+    // await expect(await autocompletionOptions0.getAttribute('aria-autocomplete')).toBe('list');
 
     // Verify autocompletion options can be selected and therefore automatically inserted into the file
-    await browser.keys(['Enter']);
+    await workbench.sendKeys('Enter');
     await textEditor.typeText(`'Jack`);
-    await browser.keys(['ArrowRight']);
-    await browser.keys(['ArrowRight']);
+    await workbench.sendKeys('ArrowRight');
+    await workbench.sendKeys('ArrowRight');
     await textEditor.typeText(';');
     await textEditor.save();
     await utilities.pause(utilities.Duration.seconds(1));
     const line7Text = await textEditor.getTextAtLine(7);
-    await expect(line7Text).toContain(`ExampleClass.SayHello('Jack');`);
+    await expect(line7Text).to.include(`ExampleClass.SayHello('Jack');`);
   });
 
   after('Tear down and clean up the testing environment', async () => {

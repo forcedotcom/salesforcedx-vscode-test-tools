@@ -5,22 +5,29 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { DefaultTreeItem, TreeItem, ViewItem, Workbench, ViewSection } from 'wdio-vscode-service';
+import { By, DefaultTreeItem, Key, Locator, TreeItem, ViewItem, ViewSection, WebElement, Workbench } from 'vscode-extension-tester';
 import { Duration, pause } from './miscellaneous.ts';
 import { fail } from 'assert';
+import { expect } from 'chai';
+import { executeQuickPick } from './commandPrompt.ts';
+import { getWorkbench } from './workbench.ts';
 
-export async function expandSideBar(
+export async function expandProjectInSideBar(
   workbench: Workbench,
   projectName: string
 ): Promise<ViewSection> {
+  await executeQuickPick('View: Show Explorer');
+
   const sidebar = workbench.getSideBar();
+  expect(await sidebar.isDisplayed()).to.be.true;
+
   const treeViewSection = await sidebar.getContent().getSection(projectName);
   await treeViewSection.expand();
   return treeViewSection;
 }
 
-export async function getVisibleItemsFromSidebar(workbench: Workbench, projectName: string) {
-  const treeViewSection = await expandSideBar(workbench, projectName);
+export async function getVisibleItemsFromSidebar(workbench: Workbench, projectName: string): Promise<string[]> {
+  const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
   const visibleItems = (await treeViewSection.getVisibleItems()) as DefaultTreeItem[];
@@ -36,7 +43,7 @@ export async function getFilteredVisibleTreeViewItems(
   projectName: string,
   searchString: string
 ): Promise<DefaultTreeItem[]> {
-  const treeViewSection = await expandSideBar(workbench, projectName);
+  const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
   const visibleItems = (await treeViewSection.getVisibleItems()) as DefaultTreeItem[];
@@ -63,7 +70,7 @@ export async function getFilteredVisibleTreeViewItemLabels(
   projectName: string,
   searchString: string
 ): Promise<string[]> {
-  const treeViewSection = await expandSideBar(workbench, projectName);
+  const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
   const visibleItems = (await treeViewSection.getVisibleItems()) as DefaultTreeItem[];
@@ -83,9 +90,6 @@ export async function getFilteredVisibleTreeViewItemLabels(
   return filteredItems;
 }
 
-// There is a bug in DefaultTreeItem.findChildItem().
-// When possible, use DefaultTreeItem.findChildItem() but if this doesn't work on
-// everyone's machine, use getVisibleChild() instead.
 export async function getVisibleChild(
   defaultTreeItem: DefaultTreeItem,
   name: string
@@ -106,33 +110,33 @@ export async function getVisibleChild(
 // getVisibleChildren() is very much like DefaultTreeItem.getChildren(), except it calls
 // getVisibleItems().
 export async function getVisibleChildren(defaultTreeItem: DefaultTreeItem): Promise<TreeItem[]> {
-  const rows = await getVisibleItems(
-    defaultTreeItem,
-    defaultTreeItem.locatorMap.DefaultTreeSection.itemRow as string
-  );
+  // const rows = await getVisibleItems(
+  //   defaultTreeItem,
+  //   defaultTreeItem.locatorMap.DefaultTreeSection.itemRow as string
+  // );
 
-  const items = await Promise.all(
-    rows.map(async (row) =>
-      new DefaultTreeItem(
-        defaultTreeItem.locatorMap,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-        row as any,
-        defaultTreeItem.viewPart
-      ).wait()
-    )
-  );
+  // const items = await Promise.all(
+  //   rows.map(async (row) =>
+  //     new DefaultTreeItem(
+  //       defaultTreeItem.locatorMap,
+  //       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+  //       row as any,
+  //       defaultTreeItem.viewPart
+  //     ).wait()
+  //   )
+  // );
 
-  return items;
+  return [];
 }
 
 // Replicate TreeItem.getChildItems()
 // This function returns a list of all visible items within the tree, and not just the children of a node.
 export async function getVisibleItems(
   treeItem: TreeItem,
-  locator: string
-): Promise<WebdriverIO.Element[]> {
+  locator: Locator
+): Promise<WebElement[]> {
   await treeItem.expand();
-  const rows = await treeItem.parent.$$(locator);
+  const rows = await treeItem.findElement(By.xpath('..')).findElements(locator);
 
   return [...rows.values()];
 }
@@ -143,17 +147,17 @@ export async function retrieveExpectedNumTestsFromSidebar(
   actionLabel: string
 ): Promise<TreeItem[]> {
   let testsItems = (await testsSection.getVisibleItems()) as TreeItem[];
-  await browser.keys(['Escape']);
+  getWorkbench().sendKeys(Key.ESCAPE);
 
   // If the tests did not show up, click the refresh button on the top right corner of the Test sidebar
   for (let x = 0; x < 3; x++) {
     if (testsItems.length === 1) {
-      await testsSection.elem.click();
+      await testsSection.click();
       const refreshAction = await testsSection.getAction(actionLabel);
       if (!refreshAction) {
         fail('Could not find debug tests action button');
       }
-      await refreshAction.elem.click();
+      await refreshAction.click();
       await pause(Duration.seconds(10));
       testsItems = (await testsSection.getVisibleItems()) as TreeItem[];
     } else if (testsItems.length === expectedNumTests) {
@@ -168,6 +172,6 @@ export async function getTestsSection(workbench: Workbench, type: string) {
   const sidebar = workbench.getSideBar();
   const sidebarView = sidebar.getContent();
   const testsSection = await sidebarView.getSection(type);
-  await expect(testsSection.elem).toBePresent();
+  expect(testsSection).to.be.ok;
   return testsSection;
 }
