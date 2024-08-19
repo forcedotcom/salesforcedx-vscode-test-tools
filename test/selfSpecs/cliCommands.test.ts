@@ -47,15 +47,18 @@ describe('CLI Commands', async () => {
     const orgListResult = await utilities.orgList();
     expect(orgListResult.exitCode).to.equal(0);
     const orgs = JSON.parse(orgListResult.stdout);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(orgs).to.be.ok;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scratchOrg = orgs.result.scratchOrgs.find((org: any) => org.alias === 'foo');
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(scratchOrg).to.be.ok;
   });
 
   step('Display org using org display', async () => {
     const orgDisplayResult = await utilities.orgDisplay('foo');
     const org = JSON.parse(orgDisplayResult.stdout);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(org).to.be.ok;
   });
 

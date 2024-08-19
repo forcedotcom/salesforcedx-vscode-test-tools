@@ -1,7 +1,7 @@
 import { Duration, isDuration, log, pause } from './miscellaneous.ts';
 import { executeQuickPick } from './commandPrompt.ts';
 import { PredicateWithTimeout } from './predicates.ts';
-import { ActivityBar, BottomBarPanel, Browser, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
 
 export function getWorkbench(): Workbench {
   return new Workbench();

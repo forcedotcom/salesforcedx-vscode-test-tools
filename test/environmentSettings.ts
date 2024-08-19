@@ -16,9 +16,9 @@ const __dirname = path.dirname(__filename);
 export class EnvironmentSettings {
   private static _instance: EnvironmentSettings;
 
-  private _vscodeVersion = 'stable';
+  private _vscodeVersion = 'latest';
   private _specFiles = [
-    './specs/**/*.e2e.ts'
+    './test/specs/**/*.e2e.ts'
     // OR
     // './specs/**/anInitialSuite.e2e.ts',
     // './specs/**/apexLsp.e2e.ts',
@@ -54,12 +54,12 @@ export class EnvironmentSettings {
     this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
 
     if (process.env.SPEC_FILES) {
-      this._specFiles = ['./specs/**/' + process.env.SPEC_FILES];
+      this._specFiles = ['./test/specs/**/' + process.env.SPEC_FILES];
     }
 
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
     this._devHubUserName = process.env.DEV_HUB_USER_NAME || this._devHubUserName;
-    this._extensionPath = process.env.TEST_RESOURCES || this._extensionPath;
+    this._extensionPath = process.env.EXTENSION_PATH || this._extensionPath;
     this._throttleFactor = parseInt(process.env.THROTTLE_FACTOR!) || this._throttleFactor;
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
     this._orgId = process.env.ORG_ID || this._orgId;

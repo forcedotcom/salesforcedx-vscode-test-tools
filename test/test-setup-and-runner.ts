@@ -10,17 +10,14 @@ import { extensions } from './utilities/index.ts';
 class TestSetupAndRunner extends ExTester {
     protected static _exTestor: TestSetupAndRunner;
 
-    constructor(private spec?: string | undefined) {
-        super(EnvironmentSettings.getInstance().extensionPath);
+    constructor(private extensionPath?: string | undefined, private spec?: string | undefined) {
+        super(extensionPath);
     }
 
     public async setup(): Promise<void> {
         await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
         await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
         await this.installExtensions();
-        // Install extensions or any other setup
-        // await tester.installVsix('path/to/your/extension.vsix');
-        // await tester.installFromMarketplace('publisher.extension-id');
     }
 
     public async runTests(): Promise<number> {
@@ -28,9 +25,9 @@ class TestSetupAndRunner extends ExTester {
         const resources = useExistingProject ? [useExistingProject] : [];
         return super.runTests(EnvironmentSettings.getInstance().specFiles, { resources });
     }
-    public async installExtension(extension: string, extensionsDir: string): Promise<void> {
+    public async installExtension(extension: string): Promise<void> {
         utilities.log(`SetUp - Started Install extension ${path.basename(extension)}`);
-        this.installVsix({ useYarn: false, vsixFile: extension });
+        await this.installVsix({ useYarn: false, vsixFile: extension });
     }
 
     public async installExtensions(excludeExtensions: utilities.ExtensionId[] = []): Promise<void> {
@@ -75,6 +72,50 @@ class TestSetupAndRunner extends ExTester {
             });
             return;
         }
+
+        const extensionsVsixs = utilities.getVsixFilesFromDir(extensionsDir);
+        if (extensionsVsixs.length === 0) {
+            throw new Error(`No vsix files were found in dir ${extensionsDir}`);
+        }
+
+        const mergeExcluded = Array.from(
+            new Set([
+                ...excludeExtensions,
+                ...extensions.filter((ext) => ext.shouldInstall === 'never').map((ext) => ext.extensionId)
+            ])
+        );
+
+        // Refactored part to use the extensions array
+        extensionsVsixs.forEach((vsix) => {
+            const match = path
+                .basename(vsix)
+                .match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+            if (match?.groups) {
+                const { extension, version } = match.groups;
+                const foundExtension = extensions.find((e) => e.extensionId === extension);
+                if (foundExtension) {
+                    foundExtension.vsixPath = vsix;
+                    // assign 'never' to this extension if its id is included in excluedExtensions
+                    foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId)
+                        ? 'never'
+                        : 'always';
+                    // if not installing, don't verify, otherwise use default value
+                    foundExtension.shouldVerifyActivation =
+                        foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
+                    utilities.log(
+                        `SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`
+                    );
+                }
+            }
+        });
+
+        // Iterate over the extensions array to install extensions
+        for (const extensionObj of extensions.filter(
+            (ext) => ext.vsixPath !== '' && ext.shouldInstall !== 'never'
+        )) {
+            await this.installExtension(extensionObj.vsixPath);
+        }
+
     }
 
     static get exTester(): TestSetupAndRunner {
@@ -97,7 +138,7 @@ const argv = yargs(hideBin(process.argv))
     .help()
     .argv as { spec: string | undefined };
 
-const testSetupAnRunner = new TestSetupAndRunner(argv.spec);
+const testSetupAnRunner = new TestSetupAndRunner(EnvironmentSettings.getInstance().extensionPath, argv.spec);
 
 testSetupAnRunner
     .setup()

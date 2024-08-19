@@ -4,10 +4,11 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
- 
+
 import { expect } from 'chai';
 import * as utilities from '../utilities/index.ts'; // Assuming utilities is a module in your project
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function showNotification(message: string) {
   // await utilities.getBrowser().executeWorkbench(async (vscode, message) => {
   //   vscode.window.showInformationMessage(`${message}`);
@@ -35,6 +36,7 @@ describe('Notifications', async () => {
       'Modify the file and retrieve again',
       utilities.Duration.seconds(2)
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isPresent).to.be.true;
     await utilities.dismissNotification('Modify the file and retrieve again');
     await utilities.pause(utilities.Duration.seconds(1));
@@ -42,6 +44,7 @@ describe('Notifications', async () => {
       'Modify the file and retrieve again',
       utilities.Duration.seconds(1)
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isNotPresent).to.be.true;
     await utilities.pause(utilities.Duration.seconds(2));
   });
@@ -51,6 +54,7 @@ describe('Notifications', async () => {
       'Choose an action:',
       utilities.Duration.seconds(1)
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isPresent).to.be.true;
     await utilities.pause(utilities.Duration.seconds(1));
 
@@ -60,6 +64,7 @@ describe('Notifications', async () => {
       'Choose an action:',
       utilities.Duration.seconds(5)
     );
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isNotPresent).to.be.true;
   });
 });

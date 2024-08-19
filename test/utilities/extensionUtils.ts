@@ -10,7 +10,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import FastGlob from 'fast-glob';
 import * as utilities from './index.ts';
-import { By, Editor, EditorView } from 'vscode-extension-tester';
+import { By, Editor } from 'vscode-extension-tester';
 
 export type ExtensionId =
   | 'salesforcedx-vscode'

@@ -106,7 +106,6 @@ export async function createApexClassWithBugs(): Promise<void> {
 
 export async function createAnonymousApexFile(): Promise<void> {
   const workbench = getWorkbench();
-  const editorView = workbench.getEditorView();
 
   // Using the Command palette, run File: New File...
   const inputBox = await executeQuickPick('Create: New File...', Duration.seconds(1));

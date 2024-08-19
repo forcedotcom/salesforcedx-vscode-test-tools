@@ -4,7 +4,7 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "project": "./test/tsconfig.json"
+    "project": "./tsconfig.json"
   },
   "env": {
     "es2022": true,

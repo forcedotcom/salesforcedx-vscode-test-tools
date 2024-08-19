@@ -19,6 +19,7 @@ export async function verifyOrgBrowserIsOpen(label: string): Promise<void> {
     'aria-label',
     label
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(orgBrowserLabelEl).to.be.ok;
 }
 

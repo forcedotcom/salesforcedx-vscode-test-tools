@@ -19,6 +19,8 @@ export async function expandProjectInSideBar(
   await executeQuickPick('View: Show Explorer');
 
   const sidebar = workbench.getSideBar();
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(await sidebar.isDisplayed()).to.be.true;
 
   const treeViewSection = await sidebar.getContent().getSection(projectName);
@@ -110,6 +112,7 @@ export async function getVisibleChild(
 // getVisibleChildren() is very much like DefaultTreeItem.getChildren(), except it calls
 // getVisibleItems().
 export async function getVisibleChildren(defaultTreeItem: DefaultTreeItem): Promise<TreeItem[]> {
+  console.log(`${defaultTreeItem}`)
   // const rows = await getVisibleItems(
   //   defaultTreeItem,
   //   defaultTreeItem.locatorMap.DefaultTreeSection.itemRow as string
@@ -147,7 +150,7 @@ export async function retrieveExpectedNumTestsFromSidebar(
   actionLabel: string
 ): Promise<TreeItem[]> {
   let testsItems = (await testsSection.getVisibleItems()) as TreeItem[];
-  getWorkbench().sendKeys(Key.ESCAPE);
+  await getWorkbench().sendKeys(Key.ESCAPE);
 
   // If the tests did not show up, click the refresh button on the top right corner of the Test sidebar
   for (let x = 0; x < 3; x++) {
@@ -172,6 +175,7 @@ export async function getTestsSection(workbench: Workbench, type: string) {
   const sidebar = workbench.getSideBar();
   const sidebarView = sidebar.getContent();
   const testsSection = await sidebarView.getSection(type);
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(testsSection).to.be.ok;
   return testsSection;
 }

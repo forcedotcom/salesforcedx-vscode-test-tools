@@ -6,11 +6,7 @@
  */
 
 import { Duration, log, pause } from './miscellaneous.ts';
-import { executeQuickPick } from './commandPrompt.ts';
-import { Key, TerminalView, Workbench } from 'vscode-extension-tester';
-
-const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
-
+import { TerminalView, Workbench } from 'vscode-extension-tester';
 
 export async function getTerminalView(workbench: Workbench): Promise<TerminalView> {
   const bottomBar = await workbench.getBottomBar().wait();

@@ -78,6 +78,7 @@ describe('An Initial Suite', async () => {
     }
 
     expect(expectedSfdxCommandsFound).to.be.equal(3);
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(unexpectedSfdxCommandWasFound).to.be.false;
 
     // Escape out of the pick list.

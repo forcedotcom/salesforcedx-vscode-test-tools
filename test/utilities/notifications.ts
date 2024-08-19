@@ -67,6 +67,8 @@ export async function acceptNotification(
   actionName: string,
   timeout: Duration
 ): Promise<void> {
+  console.log(`${notificationMessage}, ${actionName}, ${timeout}`);
+ 
   // const notification = await findNotification(notificationMessage, true, timeout);
   // if (!notification) {
   //   throw new Error(

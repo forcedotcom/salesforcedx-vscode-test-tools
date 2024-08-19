@@ -155,7 +155,7 @@ export class TestSetup {
       inputBox = await InputBox.create();
       await inputBox.setText(this.tempFolderPath!);
       await utilities.pause(utilities.Duration.seconds(2));
-      inputBox.confirm();
+      await inputBox.confirm();
 
       // Verify the project was created and was loaded.
       await this.verifyProjectCreated(projectName ?? this.tempProjectName);

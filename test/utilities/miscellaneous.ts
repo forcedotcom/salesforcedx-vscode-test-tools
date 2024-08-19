@@ -134,6 +134,7 @@ export async function createCommand(
     `SFDX: Create ${type} successfully ran`,
     Duration.minutes(10)
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(successNotificationWasFound).to.be.true;
 
   const outputPanelText = await attemptToFindOutputPanelText(
@@ -141,6 +142,7 @@ export async function createCommand(
     `Finished SFDX: Create ${type}`,
     10
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(outputPanelText).not.to.be.ok;
   const typePath = path.join(`force-app`, `main`, `default`, folder, `${name}.${extension}`);
   expect(outputPanelText).to.include(`create ${typePath}`);

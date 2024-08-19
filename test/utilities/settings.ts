@@ -5,10 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { executeQuickPick } from './commandPrompt.ts';
-import { debug, Duration, findElementByText } from './miscellaneous.ts';
-import { By, InputBox, QuickOpenBox, Setting, SettingsEditor, WebElement } from 'vscode-extension-tester';
-import { getBrowser, getWorkbench } from './workbench.ts';
+import { debug, Duration } from './miscellaneous.ts';
+import { Setting, SettingsEditor } from 'vscode-extension-tester';
+import { getWorkbench } from './workbench.ts';
 
 
 type Perspective = 'Workspace' | 'User';
@@ -36,7 +35,7 @@ async function findAndCheckSetting(
 async function openSettings(perspective: Perspective): Promise<SettingsEditor> {
   debug('openSettings - enter');
   const settings = await getWorkbench().openSettings();
-  await settings.switchToPerspective('Workspace');
+  await settings.switchToPerspective(perspective);
   debug('openSettings - after open');
   return settings;
 }

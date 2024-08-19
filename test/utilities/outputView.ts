@@ -5,13 +5,10 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import clipboard from 'clipboardy';
 import { debug, Duration, pause } from './miscellaneous.ts';
 import { dismissAllNotifications } from './notifications.ts';
 import { executeQuickPick } from './commandPrompt.ts';
-import { BottomBarPanel, Key, OutputView } from 'vscode-extension-tester';
-
-const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
+import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
 
 export async function selectOutputChannel(name: string): Promise<OutputView> {
   // Wait for all notifications to go away.  If there is a notification that is overlapping and hiding the Output channel's

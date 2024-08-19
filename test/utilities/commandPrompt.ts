@@ -110,7 +110,8 @@ export async function waitForQuickPick(
       try {
         await findQuickPickItem(prompt, pickListItem, false, true);
         return true;
-      } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
         return false;
       }
     },
@@ -169,7 +170,7 @@ export async function clickFilePathOkButton(): Promise<void> {
   }
 
   await pause(Duration.milliseconds(500));
-  okButton.sendKeys(Key.ENTER);
+  await okButton.sendKeys(Key.ENTER);
   await pause(Duration.seconds(1));
 
   const buttons = await browser.findElements(By.css('a.monaco-button.monaco-text-button'));

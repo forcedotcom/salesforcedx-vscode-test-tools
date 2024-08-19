@@ -36,6 +36,8 @@ describe('Apex LSP', async () => {
       utilities.getExtensionsToVerifyActive((ext) => ext.extensionId === 'salesforcedx-vscode-apex')
     );
     await utilities.zoomReset();
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(foundExtensions).to.be.true;
     // Close running extensions view
     await re?.sendKeys(CMD_KEY, 'w');
@@ -60,7 +62,7 @@ describe('Apex LSP', async () => {
   step('Go to Definition', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Go to Definition`);
     // Get open text editor
-    const workbench = await utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
 
     // Move cursor to the middle of "ExampleClass.SayHello() call"
@@ -81,7 +83,7 @@ describe('Apex LSP', async () => {
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
     const title = await activeTab?.getTitle();
-    await expect(title).to.be.equal('ExampleClass.cls');
+    expect(title).to.be.equal('ExampleClass.cls');
   });
 
   step('Autocompletion', async () => {
@@ -115,7 +117,7 @@ describe('Apex LSP', async () => {
     await textEditor.save();
     await utilities.pause(utilities.Duration.seconds(1));
     const line7Text = await textEditor.getTextAtLine(7);
-    await expect(line7Text).to.include(`ExampleClass.SayHello('Jack');`);
+    expect(line7Text).to.include(`ExampleClass.SayHello('Jack');`);
   });
 
   after('Tear down and clean up the testing environment', async () => {
@@ -125,7 +127,5 @@ describe('Apex LSP', async () => {
     await testSetup?.tearDown();
   });
 });
-function step(arg0: string, arg1: () => Promise<void>) {
-  throw new Error('Function not implemented.');
-}
+
 
