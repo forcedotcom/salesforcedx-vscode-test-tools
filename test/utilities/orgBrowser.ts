@@ -5,8 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { WebElement } from 'vscode-extension-tester';
-import { executeQuickPick } from './commandPrompt.ts';
-import { Duration, findElementByText } from './miscellaneous.ts';
+import { executeQuickPick } from './commandPrompt';
+import { Duration, findElementByText } from './miscellaneous';
 import { expect } from 'chai';
 
 export async function openOrgBrowser(wait: Duration = Duration.seconds(1)): Promise<void> {

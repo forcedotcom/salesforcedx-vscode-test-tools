@@ -1,8 +1,8 @@
 import spawn from 'cross-spawn';
 import { SpawnOptionsWithoutStdio } from 'child_process';
-import { debug, log } from './miscellaneous.ts';
-import { OrgEdition, SfCommandRunResults } from './types.ts';
-import { EnvironmentSettings } from '../environmentSettings.ts';
+import { debug, log } from './miscellaneous';
+import { OrgEdition, SfCommandRunResults } from './types';
+import { EnvironmentSettings } from '../environmentSettings';
 
 export type NONE = 'NONE';
 

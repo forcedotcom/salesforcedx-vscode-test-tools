@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { step } from 'mocha-steps';
-import * as utilities from '../utilities/index.ts';
+import * as utilities from '../utilities/index';
 
 describe('Settings', async () => {
   step('Test Settings', async () => {

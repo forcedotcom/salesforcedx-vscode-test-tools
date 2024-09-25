@@ -6,9 +6,9 @@
  */
 
 // import { Key } from 'vscode-extension-tester';
-import { executeQuickPick } from './commandPrompt.ts';
-import { Duration, getTextEditor, log, pause } from './miscellaneous.ts';
-import { getWorkbench } from './workbench.ts';
+import { executeQuickPick } from './commandPrompt';
+import { Duration, getTextEditor, log, pause } from './miscellaneous';
+import { getWorkbench } from './workbench';
 
 // const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 

@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration } from './miscellaneous.ts';
-import { getBrowser, getWorkbench } from './workbench.ts';
-import { executeQuickPick } from './commandPrompt.ts';
+import { Duration } from './miscellaneous';
+import { getBrowser, getWorkbench } from './workbench';
+import { executeQuickPick } from './commandPrompt';
 
 export async function waitForNotificationToGoAway(
   notificationMessage: string,
@@ -68,7 +68,7 @@ export async function acceptNotification(
   timeout: Duration
 ): Promise<void> {
   console.log(`${notificationMessage}, ${actionName}, ${timeout}`);
- 
+
   // const notification = await findNotification(notificationMessage, true, timeout);
   // if (!notification) {
   //   throw new Error(

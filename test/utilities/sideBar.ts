@@ -6,11 +6,11 @@
  */
 
 import { By, DefaultTreeItem, Key, Locator, TreeItem, ViewItem, ViewSection, WebElement, Workbench } from 'vscode-extension-tester';
-import { Duration, pause } from './miscellaneous.ts';
+import { Duration, pause } from './miscellaneous';
 import { fail } from 'assert';
 import { expect } from 'chai';
-import { executeQuickPick } from './commandPrompt.ts';
-import { getWorkbench } from './workbench.ts';
+import { executeQuickPick } from './commandPrompt';
+import { getWorkbench } from './workbench';
 
 export async function expandProjectInSideBar(
   workbench: Workbench,
@@ -19,7 +19,7 @@ export async function expandProjectInSideBar(
   await executeQuickPick('View: Show Explorer');
 
   const sidebar = workbench.getSideBar();
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(await sidebar.isDisplayed()).to.be.true;
 

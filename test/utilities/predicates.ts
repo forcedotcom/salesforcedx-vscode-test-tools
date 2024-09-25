@@ -1,6 +1,6 @@
 import { Locator } from 'vscode-extension-tester';
-import { Duration } from './miscellaneous.ts';
-import { getBrowser } from './workbench.ts';
+import { Duration } from './miscellaneous';
+import { getBrowser } from './workbench';
 
 export interface PredicateWithTimeout {
   predicate: () => Promise<boolean>;

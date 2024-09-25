@@ -7,8 +7,8 @@
 
 import fs from 'fs';
 import { step } from 'mocha-steps';
-import { EnvironmentSettings } from '../environmentSettings.ts';
-import * as utilities from '../utilities/index.ts';
+import { EnvironmentSettings } from '../environmentSettings';
+import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 
 describe('CLI Commands', async () => {

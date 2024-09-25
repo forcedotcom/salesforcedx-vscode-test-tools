@@ -1,6 +1,3 @@
 {
-  "loader": "ts-node/esm",
-  "require": "ts-node/register",
-  "extension": ["ts"],
-  "spec": "test/**/*.ts"
+  "timeout": 240000
 }

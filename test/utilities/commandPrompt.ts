@@ -5,8 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { debug, Duration, log, pause } from './miscellaneous.ts';
-import { getBrowser, getWorkbench } from './workbench.ts';
+import { debug, Duration, log, pause } from './miscellaneous';
+import { getBrowser, getWorkbench } from './workbench';
 import { By, InputBox, Key, QuickOpenBox, Workbench } from 'vscode-extension-tester';
 
 export async function openCommandPromptWithCommand(

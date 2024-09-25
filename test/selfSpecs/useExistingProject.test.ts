@@ -6,8 +6,8 @@
  */
 
 import { step } from 'mocha-steps';
-import { TestSetup } from '../testSetup.ts';
-import * as utilities from '../utilities/index.ts';
+import { TestSetup } from '../testSetup';
+import * as utilities from '../utilities/index';
 
 describe('Use existing project', async () => {
   let testSetup: TestSetup;

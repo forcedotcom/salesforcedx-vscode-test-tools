@@ -6,8 +6,8 @@
  */
 import * as fs from 'fs';
 import path from 'path';
-import { TestSetup } from '../testSetup.ts';
-import { log } from './miscellaneous.ts';
+import { TestSetup } from '../testSetup';
+import { log } from './miscellaneous';
 import FastGlob from 'fast-glob';
 
 export function createFolder(folderPath: string): void {

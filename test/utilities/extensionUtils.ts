@@ -5,11 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration, log } from './miscellaneous.ts';
+import { Duration, log } from './miscellaneous';
 import fs from 'fs/promises';
 import path from 'path';
 import FastGlob from 'fast-glob';
-import * as utilities from './index.ts';
+import * as utilities from './index';
 import { By, Editor } from 'vscode-extension-tester';
 
 export type ExtensionId =

@@ -6,15 +6,15 @@
  */
 
 import os from 'os';
-import { EnvironmentSettings } from '../environmentSettings.ts';
-import { attemptToFindOutputPanelText, clearOutputView } from './outputView.ts';
-import { executeQuickPick, findQuickPickItem } from './commandPrompt.ts';
-import { notificationIsPresentWithTimeout } from './notifications.ts';
+import { EnvironmentSettings } from '../environmentSettings';
+import { attemptToFindOutputPanelText, clearOutputView } from './outputView';
+import { executeQuickPick, findQuickPickItem } from './commandPrompt';
+import { notificationIsPresentWithTimeout } from './notifications';
 import * as DurationKit from '@salesforce/kit';
 import path from 'path';
-import { PredicateWithTimeout } from './predicates.ts';
+import { PredicateWithTimeout } from './predicates';
 import { By, TextEditor, WebElement, Workbench } from 'vscode-extension-tester';
-import { getBrowser, getWorkbench } from './workbench.ts';
+import { getBrowser, getWorkbench } from './workbench';
 import { expect } from 'chai';
 
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {

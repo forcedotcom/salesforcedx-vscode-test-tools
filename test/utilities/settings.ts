@@ -5,9 +5,9 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { debug, Duration } from './miscellaneous.ts';
+import { debug, Duration } from './miscellaneous';
 import { Setting, SettingsEditor } from 'vscode-extension-tester';
-import { getWorkbench } from './workbench.ts';
+import { getWorkbench } from './workbench';
 
 
 type Perspective = 'Workspace' | 'User';
@@ -18,7 +18,7 @@ async function findAndCheckSetting(
   perspective: Perspective = 'Workspace'
 ): Promise<{ checkButton: Setting; checkButtonValue: string | boolean | null }> {
   debug(`enter findAndCheckSetting for id: ${title}`);
-  const settings  = await openSettings(perspective);
+  const settings = await openSettings(perspective);
   debug(`openSettings - after open`);
   const setting = await settings.findSetting(title, ...categories);
 

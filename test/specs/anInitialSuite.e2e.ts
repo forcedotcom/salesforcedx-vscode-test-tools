@@ -5,8 +5,8 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { step } from 'mocha-steps';
-import { TestSetup } from '../testSetup.ts';
-import * as utilities from '../utilities/index.ts';
+import { TestSetup } from '../testSetup';
+import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { Key } from 'vscode-extension-tester';
 

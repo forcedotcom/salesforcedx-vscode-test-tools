@@ -4,9 +4,9 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { TestSetup } from '../testSetup.ts';
-import * as utilities from '../utilities/index.ts';
-import { EnvironmentSettings } from '../environmentSettings.ts';
+import { TestSetup } from '../testSetup';
+import * as utilities from '../utilities/index';
+import { EnvironmentSettings } from '../environmentSettings';
 import { Key } from 'vscode-extension-tester';
 import { expect } from 'chai';
 

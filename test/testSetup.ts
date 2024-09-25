@@ -7,14 +7,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import { EnvironmentSettings as Env } from './environmentSettings.ts';
-import * as utilities from './utilities/index.ts';
-import { fileURLToPath } from 'url';
+import { EnvironmentSettings as Env } from './environmentSettings';
+import * as utilities from './utilities/index';
 import { expect } from 'chai';
 import { QuickOpenBox, InputBox, DefaultTreeItem } from 'vscode-extension-tester';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export class TestSetup {
   public testSuiteSuffixName: string;

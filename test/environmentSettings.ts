@@ -7,36 +7,32 @@
 
 import * as fs from 'fs';
 import { join } from 'path';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { LOG_LEVELS, LogLevel } from './utilities/constants.ts';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { LOG_LEVELS, LogLevel } from './utilities/constants';
 
 export class EnvironmentSettings {
   private static _instance: EnvironmentSettings;
 
   private _vscodeVersion = 'latest';
   private _specFiles = [
-    './test/specs/**/*.e2e.ts'
+    './lib/specs/**/*.e2e.js'
     // OR
-    // './specs/**/anInitialSuite.e2e.ts',
-    // './specs/**/apexLsp.e2e.ts',
-    // './specs/**/apexReplayDebugger.e2e.ts',
-    // './specs/**/auraLsp.e2e.ts',
-    // './specs/**/authentication.e2e.ts',
-    // './specs/**/debugApexTests.e2e.ts',
-    // './specs/**/deployAndRetrieve.e2e.ts',
-    // './specs/**/lwcLsp.e2e.ts',
-    // './specs/**/manifestBuilder.e2e.ts',
-    // './specs/**/orgBrowser.e2e.ts',
-    // './specs/**/pushAndPull.e2e.ts',
-    // './specs/**/runApexTests.e2e.ts',
-    // './specs/**/sObjectsDefinitions.e2e.ts',
-    // './specs/**/templates.e2e.ts',
-    // './specs/**/trailApexReplayDebugger.e2e.ts',
-    // './specs/**/visualforceLsp.e2e.ts',
-    // './specs/**/sfdxProjectJson.e2e.ts'
+    // './specs/**/anInitialSuite.e2e.js',
+    // './specs/**/apexLsp.e2e.js',
+    // './specs/**/apexReplayDebugger.e2e.js',
+    // './specs/**/auraLsp.e2e.js',
+    // './specs/**/authentication.e2e.js',
+    // './specs/**/debugApexTests.e2e.js',
+    // './specs/**/deployAndRetrieve.e2e.js',
+    // './specs/**/lwcLsp.e2e.js',
+    // './specs/**/manifestBuilder.e2e.js',
+    // './specs/**/orgBrowser.e2e.js',
+    // './specs/**/pushAndPull.e2e.js',
+    // './specs/**/runApexTests.e2e.js',
+    // './specs/**/sObjectsDefinitions.e2e.js',
+    // './specs/**/templates.e2e.js',
+    // './specs/**/trailApexReplayDebugger.e2e.js',
+    // './specs/**/visualforceLsp.e2e.js',
+    // './specs/**/sfdxProjectJson.e2e.js'
   ];
   private _devHubAliasName = 'vscodeOrg';
   private _devHubUserName = 'svcideebot@salesforce.com';
@@ -54,7 +50,7 @@ export class EnvironmentSettings {
     this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
 
     if (process.env.SPEC_FILES) {
-      this._specFiles = ['./test/specs/**/' + process.env.SPEC_FILES];
+      this._specFiles = ['./specs/**/' + process.env.SPEC_FILES];
     }
 
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;

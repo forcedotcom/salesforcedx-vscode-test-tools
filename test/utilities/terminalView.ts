@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration, log, pause } from './miscellaneous.ts';
+import { Duration, log, pause } from './miscellaneous';
 import { TerminalView, Workbench } from 'vscode-extension-tester';
 
 export async function getTerminalView(workbench: Workbench): Promise<TerminalView> {

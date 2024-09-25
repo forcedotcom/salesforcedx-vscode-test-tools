@@ -1,5 +1,5 @@
-import { getTextEditor, pause } from './miscellaneous.ts';
-import { getWorkbench } from './workbench.ts';
+import { getTextEditor, pause } from './miscellaneous';
+import { getWorkbench } from './workbench';
 
 export async function createSfdxProjectJsonWithAllFields(): Promise<void> {
   const sfdxConfig = [

@@ -6,8 +6,8 @@
  */
 
 import { WebElement } from 'vscode-extension-tester';
-import { Duration, debug, pause } from './miscellaneous.ts';
-import { getWorkbench } from './workbench.ts';
+import { Duration, debug, pause } from './miscellaneous';
+import { getWorkbench } from './workbench';
 
 export async function getStatusBarItemWhichIncludes(title: string): Promise<WebElement> {
   const workbench = getWorkbench();
