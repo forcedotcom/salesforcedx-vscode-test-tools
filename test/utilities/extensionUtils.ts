@@ -148,7 +148,8 @@ export async function showRunningExtensions(): Promise<Editor | undefined> {
     },
     5000, // Timeout after 5 seconds
     'Expected "Running Extensions" tab to be visible after 5 seconds',
-    500);
+    500
+  );
   return re;
 }
 
@@ -278,17 +279,23 @@ export async function findExtensionsInRunningExtensionsList(
     throw new Error('Could not find the running extensions editor');
   }
   // Get all extensions
-  const allExtensions = await runningExtensionsEditor.findElements(By.css('div.monaco-list-row > div.extension'))
+  const allExtensions = await runningExtensionsEditor.findElements(
+    By.css('div.monaco-list-row > div.extension')
+  );
 
   const runningExtensions: ExtensionActivation[] = [];
   for (const extension of allExtensions) {
-    const parent = await extension.findElement(By.css('..'));
+    const parent = await extension.findElement(By.xpath('..'));
     const extensionId = await parent.getAttribute('aria-label');
     const version = await extension.findElement(By.css('.version')).getText();
     const activationTime = await extension.findElement(By.css('.activation-time')).getText();
     const isActivationComplete = /\:\s*?[0-9]{1,}ms/.test(activationTime);
-    const bugError = await parent.findElement(By.css('span.codicon-bug error'));
-    const hasBug = (await bugError.getAttribute('message')).startsWith('no such element') ? false : true;
+    let hasBug;
+    try {
+      const bugError = await parent.findElement(By.css('span.codicon-bug error'));
+    } catch (error: any) {
+      hasBug = error.message.startsWith('no such element') ? false : true;
+    }
     runningExtensions.push({
       extensionId,
       activationTime,

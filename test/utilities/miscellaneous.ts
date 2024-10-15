@@ -8,7 +8,7 @@
 import os from 'os';
 import { EnvironmentSettings } from '../environmentSettings';
 import { attemptToFindOutputPanelText, clearOutputView } from './outputView';
-import { executeQuickPick, findQuickPickItem } from './commandPrompt';
+import { clickFilePathOkButton, executeQuickPick, findQuickPickItem } from './commandPrompt';
 import { notificationIsPresentWithTimeout } from './notifications';
 import * as DurationKit from '@salesforce/kit';
 import path from 'path';
@@ -80,18 +80,21 @@ export async function findElementByText(
     throw new Error('labelText must be defined');
   }
   debug(`findElementByText ${type}[${attribute}="${labelText}"]`);
-  const element = await getWorkbench().findElement(By.xpath(`${type}[${attribute}="${labelText}"]`));
+  const element = await getWorkbench().findElement(
+    By.xpath(`${type}[${attribute}="${labelText}"]`)
+  );
   if (!element) {
     throw new Error(`Element with selector: "${type}[${attribute}=\"${labelText}\"]" not found}`);
   }
   if (waitForClickable) {
-    await getBrowser().wait(async () => {
-      const isDisplayedAndEnabled = await element.isDisplayed() && await element.isEnabled();
-      return waitOptions?.reverse ? !isDisplayedAndEnabled : isDisplayedAndEnabled;
-    },
+    await getBrowser().wait(
+      async () => {
+        const isDisplayedAndEnabled = (await element.isDisplayed()) && (await element.isEnabled());
+        return waitOptions?.reverse ? !isDisplayedAndEnabled : isDisplayedAndEnabled;
+      },
       waitOptions?.timeout?.milliseconds ?? Duration.seconds(5).milliseconds,
       waitOptions?.timeoutMsg,
-      waitOptions?.interval?.milliseconds ?? Duration.milliseconds(500).milliseconds,
+      waitOptions?.interval?.milliseconds ?? Duration.milliseconds(500).milliseconds
     );
   }
 
@@ -249,4 +252,15 @@ export async function sleep(duration: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, duration);
   });
+}
+
+/*
+ * VSCode will be working on the new workspace, and the previous one is closed.
+ */
+export async function openFolder(path: string) {
+  const prompt = await executeQuickPick('File: Open Folder...'); // use this cmd palette to open
+  // Set the location of the project
+  await prompt.setText(path);
+  await pause(Duration.seconds(3));
+  await clickFilePathOkButton();
 }

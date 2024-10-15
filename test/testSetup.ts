@@ -128,30 +128,15 @@ export class TestSetup {
     utilities.log('');
     if (!Env.getInstance().useExistingProject) {
       utilities.log(`${projectName ?? this.testSuiteSuffixName} - Starting createProject()...`);
-      this.prompt = await utilities.executeQuickPick('SFDX: Create Project');
-      // Selecting "SFDX: Create Project" causes the extension to be loaded, and this takes a while.
-      // Select the "Standard" project type.
-      await utilities.waitForQuickPick(this.prompt, 'Standard', {
-        msg: 'Expected extension salesforcedx-core to be available within 5 seconds',
-        timeout: utilities.Duration.seconds(5)
-      });
 
-      // Enter the project's name.
-      let inputBox = await InputBox.create();
-      await inputBox.setText(projectName ?? this.tempProjectName);
-      await inputBox.confirm();
-
-      await utilities.pause(utilities.Duration.seconds(2));
-
-      // Press Enter/Return.
-      inputBox = await InputBox.create();
-      await inputBox.confirm();
-
-      // Set the location of the project.
-      inputBox = await InputBox.create();
-      await inputBox.setText(this.tempFolderPath!);
-      await utilities.pause(utilities.Duration.seconds(2));
-      await inputBox.confirm();
+      await utilities.generateSfProject(this.tempProjectName, this.tempFolderPath); // generate new sf project with cli
+      if (projectName) {
+        this.projectFolderPath = path.join(this.tempFolderPath!, projectName);
+        utilities.log(
+          `${this.testSuiteSuffixName} - new projectFolderPath is ${this.projectFolderPath}`
+        );
+      }
+      await utilities.openFolder(this.projectFolderPath!); // switch to the new VS Code workspace
 
       // Verify the project was created and was loaded.
       await this.verifyProjectCreated(projectName ?? this.tempProjectName);
@@ -355,17 +340,15 @@ export class TestSetup {
     // Reload the VS Code window
     const workbench = await utilities.getWorkbench();
     await utilities.reloadWindow();
-    await utilities.showExplorerView();
 
     const sidebar = await workbench.getSideBar().wait();
     const content = await sidebar.getContent().wait();
-    const treeViewSection = await (await content.getSection(projectName.toUpperCase())).wait();
+    const treeViewSection = await content.getSection(projectName);
     if (!treeViewSection) {
       throw new Error(
         'In verifyProjectCreated(), getSection() returned a treeViewSection with a value of null (or undefined)'
       );
     }
-
     const forceAppTreeItem = (await treeViewSection.findItem('force-app')) as DefaultTreeItem;
     if (!forceAppTreeItem) {
       throw new Error(
