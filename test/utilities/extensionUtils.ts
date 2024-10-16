@@ -6,11 +6,9 @@
  */
 
 import { Duration, log } from './miscellaneous';
-import fs from 'fs/promises';
-import path from 'path';
-import FastGlob from 'fast-glob';
 import * as utilities from './index';
 import { By, Editor } from 'vscode-extension-tester';
+import { expect } from 'chai';
 
 export type ExtensionId =
   | 'salesforcedx-vscode'
@@ -54,7 +52,7 @@ export type VerifyExtensionsOptions = {
   interval?: number;
 };
 
-const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(30);
+const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(60);
 
 export const extensions: ExtensionType[] = [
   {
@@ -168,39 +166,6 @@ export function getExtensionsToVerifyActive(
     .filter(predicate);
 }
 
-export async function findVSCodeBinary(): Promise<string> {
-  const serviceDirPath = path.join(process.cwd(), '.wdio-vscode-service');
-
-  const wdioServiceDirContents = await fs.readdir(serviceDirPath);
-
-  // Search for vscode installation directory
-  const vscodeInstallDir = wdioServiceDirContents.find((entry) =>
-    /^vscode-.*?-\d+\.\d+\.\d+$/.test(entry)
-  );
-
-  if (!vscodeInstallDir) {
-    throw new Error(`Could not find vscode install directory in ${serviceDirPath}`);
-  }
-
-  // Construct full path to vscode installation directory
-  const vscodeFullPath = path.join(serviceDirPath, vscodeInstallDir);
-
-  // Define the glob pattern for code binary
-  const codeBinaryPattern = '**/bin/{code,Code.exe}';
-
-  // Search for code binary in vscode installation directory
-  const codeBin = await FastGlob(codeBinaryPattern, {
-    cwd: vscodeFullPath,
-    absolute: true // returning absolute paths
-  });
-
-  if (codeBin.length === 0) {
-    throw new Error(`Could not find code binary in ${vscodeFullPath}`);
-  }
-
-  return codeBin[0];
-}
-
 export async function verifyExtensionsAreRunning(
   extensions: ExtensionType[],
   timeout = VERIFY_EXTENSIONS_TIMEOUT
@@ -308,4 +273,25 @@ export async function findExtensionsInRunningExtensionsList(
 
   // limit runningExtensions to those whose property extensionId is in the list of extensionIds
   return runningExtensions.filter((extension) => extensionIds.includes(extension.extensionId));
+}
+
+export async function checkForUncaughtErrors(): Promise<void> {
+  await utilities.showRunningExtensions();
+
+  // Zoom out so all the extensions are visible
+  await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
+
+  const uncaughtErrors = (
+    await utilities.findExtensionsInRunningExtensionsList(
+      utilities.getExtensionsToVerifyActive().map((ext) => ext.extensionId)
+    )
+  ).filter((ext) => ext.hasBug);
+
+  await utilities.zoomReset();
+
+  uncaughtErrors.forEach((ext) => {
+    utilities.log(`Extension ${ext.extensionId}:${ext.version ?? 'unknown'} has a bug`);
+  });
+
+  expect(uncaughtErrors.length).equal(0);
 }

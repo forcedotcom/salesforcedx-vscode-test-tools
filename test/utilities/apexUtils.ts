@@ -7,8 +7,9 @@
 
 import { Key } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
-import { Duration, getTextEditor, pause } from './miscellaneous';
+import { Duration, pause } from './miscellaneous';
 import { getWorkbench } from './workbench';
+import { getTextEditor } from './textEditorView';
 
 export async function createApexClass(
   name: string,
@@ -18,16 +19,12 @@ export async function createApexClass(
   const workbench = getWorkbench();
 
   // Using the Command palette, run SFDX: Create Apex Class to create the main class
-  const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(1));
+  const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
 
   // Set the name of the new Apex Class
   await inputBox.setText(name);
-  await pause(Duration.seconds(1));
-  await inputBox.sendKeys(Key.ENTER);
-  await pause(Duration.seconds(1));
-
-  // Select the default directory (press Enter/Return).
-  await inputBox.sendKeys(Key.ENTER);
+  await inputBox.confirm();
+  await inputBox.confirm();
   await pause(Duration.seconds(1));
 
   // Modify class content
@@ -112,8 +109,8 @@ export async function createAnonymousApexFile(): Promise<void> {
 
   // Set the name of the new Anonymous Apex file
   await inputBox.setText('Anonymous.apex');
-  await inputBox.sendKeys(Key.ENTER);
-  await inputBox.sendKeys(Key.ENTER);
+  await inputBox.confirm();
+  await inputBox.confirm();
 
   const textEditor = await getTextEditor(workbench, 'Anonymous.apex');
   await textEditor.setText("System.debug('¡Hola mundo!');");

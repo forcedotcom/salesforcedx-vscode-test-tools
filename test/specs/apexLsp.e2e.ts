@@ -14,13 +14,18 @@ const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
 describe('Apex LSP', async () => {
   let testSetup: TestSetup;
+  const testReqConfig: utilities.TestReqConfig = {
+    projectConfig: {
+      projectShape: utilities.ProjectShapeOption.NEW
+    },
+    isOrgRequired: false,
+    testSuiteSuffixName: 'ApexLsp'
+  };
 
   step('Set up the testing environment', async () => {
     utilities.log('ApexLsp - Set up the testing environment');
     utilities.log(`ApexLsp - JAVA_HOME: ${EnvironmentSettings.getInstance().javaHome}`);
-    testSetup = new TestSetup('ApexLsp');
-    await testSetup.setUp();
-
+    testSetup = await TestSetup.setUp(testReqConfig);
     // Create Apex Class
     await utilities.createApexClassWithTest('ExampleClass');
   });
@@ -40,16 +45,14 @@ describe('Apex LSP', async () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(foundExtensions).to.be.true;
     // Close running extensions view
-    await re?.sendKeys(CMD_KEY, 'w');
+    await utilities.closeCurrentEditor();
   });
 
   step('Verify LSP finished indexing', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
 
     // Get Apex LSP Status Bar
-    const statusBar = await utilities.getStatusBarItemWhichIncludes(
-      'Editor Language Status'
-    );
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
     await statusBar.click();
     expect(await statusBar.getAttribute('aria-label')).to.include('Indexing complete');
 
@@ -127,5 +130,3 @@ describe('Apex LSP', async () => {
     await testSetup?.tearDown();
   });
 });
-
-

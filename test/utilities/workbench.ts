@@ -16,13 +16,18 @@ export function getWorkbench(): Workbench {
 export function getBrowser(): WebDriver {
   return VSBrowser.instance.driver;
 }
-// { predicate: standardPredicates.alwaysTrue, maxWaitTime: 5_000 }
+
 export async function reloadWindow(
   predicateOrWait: PredicateWithTimeout | Duration = Duration.milliseconds(0)
 ): Promise<void> {
   log(`Reloading window`);
   const prompt = await executeQuickPick('Developer: Reload Window');
   await handlePredicateOrWait(predicateOrWait, prompt);
+}
+export async function closeCurrentEditor(): Promise<void> {
+  log(`Closing current editor`);
+  await executeQuickPick('View: Close Editor');
+  await pause(Duration.seconds(1));
 }
 
 export async function enableAllExtensions(): Promise<void> {

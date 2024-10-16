@@ -53,7 +53,7 @@ export async function selectQuickPickItem(
   text: string
 ): Promise<void> {
   if (!prompt) {
-    throw new Error('Prompt canot be undefined');
+    throw new Error('Prompt cannot be undefined');
   }
   const quickPick = await prompt.findQuickPick(text);
   if (!quickPick || (await quickPick.getLabel()) !== text) {
@@ -136,6 +136,7 @@ export async function executeQuickPick(
     const prompt = await workbench.openCommandPrompt();
     await prompt.setText(`>${command}`);
     await prompt.confirm();
+    await pause(Duration.seconds(1));
     return prompt;
   } catch (error) {
     let errorMessage: string;
