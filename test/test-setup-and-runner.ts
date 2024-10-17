@@ -6,7 +6,8 @@ import * as utilities from './utilities/index';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { extensions } from './utilities/index';
-import { CodeUtil, ReleaseQuality } from 'vscode-extension-tester/out/util/codeUtil';
+import { ReleaseQuality } from 'vscode-extension-tester/out/util/codeUtil';
+import { expect } from 'chai';
 
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
@@ -22,6 +23,7 @@ class TestSetupAndRunner extends ExTester {
     await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
     await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
     await this.installExtensions();
+    await this.setupAndAuthorizeOrg();
   }
 
   public async runTests(): Promise<number> {
@@ -131,6 +133,31 @@ class TestSetupAndRunner extends ExTester {
     )) {
       await this.installExtension(extensionObj.vsixPath);
     }
+  }
+
+  public async setupAndAuthorizeOrg() {
+    const environmentSettings = EnvironmentSettings.getInstance();
+    const devHubUserName = environmentSettings.devHubUserName;
+    const devHubAliasName = environmentSettings.devHubAliasName;
+    const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
+    const orgId = environmentSettings.orgId;
+    const sfdxAuthUrl = String(SFDX_AUTH_URL);
+    const authFilePath = 'authFile.txt';
+
+    // Create and write the SFDX Auth URL in a text file
+    await fs.writeFile(authFilePath, sfdxAuthUrl);
+
+    // Step 1: Authorize to Testing Org
+    const authorizeOrg = await utilities.orgLoginSfdxUrl(authFilePath);
+    expect(authorizeOrg.stdout).to.contain(
+      `Successfully authorized ${devHubUserName} with org ID ${orgId}`
+    );
+
+    // Step 2: Set Alias for the Org
+    const setAlias = await utilities.setAlias(devHubAliasName, devHubUserName);
+    expect(setAlias.stdout).to.contain(devHubAliasName);
+    expect(setAlias.stdout).to.contain(devHubUserName);
+    expect(setAlias.stdout).to.contain('true');
   }
 
   static get exTester(): TestSetupAndRunner {

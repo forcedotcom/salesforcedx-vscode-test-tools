@@ -8,6 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
+import { VSBrowser } from 'vscode-extension-tester';
 
 /*
 anInitialSuite.e2e.ts is a special case.  We want to validate that the Salesforce extensions and
@@ -33,7 +34,6 @@ describe('An Initial Suite', async () => {
   };
 
   let testSetup: TestSetup;
-
   step('Verify our extensions are not initially loaded', async () => {
     await utilities.pause(utilities.Duration.seconds(20));
     await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
