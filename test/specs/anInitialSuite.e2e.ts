@@ -8,7 +8,6 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { VSBrowser } from 'vscode-extension-tester';
 
 /*
 anInitialSuite.e2e.ts is a special case.  We want to validate that the Salesforce extensions and

@@ -8,12 +8,7 @@
 import os from 'os';
 import { EnvironmentSettings } from '../environmentSettings';
 import { attemptToFindOutputPanelText, clearOutputView } from './outputView';
-import {
-  clickFilePathOkButton,
-  executeQuickPick,
-  findQuickPickItem,
-  selectQuickPickWithText
-} from './commandPrompt';
+import { clickFilePathOkButton, executeQuickPick, findQuickPickItem } from './commandPrompt';
 import { notificationIsPresentWithTimeout } from './notifications';
 import * as DurationKit from '@salesforce/kit';
 import path from 'path';

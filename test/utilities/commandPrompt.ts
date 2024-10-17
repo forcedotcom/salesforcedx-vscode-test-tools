@@ -135,7 +135,7 @@ export async function executeQuickPick(
     const workbench = getWorkbench();
     const prompt = await workbench.openCommandPrompt();
     await prompt.setText(`>${command}`);
-    await prompt.confirm();
+    await prompt.selectQuickPick(command);
     await pause(Duration.seconds(1));
     return prompt;
   } catch (error) {
