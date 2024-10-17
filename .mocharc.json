@@ -1,3 +1,5 @@
 {
-  "timeout": 240000
+  "timeout": 240000,
+  "retries": 3,
+  "spec": "lib/specs/**/*.e2e.js"
 }
