@@ -7,7 +7,7 @@
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { EnvironmentSettings } from '../environmentSettings';
-import { Key } from 'vscode-extension-tester';
+import { By, Key } from 'vscode-extension-tester';
 import { step } from 'mocha-steps';
 import { expect } from 'chai';
 
@@ -27,23 +27,9 @@ describe('Apex LSP', async () => {
     utilities.log('ApexLsp - Set up the testing environment');
     utilities.log(`ApexLsp - JAVA_HOME: ${EnvironmentSettings.getInstance().javaHome}`);
     testSetup = await TestSetup.setUp(testReqConfig);
+    await utilities.pause(utilities.Duration.seconds(10));
     // Create Apex Class
     await utilities.createApexClassWithTest('ExampleClass');
-  });
-
-  step('Verify Extension is Running', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Verify Extension is Running`);
-
-    // Using the Command palette, run Developer: Show Running Extensions
-    const re = await utilities.showRunningExtensions();
-    // Verify Apex extension is present and running
-    const foundExtensions = await utilities.verifyExtensionsAreRunning(
-      utilities.getExtensionsToVerifyActive((ext) => ext.extensionId === 'salesforcedx-vscode-apex')
-    );
-    await utilities.zoomReset();
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(foundExtensions).to.be.true;
   });
 
   step('Verify LSP finished indexing', async () => {
@@ -66,21 +52,13 @@ describe('Apex LSP', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Go to Definition`);
     // Get open text editor
     const workbench = utilities.getWorkbench();
-    await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
-
+    const textEditor = await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
     // Move cursor to the middle of "ExampleClass.SayHello() call"
-    await workbench.sendKeys(CMD_KEY, 'f');
-    await utilities.pause(utilities.Duration.seconds(1));
-    await workbench.sendKeys('.SayHello');
-    await workbench.sendKeys('Escape');
-    await workbench.sendKeys('ArrowRight');
-    await workbench.sendKeys('ArrowLeft');
-    await workbench.sendKeys('ArrowLeft');
+    await textEditor.moveCursor(6, 20);
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Go to definition through F12
-    await workbench.sendKeys('F12');
-    await utilities.pause(utilities.Duration.seconds(1));
+    await utilities.executeQuickPick('Go to Definition', utilities.Duration.seconds(2));
 
     // Verify 'Go to definition' took us to the definition file
     const editorView = workbench.getEditorView();
@@ -95,28 +73,18 @@ describe('Apex LSP', async () => {
     const workbench = await utilities.getWorkbench().wait();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
 
-    // Move cursor to line 7 and type ExampleClass.s
-    await workbench.sendKeys(CMD_KEY, 'f');
-    await utilities.pause(utilities.Duration.seconds(1));
-    await workbench.sendKeys('System.debug');
-    await workbench.sendKeys('Escape');
-    await workbench.sendKeys('ArrowLeft');
-    await workbench.sendKeys('ArrowDown');
-    await workbench.sendKeys('ArrowDown');
-    await workbench.sendKeys('ExampleClass.say');
+    // Move cursor to line 7 and type ExampleClass.say
+    await textEditor.typeTextAt(7, 1, '\tExampleClass.say');
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Verify autocompletion options are present
-    // const autocompletionOptions = await $$('textarea.inputarea.monaco-mouse-cursor-text');
-    // await expect(await autocompletionOptions0.getAttribute('aria-haspopup')).toBe('true');
-    // await expect(await autocompletionOptions0.getAttribute('aria-autocomplete')).toBe('list');
-
+    const autocompletionOptions = await workbench.findElements(By.css('div.monaco-list-row.show-file-icons'));
+    const ariaLabel = await autocompletionOptions[0].getAttribute('aria-label');
+    expect(ariaLabel).to.contain('SayHello(name)');
+    await autocompletionOptions[0].click();
     // Verify autocompletion options can be selected and therefore automatically inserted into the file
-    await workbench.sendKeys('Enter');
     await textEditor.typeText(`'Jack`);
-    await workbench.sendKeys('ArrowRight');
-    await workbench.sendKeys('ArrowRight');
-    await textEditor.typeText(';');
+    await textEditor.typeTextAt(7, 38, ';');
     await textEditor.save();
     await utilities.pause(utilities.Duration.seconds(1));
     const line7Text = await textEditor.getTextAtLine(7);
@@ -124,9 +92,7 @@ describe('Apex LSP', async () => {
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(
-      `${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`
-    );
+    utilities.log(`${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 });
