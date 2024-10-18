@@ -19,6 +19,7 @@ export async function selectOutputChannel(name: string): Promise<OutputView> {
 
   // Find the given channel in the Output view
   const outputView = await new BottomBarPanel().openOutputView();
+  await pause(Duration.seconds(1));
   if (!!name) {
     await outputView.selectChannel(name);
   }
@@ -55,10 +56,7 @@ export async function getOutputViewText(outputChannelName: string = ''): Promise
  *   ]
  * );
  */
-export async function verifyOutputPanelText(
-  outputPanelText: string,
-  expectedTexts: string[]
-): Promise<void> {
+export async function verifyOutputPanelText(outputPanelText: string, expectedTexts: string[]): Promise<void> {
   for (const expectedText of expectedTexts) {
     expect(outputPanelText).to.contain(expectedText);
   }
@@ -70,9 +68,7 @@ export async function attemptToFindOutputPanelText(
   searchString: string,
   attempts: number
 ): Promise<string | undefined> {
-  debug(
-    `attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`
-  );
+  debug(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
   while (attempts > 0) {
     const outputViewText = await getOutputViewText(outputChannelName);
     if (outputViewText.includes(searchString)) {
@@ -93,15 +89,7 @@ export async function getOperationTime(outputText: string): Promise<string> {
   while ((matches = tRegex.exec(outputText)) !== null) {
     if (matches.groups) {
       const { hours, minutes, seconds, secondFraction } = matches.groups;
-      const time = new Date(
-        1970,
-        0,
-        1,
-        Number(hours),
-        Number(minutes),
-        Number(seconds),
-        Number(secondFraction) * 1000
-      );
+      const time = new Date(1970, 0, 1, Number(hours), Number(minutes), Number(seconds), Number(secondFraction) * 1000);
       times.push(time);
     }
   }
