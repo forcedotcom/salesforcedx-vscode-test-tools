@@ -73,7 +73,7 @@ describe('Apex LSP', async () => {
     const workbench = await utilities.getWorkbench().wait();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleClassTest.cls');
 
-    // Move cursor to line 7 and type ExampleClass.s
+    // Move cursor to line 7 and type ExampleClass.say
     await textEditor.typeTextAt(7, 1, '\tExampleClass.say');
     await utilities.pause(utilities.Duration.seconds(1));
 
