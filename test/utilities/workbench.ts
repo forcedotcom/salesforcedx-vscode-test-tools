@@ -1,22 +1,33 @@
 import { Duration, isDuration, log, pause } from './miscellaneous';
 import { executeQuickPick } from './commandPrompt';
 import { PredicateWithTimeout } from './predicates';
-import { ActivityBar, BottomBarPanel, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
+import {
+  ActivityBar,
+  BottomBarPanel,
+  VSBrowser,
+  WebDriver,
+  Workbench
+} from 'vscode-extension-tester';
 
 export function getWorkbench(): Workbench {
   return new Workbench();
 }
 
 export function getBrowser(): WebDriver {
-  return VSBrowser.instance.driver
+  return VSBrowser.instance.driver;
 }
-// { predicate: standardPredicates.alwaysTrue, maxWaitTime: 5_000 }
+
 export async function reloadWindow(
   predicateOrWait: PredicateWithTimeout | Duration = Duration.milliseconds(0)
 ): Promise<void> {
   log(`Reloading window`);
   const prompt = await executeQuickPick('Developer: Reload Window');
   await handlePredicateOrWait(predicateOrWait, prompt);
+}
+export async function closeCurrentEditor(): Promise<void> {
+  log(`Closing current editor`);
+  await executeQuickPick('View: Close Editor');
+  await pause(Duration.seconds(1));
 }
 
 export async function enableAllExtensions(): Promise<void> {
@@ -26,9 +37,9 @@ export async function enableAllExtensions(): Promise<void> {
 
 export async function showExplorerView(): Promise<void> {
   log('Show Explorer');
-  const control = await new ActivityBar().getViewControl("Explorer");
+  const control = await new ActivityBar().getViewControl('Explorer');
   if (!control) {
-    throw new Error('Could not open Explorer view in activity bar')
+    throw new Error('Could not open Explorer view in activity bar');
   }
   await control.openView();
 }

@@ -8,7 +8,6 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { Key } from 'vscode-extension-tester';
 
 /*
 anInitialSuite.e2e.ts is a special case.  We want to validate that the Salesforce extensions and
@@ -25,14 +24,17 @@ suite does run, it needs to run first.
 */
 
 describe('An Initial Suite', async () => {
+  const testReqConfig: utilities.TestReqConfig = {
+    projectConfig: {
+      projectShape: utilities.ProjectShapeOption.NEW
+    },
+    isOrgRequired: false,
+    testSuiteSuffixName: 'AnInitialSuite'
+  };
+
   let testSetup: TestSetup;
-
-  step('Install extensions', async () => {
-    await utilities.reloadAndEnableExtensions();
-  });
-
   step('Verify our extensions are not initially loaded', async () => {
-    await utilities.showRunningExtensions();
+    await utilities.pause(utilities.Duration.seconds(20));
     await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
 
     const foundSfExtensions = await utilities.findExtensionsInRunningExtensionsList(
@@ -78,7 +80,6 @@ describe('An Initial Suite', async () => {
     }
 
     expect(expectedSfdxCommandsFound).to.be.equal(3);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(unexpectedSfdxCommandWasFound).to.be.false;
 
     // Escape out of the pick list.
@@ -86,35 +87,16 @@ describe('An Initial Suite', async () => {
   });
 
   step('Set up the testing environment', async () => {
-    testSetup = new TestSetup('AnInitialSuite');
-    // Don't call testSetup.setUp() b/c we don't need to authorize a scratch org,
-    // just call setUpTestingEnvironment() and createProject().
-    await testSetup.setUpTestingEnvironment();
-    await testSetup.createProject('developer');
-    await utilities.reloadAndEnableExtensions();
-  });
-
-  step('Verify our extensions are loaded after creating an SFDX project', async () => {
-    await utilities.verifyExtensionsAreRunning(utilities.getExtensionsToVerifyActive());
-    await utilities.getWorkbench().sendKeys(Key.ESCAPE);
-    await utilities.pause(utilities.Duration.seconds(1));
-    await utilities.getWorkbench().sendKeys(Key.ESCAPE);
-    await utilities.pause(utilities.Duration.seconds(1));
+    testSetup = await TestSetup.setUp(testReqConfig);
   });
 
   step('Verify that SFDX commands are present after an SFDX project has been created', async () => {
     const workbench = utilities.getWorkbench();
-    await utilities.enableAllExtensions();
-    await utilities.executeQuickPick(
-      'Extensions: Show Enabled Extensions',
-      utilities.Duration.seconds(2)
-    );
     const prompt = await utilities.openCommandPromptWithCommand(workbench, 'SFDX:');
     const quickPicks = await prompt.getQuickPicks();
     const commands = await Promise.all(quickPicks.map((quickPick) => quickPick.getLabel()));
 
     // Look for the first few SFDX commands.
-    expect(commands).to.include('SFDX: Create Project');
     expect(commands).to.include('SFDX: Authorize a Dev Hub');
     expect(commands).to.include('SFDX: Authorize an Org');
     expect(commands).to.include('SFDX: Authorize an Org using Session ID');

@@ -9,6 +9,7 @@ import { debug, Duration, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
 import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
+import { expect } from 'chai';
 
 export async function selectOutputChannel(name: string): Promise<OutputView> {
   // Wait for all notifications to go away.  If there is a notification that is overlapping and hiding the Output channel's
@@ -32,6 +33,35 @@ export async function getOutputViewText(outputChannelName: string = ''): Promise
   await executeQuickPick('Output: Focus on Output View', Duration.seconds(2));
 
   return await outputView.getText();
+}
+
+/**
+ * Verifies that the output panel contains all expected text snippets.
+ *
+ * @param {string} outputPanelText - The output panel text as a string that needs to be verified.
+ * @param {string[]} expectedTexts - An array of strings representing the expected text snippets that should be present in the output panel.
+ *
+ * @example
+ * await verifyOutputPanelText(
+ *   testResult,
+ *   [
+ *     '=== Test Summary',
+ *     'Outcome              Passed',
+ *     'Tests Ran            1',
+ *     'Pass Rate            100%',
+ *     'TEST NAME',
+ *     'ExampleTest1  Pass',
+ *     'ended SFDX: Run Apex Tests'
+ *   ]
+ * );
+ */
+export async function verifyOutputPanelText(
+  outputPanelText: string,
+  expectedTexts: string[]
+): Promise<void> {
+  for (const expectedText of expectedTexts) {
+    expect(outputPanelText).to.contain(expectedText);
+  }
 }
 
 // If found, this function returns the entire text that's in the Output panel.

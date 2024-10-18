@@ -53,7 +53,7 @@ export async function selectQuickPickItem(
   text: string
 ): Promise<void> {
   if (!prompt) {
-    throw new Error('Prompt canot be undefined');
+    throw new Error('Prompt cannot be undefined');
   }
   const quickPick = await prompt.findQuickPick(text);
   if (!quickPick || (await quickPick.getLabel()) !== text) {
@@ -117,7 +117,7 @@ export async function waitForQuickPick(
     },
     options.timeout?.milliseconds,
     options.msg ?? `Expected to find option ${pickListItem} before ${options.timeout} milliseconds`,
-    500, // Check every 500 ms
+    500 // Check every 500 ms
   );
 }
 /**
@@ -133,14 +133,10 @@ export async function executeQuickPick(
   debug(`executeQuickPick command: ${command}`);
   try {
     const workbench = getWorkbench();
-    await workbench.executeCommand(command);
-    let prompt = await InputBox.create(wait.milliseconds);
-    if (!prompt) {
-      prompt = new InputBox();
-      if (!prompt) {
-        throw new Error('Could not acquire the command\'s prompt (input box)');
-      }
-    }
+    const prompt = await workbench.openCommandPrompt();
+    await prompt.setText(`>${command}`);
+    await prompt.selectQuickPick(command);
+    await pause(Duration.seconds(1));
     return prompt;
   } catch (error) {
     let errorMessage: string;
@@ -163,7 +159,9 @@ export async function executeQuickPick(
 
 export async function clickFilePathOkButton(): Promise<void> {
   const browser = getBrowser();
-  const okButton = await browser.findElement(By.css('*:not([style*="display: none"]).quick-input-action .monaco-button'));
+  const okButton = await browser.findElement(
+    By.css('*:not([style*="display: none"]).quick-input-action .monaco-button')
+  );
 
   if (!okButton) {
     throw new Error('Ok button not found');
@@ -178,10 +176,11 @@ export async function clickFilePathOkButton(): Promise<void> {
     const text = await item.getText();
     if (text.includes('Overwrite')) {
       log('clickFilePathOkButton() - folder already exists');
-      await browser.wait(async () =>
-        await item.isDisplayed() && await item.isEnabled(),
+      await browser.wait(
+        async () => (await item.isDisplayed()) && (await item.isEnabled()),
         Duration.seconds(5).milliseconds,
-        `Overwrite button not clickable within 5 seconds`);
+        `Overwrite button not clickable within 5 seconds`
+      );
       await item.click();
     }
   }

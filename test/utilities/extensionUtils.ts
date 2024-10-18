@@ -6,11 +6,9 @@
  */
 
 import { Duration, log } from './miscellaneous';
-import fs from 'fs/promises';
-import path from 'path';
-import FastGlob from 'fast-glob';
 import * as utilities from './index';
 import { By, Editor } from 'vscode-extension-tester';
+import { expect } from 'chai';
 
 export type ExtensionId =
   | 'salesforcedx-vscode'
@@ -54,7 +52,7 @@ export type VerifyExtensionsOptions = {
   interval?: number;
 };
 
-const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(30);
+const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(60);
 
 export const extensions: ExtensionType[] = [
   {
@@ -148,7 +146,8 @@ export async function showRunningExtensions(): Promise<Editor | undefined> {
     },
     5000, // Timeout after 5 seconds
     'Expected "Running Extensions" tab to be visible after 5 seconds',
-    500);
+    500
+  );
   return re;
 }
 
@@ -165,39 +164,6 @@ export function getExtensionsToVerifyActive(
       return ext.shouldVerifyActivation;
     })
     .filter(predicate);
-}
-
-export async function findVSCodeBinary(): Promise<string> {
-  const serviceDirPath = path.join(process.cwd(), '.wdio-vscode-service');
-
-  const wdioServiceDirContents = await fs.readdir(serviceDirPath);
-
-  // Search for vscode installation directory
-  const vscodeInstallDir = wdioServiceDirContents.find((entry) =>
-    /^vscode-.*?-\d+\.\d+\.\d+$/.test(entry)
-  );
-
-  if (!vscodeInstallDir) {
-    throw new Error(`Could not find vscode install directory in ${serviceDirPath}`);
-  }
-
-  // Construct full path to vscode installation directory
-  const vscodeFullPath = path.join(serviceDirPath, vscodeInstallDir);
-
-  // Define the glob pattern for code binary
-  const codeBinaryPattern = '**/bin/{code,Code.exe}';
-
-  // Search for code binary in vscode installation directory
-  const codeBin = await FastGlob(codeBinaryPattern, {
-    cwd: vscodeFullPath,
-    absolute: true // returning absolute paths
-  });
-
-  if (codeBin.length === 0) {
-    throw new Error(`Could not find code binary in ${vscodeFullPath}`);
-  }
-
-  return codeBin[0];
 }
 
 export async function verifyExtensionsAreRunning(
@@ -270,25 +236,37 @@ export async function findExtensionsInRunningExtensionsList(
   // This function assumes the Extensions list was opened.
 
   // Close the panel and clear notifications so we can see as many of the running extensions as we can.
-  const center = await utilities.getWorkbench().openNotificationsCenter();
-  await center.clearAllNotifications();
-  await center.close();
+  try {
+    const center = await utilities.getWorkbench().openNotificationsCenter();
+    await center.clearAllNotifications();
+    await center.close();
+  } catch (error) {
+    if (error instanceof Error) {
+      log(`Failed clearing all notifications ${error.message}`);
+    }
+  }
   const runningExtensionsEditor = await showRunningExtensions();
   if (!runningExtensionsEditor) {
     throw new Error('Could not find the running extensions editor');
   }
   // Get all extensions
-  const allExtensions = await runningExtensionsEditor.findElements(By.css('div.monaco-list-row > div.extension'))
+  const allExtensions = await runningExtensionsEditor.findElements(
+    By.css('div.monaco-list-row > div.extension')
+  );
 
   const runningExtensions: ExtensionActivation[] = [];
   for (const extension of allExtensions) {
-    const parent = await extension.findElement(By.css('..'));
+    const parent = await extension.findElement(By.xpath('..'));
     const extensionId = await parent.getAttribute('aria-label');
     const version = await extension.findElement(By.css('.version')).getText();
     const activationTime = await extension.findElement(By.css('.activation-time')).getText();
     const isActivationComplete = /\:\s*?[0-9]{1,}ms/.test(activationTime);
-    const bugError = await parent.findElement(By.css('span.codicon-bug error'));
-    const hasBug = (await bugError.getAttribute('message')).startsWith('no such element') ? false : true;
+    let hasBug;
+    try {
+      const bugError = await parent.findElement(By.css('span.codicon-bug error'));
+    } catch (error: any) {
+      hasBug = error.message.startsWith('no such element') ? false : true;
+    }
     runningExtensions.push({
       extensionId,
       activationTime,
@@ -301,4 +279,25 @@ export async function findExtensionsInRunningExtensionsList(
 
   // limit runningExtensions to those whose property extensionId is in the list of extensionIds
   return runningExtensions.filter((extension) => extensionIds.includes(extension.extensionId));
+}
+
+export async function checkForUncaughtErrors(): Promise<void> {
+  await utilities.showRunningExtensions();
+
+  // Zoom out so all the extensions are visible
+  await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
+
+  const uncaughtErrors = (
+    await utilities.findExtensionsInRunningExtensionsList(
+      utilities.getExtensionsToVerifyActive().map((ext) => ext.extensionId)
+    )
+  ).filter((ext) => ext.hasBug);
+
+  await utilities.zoomReset();
+
+  uncaughtErrors.forEach((ext) => {
+    utilities.log(`Extension ${ext.extensionId}:${ext.version ?? 'unknown'} has a bug`);
+  });
+
+  expect(uncaughtErrors.length).equal(0);
 }

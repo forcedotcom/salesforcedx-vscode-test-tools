@@ -6,7 +6,7 @@
  */
 
 import { WebElement } from 'vscode-extension-tester';
-import { Duration, debug, pause } from './miscellaneous';
+import { Duration, log, pause } from './miscellaneous';
 import { getWorkbench } from './workbench';
 
 export async function getStatusBarItemWhichIncludes(title: string): Promise<WebElement> {
@@ -16,15 +16,13 @@ export async function getStatusBarItemWhichIncludes(title: string): Promise<WebE
     const statusBar = await workbench.getStatusBar().wait();
     const items = await statusBar.getItems();
     for (const item of items) {
-      const itemTitle = await item.getAttribute('title');
-      debug(`status bar item title ${itemTitle}`);
-      if (itemTitle.includes(title)) {
+      const ariaLabel = await item.getAttribute('aria-label');
+      if (ariaLabel.includes(title)) {
+        log('Status Bar item found.');
         return item;
       }
     }
-
     await pause(Duration.seconds(1));
   }
-
   throw new Error(`Status bar item containing ${title} was not found`);
 }

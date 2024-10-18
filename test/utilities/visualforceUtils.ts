@@ -6,16 +6,15 @@
  */
 
 import { executeQuickPick } from './commandPrompt';
-import { Duration, getTextEditor, pause } from './miscellaneous';
+import { Duration, pause } from './miscellaneous';
+import { getTextEditor } from './textEditorView';
 import { getWorkbench } from './workbench';
 
 export async function createVisualforcePage(): Promise<void> {
   const workbench = getWorkbench();
 
   // Using the Command palette, run SFDX: Create Visualforce Page
-  const inputBox = await executeQuickPick(
-    'SFDX: Create Visualforce Page',
-  );
+  const inputBox = await executeQuickPick('SFDX: Create Visualforce Page');
 
   // Set the name of the new Visualforce Page
   await inputBox.setText('FooPage');

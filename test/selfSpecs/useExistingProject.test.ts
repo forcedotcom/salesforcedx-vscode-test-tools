@@ -10,11 +10,18 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
 describe('Use existing project', async () => {
+  const testReqConfig: utilities.TestReqConfig = {
+    projectConfig: {
+      projectShape: utilities.ProjectShapeOption.NEW
+    },
+    isOrgRequired: false,
+    testSuiteSuffixName: 'UseExistingProject'
+  };
+
   let testSetup: TestSetup;
   step('verify existing project is open', async () => {
-    testSetup = new TestSetup('UseExistingProject');
+    testSetup = await TestSetup.setUp(testReqConfig);
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify existing project open`);
-    await testSetup.setUpTestingEnvironment();
-    await testSetup.verifyProjectCreated('dreamhouse-lwc-testing');
+    await utilities.verifyProjectLoaded('dreamhouse-lwc-testing');
   });
 });
