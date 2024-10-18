@@ -236,9 +236,15 @@ export async function findExtensionsInRunningExtensionsList(
   // This function assumes the Extensions list was opened.
 
   // Close the panel and clear notifications so we can see as many of the running extensions as we can.
-  const center = await utilities.getWorkbench().openNotificationsCenter();
-  await center.clearAllNotifications();
-  await center.close();
+  try {
+    const center = await utilities.getWorkbench().openNotificationsCenter();
+    await center.clearAllNotifications();
+    await center.close();
+  } catch (error) {
+    if (error instanceof Error) {
+      log(`Failed clearing all notifications ${error.message}`);
+    }
+  }
   const runningExtensionsEditor = await showRunningExtensions();
   if (!runningExtensionsEditor) {
     throw new Error('Could not find the running extensions editor');
