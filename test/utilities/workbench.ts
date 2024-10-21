@@ -1,19 +1,15 @@
-import { Duration, isDuration, log, pause } from './miscellaneous';
+import { ActivityBar, BottomBarPanel, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
+import { debug, Duration, isDuration, log, pause } from './miscellaneous';
 import { PredicateWithTimeout } from './predicates';
-import {
-  ActivityBar,
-  BottomBarPanel,
-  VSBrowser,
-  WebDriver,
-  Workbench
-} from 'vscode-extension-tester';
 
 export function getWorkbench(): Workbench {
+  debug('calling getWorkbench()');
   return new Workbench();
 }
 
 export function getBrowser(): WebDriver {
+  debug('calling getBrowser()');
   return VSBrowser.instance.driver;
 }
 
@@ -63,10 +59,7 @@ export async function openNewTerminal(): Promise<void> {
   await new BottomBarPanel().openTerminalView();
 }
 
-async function handlePredicateOrWait(
-  predicateOrWait: PredicateWithTimeout | Duration,
-  prompt: unknown
-) {
+async function handlePredicateOrWait(predicateOrWait: PredicateWithTimeout | Duration, prompt: unknown) {
   log('handlePredicateOrWait');
   if (isDuration(predicateOrWait)) {
     if (predicateOrWait.milliseconds > 0) {
