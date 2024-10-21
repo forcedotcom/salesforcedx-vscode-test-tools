@@ -52,9 +52,9 @@ describe('SOQL', async () => {
     const title = await activeTab?.getTitle();
     expect(title).to.equal('untitled.soql');
     const openTabs = await editorView.getOpenEditorTitles();
-    expect(openTabs.length).to.equal(3);
-    expect(openTabs[1]).to.equal('untitled.soql');
+    expect(openTabs.length).to.equal(4);
     expect(openTabs[2]).to.equal('untitled.soql');
+    expect(openTabs[3]).to.equal('untitled.soql');
   });
 
   step('Switch Between SOQL Builder and Text Editor - from file', async () => {
