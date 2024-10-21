@@ -59,6 +59,7 @@ describe('SOQL', async () => {
 
   step('Switch Between SOQL Builder and Text Editor - from file', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Switch Between SOQL Builder and Text Editor - from file`);
+    await utilities.reloadWindow(utilities.Duration.seconds(5));
 
     // Click Switch Between SOQL Builder and Text Editor
     const workbench = await utilities.getWorkbench();
