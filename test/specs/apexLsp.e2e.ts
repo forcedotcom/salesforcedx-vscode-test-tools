@@ -64,7 +64,7 @@ describe('Apex LSP', async () => {
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
     const title = await activeTab?.getTitle();
-    expect(title).to.be.equal('ExampleClass.cls');
+    expect(title).to.equal('ExampleClass.cls');
   });
 
   step('Autocompletion', async () => {

@@ -5,13 +5,10 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// import { Key } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, pause } from './miscellaneous';
 import { getTextEditor } from './textEditorView';
 import { getWorkbench } from './workbench';
-
-// const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
 export async function createLwc(name: string): Promise<void> {
   log('createLwc() - calling browser.getWorkbench()');
@@ -28,12 +25,8 @@ export async function createLwc(name: string): Promise<void> {
   // Set the name of the new component
   await inputBox.setText(name);
   await inputBox.confirm();
-  await pause(Duration.seconds(1));
-
-  log('createLwc() - Select the default directory');
-  // Select the default directory (press Enter/Return).
   await inputBox.confirm();
-  await pause(Duration.seconds(3));
+  await pause(Duration.seconds(1));
 
   log('createLwc() - Modify js content');
   // Modify js content
@@ -58,11 +51,9 @@ export async function createLwc(name: string): Promise<void> {
     `\t<lightning-card title="${name}" icon-name="custom:custom14">`,
     `\t\t<div class="slds-var-m-around_medium">Hello, {greeting}!</div>`,
     `\t</lightning-card>`,
+    ``,
     `</template>`
   ].join('\n');
-  // `\t\t<c-view-source source="lwc/hello" slot="footer">`,
-  // `\t\t\tBind an HTML element to a component property.`,
-  // `\t\t</c-view-source>`,
   await textEditor.setText(htmlText);
   await textEditor.save();
   await pause(Duration.seconds(1));
@@ -104,21 +95,9 @@ export async function createLwc(name: string): Promise<void> {
   await textEditor.save();
   await pause(Duration.seconds(1));
 
-  // const browser = getBrowser();
   // Set breakpoints
-  // await browser.send([CMD_KEY, 'f']);
-  // await pause(Duration.seconds(1));
-  // await browser.keys(`await expect(div.textContent).toBe('Hello, World!');`);
-  // await browser.keys(['Escape']);
-  // await browser.keys(['ArrowRight']);
-  // await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
-
-  // await browser.keys([CMD_KEY, 'f']);
-  // await pause(Duration.seconds(1));
-  // await browser.keys(`await expect(element).toBeDefined();`);
-  // await browser.keys(['Escape']);
-  // await browser.keys(['ArrowRight']);
-  // await executeQuickPick('Debug: Inline Breakpoint', Duration.seconds(2));
+  await textEditor.toggleBreakpoint(17);
+  await textEditor.toggleBreakpoint(25);
 }
 
 export async function createAura(name: string): Promise<void> {

@@ -5,17 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Key } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, pause } from './miscellaneous';
 import { getWorkbench } from './workbench';
 import { getTextEditor } from './textEditorView';
 
-export async function createApexClass(
-  name: string,
-  classText: string,
-  breakpoint?: number
-): Promise<void> {
+export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   const workbench = getWorkbench();
 
   // Using the Command palette, run SFDX: Create Apex Class to create the main class
