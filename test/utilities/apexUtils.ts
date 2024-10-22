@@ -5,19 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Key } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
-import { Duration, pause } from './miscellaneous';
+import { Duration, log, pause } from './miscellaneous';
 import { getWorkbench } from './workbench';
 import { getTextEditor } from './textEditorView';
 
-export async function createApexClass(
-  name: string,
-  classText: string,
-  breakpoint?: number
-): Promise<void> {
-  const workbench = getWorkbench();
-
+export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   // Using the Command palette, run SFDX: Create Apex Class to create the main class
   const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
 
@@ -28,6 +21,7 @@ export async function createApexClass(
   await pause(Duration.seconds(1));
 
   // Modify class content
+  const workbench = getWorkbench();
   const textEditor = await getTextEditor(workbench, name + '.cls');
   await textEditor.setText(classText);
   await textEditor.save();
@@ -119,6 +113,7 @@ export async function createAnonymousApexFile(): Promise<void> {
 }
 
 export async function createApexController(): Promise<void> {
+  log(`calling createApexController()`);
   const classText = [
     `public class MyController {`,
     `\tprivate final Account account;`,
