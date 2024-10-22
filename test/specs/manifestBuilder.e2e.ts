@@ -100,7 +100,7 @@ describe('Manifest Builder', async () => {
     // Clear output before running the command
     await utilities.clearOutputView();
     // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
-    await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(1));
+    await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -146,7 +146,7 @@ describe('Manifest Builder', async () => {
     await utilities.getTextEditor(workbench, 'manifest.xml');
     // Clear output before running the command
     await utilities.clearOutputView();
-    await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(5));
+    await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "SFDX: Retrieve This Source from Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -173,7 +173,7 @@ describe('Manifest Builder', async () => {
         'Product__c',
         'Product__c.object-meta.xml'
       )}`,
-      'ended SFDX: Deploy This Source to Org'
+      'ended SFDX: Retrieve This Source from Org'
     ];
     // Verify Output tab
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
