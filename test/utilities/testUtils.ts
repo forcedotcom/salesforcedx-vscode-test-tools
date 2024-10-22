@@ -69,7 +69,7 @@ export async function runTestCaseFromSideBar(
 ): Promise<string | undefined> {
   log(`Running ${testSuite} - ${testName} - ${actionLabel} from SideBar`);
   const testingView = await workbench.getActivityBar().getViewControl('Testing');
-  await expect(testingView).not.to.be.undefined;
+  await expect(testingView).to.not.be.undefined;
 
   // Open the Test Sidebar
   const testingSideBarView = await testingView?.openView();
@@ -78,12 +78,12 @@ export async function runTestCaseFromSideBar(
   // Select test
   const testSection = await getTestsSection(workbench, testSuite);
   const testItem = (await testSection.findItem(testName)) as TreeItem;
-  await expect(testItem).not.to.be.undefined;
+  await expect(testItem).to.not.be.undefined;
   await testItem.select();
 
   // Click button to run test
   const actionButton = await testItem.getActionButton(actionLabel);
-  await expect(actionButton).not.to.be.undefined;
+  await expect(actionButton).to.not.be.undefined;
   await actionButton?.click();
 
   let testResult: string | undefined;
@@ -150,11 +150,7 @@ export async function verifyTestItemsInSideBar(
   expectedNumClasses: number
 ): Promise<TreeItem[]> {
   log('Starting verifyTestItemsInSideBar()');
-  const testsItems = await retrieveExpectedNumTestsFromSidebar(
-    expectedNumTests,
-    testsSection,
-    refreshCommand
-  );
+  const testsItems = await retrieveExpectedNumTestsFromSidebar(expectedNumTests, testsSection, refreshCommand);
   const isLWCSection = refreshCommand.includes('Lightning');
   if (isLWCSection) {
     log('Expanding LWC Tests');

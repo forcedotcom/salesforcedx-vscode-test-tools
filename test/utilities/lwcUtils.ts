@@ -19,10 +19,7 @@ export async function createLwc(name: string): Promise<void> {
 
   log('createLwc() - Running SFDX: Create Lightning Web Component');
   // Using the Command palette, run SFDX: Create Lightning Web Component.
-  const inputBox = await executeQuickPick(
-    'SFDX: Create Lightning Web Component',
-    Duration.seconds(1)
-  );
+  const inputBox = await executeQuickPick('SFDX: Create Lightning Web Component', Duration.seconds(1));
 
   log('createLwc() - Set the name of the new component');
   // Set the name of the new component
@@ -122,7 +119,6 @@ export async function createLwc(name: string): Promise<void> {
 }
 
 export async function createAura(name: string): Promise<void> {
-  log('createAura() - calling browser.getWorkbench()');
   const workbench = await getWorkbench();
 
   log('createAura() - Running SFDX: Create Aura Component');
@@ -132,12 +128,8 @@ export async function createAura(name: string): Promise<void> {
   // Set the name of the new component
   await inputBox.setText(name);
   await inputBox.confirm();
-  await pause(Duration.seconds(1));
-
-  log('createAura() - Select the default directory');
-  // Select the default directory (press Enter/Return).
   await inputBox.confirm();
-  await pause(Duration.seconds(3));
+  await pause(Duration.seconds(1));
 
   log('createAura() - Modify html content');
   // Modify html content
