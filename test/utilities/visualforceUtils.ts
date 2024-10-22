@@ -6,12 +6,12 @@
  */
 
 import { executeQuickPick } from './commandPrompt';
-import { Duration, pause } from './miscellaneous';
+import { Duration, log, pause } from './miscellaneous';
 import { getTextEditor } from './textEditorView';
 import { getWorkbench } from './workbench';
 
 export async function createVisualforcePage(): Promise<void> {
-  const workbench = getWorkbench();
+  log(`calling createVisualforcePage()`);
 
   // Using the Command palette, run SFDX: Create Visualforce Page
   const inputBox = await executeQuickPick('SFDX: Create Visualforce Page');
@@ -19,12 +19,11 @@ export async function createVisualforcePage(): Promise<void> {
   // Set the name of the new Visualforce Page
   await inputBox.setText('FooPage');
   await inputBox.confirm();
-
-  // Select the default directory (press Enter/Return).
   await inputBox.confirm();
   await pause(Duration.seconds(1));
 
   // Modify page content
+  const workbench = getWorkbench();
   const textEditor = await getTextEditor(workbench, 'FooPage.page');
   const pageText = [
     `<apex:page controller="myController" tabStyle="Account">`,
