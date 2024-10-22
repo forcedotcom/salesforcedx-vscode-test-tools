@@ -146,24 +146,17 @@ describe('Manifest Builder', async () => {
     await utilities.getTextEditor(workbench, 'manifest.xml');
     // Clear output before running the command
     await utilities.clearOutputView();
-    await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(60));
+    await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(5));
 
     // Look for the success notification that appears which says, "SFDX: Retrieve This Source from Org successfully ran".
-    // const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    //   'SFDX: Retrieve This Source from Org successfully ran',
-    //   utilities.Duration.TEN_MINUTES
-    // );
-    // expect(successNotificationWasFound).to.equal(true);
-
-    // Verify Output tab
-    const outputPanelText = await utilities.attemptToFindOutputPanelText(
-      'Salesforce CLI',
-      'Starting SFDX: Retrieve This Source from Org',
-      10
+    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'SFDX: Retrieve This Source from Org successfully ran',
+      utilities.Duration.TEN_MINUTES
     );
-    expect(outputPanelText).to.not.be.undefined;
-    expect(outputPanelText).to.contain('Retrieved Source');
-    expect(outputPanelText).to.contain(
+    expect(successNotificationWasFound).to.equal(true);
+
+    const expectedTexts = [
+      'Retrieved Source',
       `Customer__c  CustomObject  ${path.join(
         'force-app',
         'main',
@@ -171,9 +164,7 @@ describe('Manifest Builder', async () => {
         'objects',
         'Customer__c',
         'Customer__c.object-meta.xml'
-      )}`
-    );
-    expect(outputPanelText).to.contain(
+      )}`,
       `Product__c   CustomObject  ${path.join(
         'force-app',
         'main',
@@ -181,8 +172,17 @@ describe('Manifest Builder', async () => {
         'objects',
         'Product__c',
         'Product__c.object-meta.xml'
-      )}`
+      )}`,
+      'ended SFDX: Deploy This Source to Org'
+    ];
+    // Verify Output tab
+    const outputPanelText = await utilities.attemptToFindOutputPanelText(
+      'Salesforce CLI',
+      'Starting SFDX: Retrieve This Source from Org',
+      10
     );
+    expect(outputPanelText).to.not.be.undefined;
+    await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
   });
 
   after('Tear down and clean up the testing environment', async () => {
