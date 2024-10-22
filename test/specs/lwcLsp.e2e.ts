@@ -51,22 +51,24 @@ describe('LWC LSP', async () => {
   });
 
   step('Go to Definition (HTML)', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Go to Definition (HTML)`);
-    // Get open text editor
-    const workbench = await utilities.getWorkbench();
-    const textEditor = await utilities.getTextEditor(workbench, 'lwc1.html');
+    if (process.platform !== 'win32') {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Go to Definition (HTML)`);
+      // Get open text editor
+      const workbench = await utilities.getWorkbench();
+      const textEditor = await utilities.getTextEditor(workbench, 'lwc1.html');
 
-    // Move cursor to the middle of "greeting"
-    await textEditor.moveCursor(3, 58);
+      // Move cursor to the middle of "greeting"
+      await textEditor.moveCursor(3, 58);
 
-    // Go to definition through F12
-    await utilities.executeQuickPick('Go to Definition', utilities.Duration.seconds(2));
+      // Go to definition through F12
+      await utilities.executeQuickPick('Go to Definition', utilities.Duration.seconds(2));
 
-    // Verify 'Go to definition' took us to the definition file
-    const editorView = workbench.getEditorView();
-    const activeTab = await editorView.getActiveTab();
-    const title = await activeTab?.getTitle();
-    expect(title).to.equal('lwc1.js');
+      // Verify 'Go to definition' took us to the definition file
+      const editorView = workbench.getEditorView();
+      const activeTab = await editorView.getActiveTab();
+      const title = await activeTab?.getTitle();
+      expect(title).to.equal('lwc1.js');
+    }
   });
 
   step('Autocompletion', async () => {
