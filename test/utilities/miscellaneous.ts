@@ -127,11 +127,11 @@ export async function createCommand(
     Duration.minutes(10)
   );
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(successNotificationWasFound).to.be.true;
+  expect(successNotificationWasFound).to.equal(true);
 
   const outputPanelText = await attemptToFindOutputPanelText(`Salesforce CLI`, `Finished SFDX: Create ${type}`, 10);
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(outputPanelText).not.to.be.ok;
+  expect(outputPanelText).not.to.be.undefined;
   const typePath = path.join(`force-app`, `main`, `default`, folder, `${name}.${extension}`);
   expect(outputPanelText).to.include(`create ${typePath}`);
 
