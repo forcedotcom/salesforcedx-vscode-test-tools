@@ -56,9 +56,8 @@ describe('Miscellaneous', async () => {
     // Type snippet "soql" and check it inserted the expected query
     const textEditor = await utilities.getTextEditor(workbench, 'Anonymous.apex');
     await textEditor.typeText('soql');
+    await utilities.pause(utilities.Duration.seconds(1));
     const autocompletionOptions = await workbench.findElements(By.css('div.monaco-list-row.show-file-icons'));
-    console.log(autocompletionOptions);
-    console.log('length', autocompletionOptions.length);
     const ariaLabel = await autocompletionOptions[0].getAttribute('aria-label');
     expect(ariaLabel).to.contain('soql');
 
