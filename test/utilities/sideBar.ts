@@ -16,37 +16,30 @@ import {
   WebElement,
   Workbench
 } from 'vscode-extension-tester';
-import { Duration, log, pause } from './miscellaneous';
-import { fail } from 'assert';
+import { debug, log } from './miscellaneous';
 import { expect } from 'chai';
-import { executeQuickPick } from './commandPrompt';
 import { getWorkbench, reloadWindow, showExplorerView } from './workbench';
 
-export async function expandProjectInSideBar(
-  workbench: Workbench,
-  projectName: string
-): Promise<ViewSection> {
+export async function expandProjectInSideBar(workbench: Workbench, projectName: string): Promise<ViewSection> {
+  debug('expandProjectInSideBar()');
   await showExplorerView();
 
   const sidebar = workbench.getSideBar();
-  expect(await sidebar.isDisplayed()).to.be.true;
+  expect(await sidebar.isDisplayed()).to.equal(true);
 
-  const treeViewSection = await sidebar.getContent().getSection(projectName);
+  const content = sidebar.getContent();
+  const treeViewSection = await content.getSection(projectName);
   await treeViewSection.expand();
   return treeViewSection;
 }
 
-export async function getVisibleItemsFromSidebar(
-  workbench: Workbench,
-  projectName: string
-): Promise<string[]> {
+export async function getVisibleItemsFromSidebar(workbench: Workbench, projectName: string): Promise<string[]> {
+  debug('getVisibleItemsFromSidebar()');
   const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
   const visibleItems = (await treeViewSection.getVisibleItems()) as DefaultTreeItem[];
-  const visibleItemsLabels = await Promise.all(
-    visibleItems.map((item) => item.getLabel().then((label) => label))
-  );
+  const visibleItemsLabels = await Promise.all(visibleItems.map(item => item.getLabel().then(label => label)));
 
   return visibleItemsLabels;
 }
@@ -56,6 +49,7 @@ export async function getFilteredVisibleTreeViewItems(
   projectName: string,
   searchString: string
 ): Promise<DefaultTreeItem[]> {
+  debug('getFilteredVisibleTreeViewItems()');
   const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
@@ -103,10 +97,7 @@ export async function getFilteredVisibleTreeViewItemLabels(
   return filteredItems;
 }
 
-export async function getVisibleChild(
-  defaultTreeItem: DefaultTreeItem,
-  name: string
-): Promise<TreeItem | undefined> {
+export async function getVisibleChild(defaultTreeItem: DefaultTreeItem, name: string): Promise<TreeItem | undefined> {
   const children = await getVisibleChildren(defaultTreeItem);
   for (let i = 0; i < children.length; i++) {
     const child = children[i];
