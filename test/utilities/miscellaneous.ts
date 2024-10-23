@@ -86,9 +86,7 @@ export async function findElementByText(
     throw new Error('labelText must be defined');
   }
   debug(`findElementByText ${type}[${attribute}="${labelText}"]`);
-  const element = await getWorkbench().findElement(
-    By.xpath(`${type}[${attribute}="${labelText}"]`)
-  );
+  const element = await getWorkbench().findElement(By.xpath(`${type}[${attribute}="${labelText}"]`));
   if (!element) {
     throw new Error(`Element with selector: "${type}[${attribute}=\"${labelText}\"]" not found}`);
   }
@@ -131,23 +129,13 @@ export async function createCommand(
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(successNotificationWasFound).to.be.true;
 
-  const outputPanelText = await attemptToFindOutputPanelText(
-    `Salesforce CLI`,
-    `Finished SFDX: Create ${type}`,
-    10
-  );
+  const outputPanelText = await attemptToFindOutputPanelText(`Salesforce CLI`, `Finished SFDX: Create ${type}`, 10);
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(outputPanelText).not.to.be.ok;
   const typePath = path.join(`force-app`, `main`, `default`, folder, `${name}.${extension}`);
   expect(outputPanelText).to.include(`create ${typePath}`);
 
-  const metadataPath = path.join(
-    `force-app`,
-    `main`,
-    `default`,
-    folder,
-    `${name}.${extension}-meta.xml`
-  );
+  const metadataPath = path.join(`force-app`, `main`, `default`, folder, `${name}.${extension}-meta.xml`);
   expect(outputPanelText).to.include(`create ${metadataPath}`);
   return outputPanelText;
 }
@@ -158,9 +146,7 @@ export async function setDefaultOrg(targetOrg: string): Promise<void> {
 }
 
 // Type guard function to check if the argument is a Duration
-export function isDuration(
-  predicateOrWait: PredicateWithTimeout | Duration
-): predicateOrWait is Duration {
+export function isDuration(predicateOrWait: PredicateWithTimeout | Duration): predicateOrWait is Duration {
   return (predicateOrWait as Duration).milliseconds !== undefined;
 }
 
@@ -240,7 +226,7 @@ export class Duration extends DurationKit.Duration {
 }
 
 export async function sleep(duration: number): Promise<void> {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(resolve, duration);
   });
 }
@@ -267,5 +253,6 @@ export async function openFile(path: string) {
   // Set the location of the project
   await prompt.setText(path);
   await pause(Duration.seconds(2));
-  await clickFilePathOkButton();
+  const fileName = path.substring(path.lastIndexOf('/') + 1);
+  await prompt.selectQuickPick(fileName);
 }
