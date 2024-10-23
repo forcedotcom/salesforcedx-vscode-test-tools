@@ -33,7 +33,7 @@ export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
   const copyRecursive = (src: string, dest: string) => {
     if (fs.statSync(src).isDirectory()) {
       fs.mkdirSync(dest, { recursive: true });
-      fs.readdirSync(src).forEach((child) => {
+      fs.readdirSync(src).forEach(child => {
         copyRecursive(path.join(src, child), path.join(dest, child));
       });
     } else {
@@ -54,15 +54,43 @@ export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
   }
 }
 
+export async function createGlobalSnippetsFile(testSetup: TestSetup): Promise<void> {
+  const projectPath = testSetup.projectFolderPath;
+  const tempFolderPath = testSetup.tempFolderPath;
+  if (!tempFolderPath) {
+    throw new Error('tempFolderPath is undefined');
+  }
+  const destination = path.join(projectPath!, '.vscode', 'apex.json.code-snippets');
+  const apexSnippet = [
+    `{`,
+    `"SOQL": {`,
+    `"prefix": "soql",`,
+    `"body": [`,
+    `  "[SELECT \${1:field1, field2} FROM \${2:SobjectName} WHERE \${3:clause}];"`,
+    `],`,
+    `"description": "Apex SOQL query"`,
+    `}`,
+    `}`
+  ].join('\n');
+
+  try {
+    fs.writeFileSync(destination, apexSnippet);
+  } catch (error) {
+    if (error instanceof Error) {
+      log(`Failed in creating apex snippets file ${error.message}`);
+    }
+    log(`destination was: '${destination}'`);
+    await testSetup?.tearDown();
+    throw error;
+  }
+}
 /**
  * Scans the directory for vsix files and returns the full path to each file
  * @param vsixDir
  * @returns
  */
 export function getVsixFilesFromDir(vsixDir: string): string[] {
-  return FastGlob.sync('**/*.vsix', { cwd: vsixDir }).map((vsixFile) =>
-    path.join(vsixDir, vsixFile)
-  );
+  return FastGlob.sync('**/*.vsix', { cwd: vsixDir }).map(vsixFile => path.join(vsixDir, vsixFile));
 }
 
 /**

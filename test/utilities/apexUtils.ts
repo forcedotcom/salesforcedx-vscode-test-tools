@@ -107,7 +107,8 @@ export async function createAnonymousApexFile(): Promise<void> {
   await inputBox.confirm();
 
   const textEditor = await getTextEditor(workbench, 'Anonymous.apex');
-  await textEditor.setText("System.debug('¡Hola mundo!');");
+  const fileContent = ["System.debug('¡Hola mundo!');", ''].join('\n');
+  await textEditor.setText(fileContent);
   await textEditor.save();
   await pause(Duration.seconds(1));
 }
