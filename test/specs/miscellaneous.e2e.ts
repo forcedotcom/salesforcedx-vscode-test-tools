@@ -119,7 +119,7 @@ describe('Miscellaneous', async () => {
     // Type snippet "lwc", select "lwc-event" and check it inserted the right thing
     const textEditor = await utilities.getTextEditor(workbench, 'lwc.js');
     await textEditor.typeText('lwc');
-
+    await utilities.pause(utilities.Duration.seconds(1));
     const autocompletionOptions = await workbench.findElements(By.css('div.monaco-list-row.show-file-icons'));
     const ariaLabel = await autocompletionOptions[2].getAttribute('aria-label');
     expect(ariaLabel).to.contain('lwc-event');
