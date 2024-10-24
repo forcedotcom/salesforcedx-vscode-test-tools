@@ -8,7 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { By } from 'vscode-extension-tester';
+import { By, after } from 'vscode-extension-tester';
 
 describe('Miscellaneous', async () => {
   let testSetup: TestSetup;

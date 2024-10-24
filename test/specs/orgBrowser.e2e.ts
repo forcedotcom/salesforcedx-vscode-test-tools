@@ -8,7 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { By, ModalDialog } from 'vscode-extension-tester';
+import { By, ModalDialog, after } from 'vscode-extension-tester';
 
 describe('Org Browser', async () => {
   let testSetup: TestSetup;
@@ -36,16 +36,17 @@ describe('Org Browser', async () => {
   step('Check some metadata types are available', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Check some metadata types are available`);
     const metadataTypes = [
+      'AI Applications',
       'Apex Classes',
+      'Apex Test Suites',
       'Apex Triggers',
       'App Menus',
       'Assignment Rules',
       'Aura Components',
       'Auth Providers',
-      'Apex Test Suites',
-      'Communities',
-      'Connected Apps',
-      'Certificates'
+      'Branding Sets',
+      'Certificates',
+      'Communities'
     ];
     for (const type of metadataTypes) {
       console.log('*** type = ' + type);

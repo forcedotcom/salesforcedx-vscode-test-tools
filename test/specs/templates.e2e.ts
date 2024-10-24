@@ -12,6 +12,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import * as analyticsTemplate from '../testData/sampleAnalyticsTemplateData';
 import { expect } from 'chai';
+import { after } from 'vscode-extension-tester';
 
 const exec = util.promisify(child_process.exec);
 

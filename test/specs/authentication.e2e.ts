@@ -6,7 +6,7 @@
  */
 
 import { step } from 'mocha-steps';
-import { By, InputBox } from 'vscode-extension-tester';
+import { By, InputBox, after } from 'vscode-extension-tester';
 import { EnvironmentSettings } from '../environmentSettings';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';

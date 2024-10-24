@@ -40,7 +40,7 @@ export async function getTestsSection(workbench: Workbench, type: string) {
   const sidebarView = sidebar.getContent();
   const testsSection = await sidebarView.getSection(type);
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(testsSection).to.be.ok;
+  expect(testsSection).to.not.be.undefined;
   return testsSection;
 }
 
@@ -163,7 +163,7 @@ export async function verifyTestItemsInSideBar(
   // Make sure all the tests are present in the sidebar
   await expect(testsItems.length).to.equal(isLWCSection ? expectedNumClasses : expectedNumTests);
   for (const item of expectedItems) {
-    await expect(await testsSection.findItem(item)).to.be.ok;
+    await expect(await testsSection.findItem(item)).to.not.be.undefined;
   }
   return testsItems;
 }
