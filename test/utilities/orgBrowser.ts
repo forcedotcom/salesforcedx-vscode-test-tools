@@ -11,6 +11,7 @@ import { expect } from 'chai';
 
 export async function openOrgBrowser(wait: Duration = Duration.seconds(1)): Promise<void> {
   await executeQuickPick('View: Show Org Browser', wait);
+  await executeQuickPick('SFDX: Refresh Types', Duration.seconds(5));
 }
 
 export async function verifyOrgBrowserIsOpen(): Promise<void> {
