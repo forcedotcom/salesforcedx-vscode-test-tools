@@ -4,7 +4,7 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { WebElement } from 'vscode-extension-tester';
+import { SideBarView, WebElement } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, findElementByText } from './miscellaneous';
 import { expect } from 'chai';
@@ -13,14 +13,11 @@ export async function openOrgBrowser(wait: Duration = Duration.seconds(1)): Prom
   await executeQuickPick('View: Show Org Browser', wait);
 }
 
-export async function verifyOrgBrowserIsOpen(label: string): Promise<void> {
-  const orgBrowserLabelEl = await findElementByText(
-    'div',
-    'aria-label',
-    label
-  );
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(orgBrowserLabelEl).to.be.ok;
+export async function verifyOrgBrowserIsOpen(): Promise<void> {
+  const orgBrowser = new SideBarView();
+  const titlePart = orgBrowser.getTitlePart();
+  const title = await titlePart.getTitle();
+  expect(title).to.equal('ORG BROWSER: METADATA');
 }
 
 export async function findTypeInOrgBrowser(type: string): Promise<WebElement> {

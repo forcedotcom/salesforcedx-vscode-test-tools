@@ -85,8 +85,8 @@ export async function findElementByText(
   if (!labelText) {
     throw new Error('labelText must be defined');
   }
-  debug(`findElementByText ${type}[${attribute}="${labelText}"]`);
-  const element = await getWorkbench().findElement(By.xpath(`${type}[${attribute}="${labelText}"]`));
+  debug(`findElementByText //${type}[@${attribute}="${labelText}"]`);
+  const element = await getWorkbench().findElement(By.xpath(`//${type}[@${attribute}="${labelText}"]`));
   if (!element) {
     throw new Error(`Element with selector: "${type}[${attribute}=\"${labelText}\"]" not found}`);
   }
