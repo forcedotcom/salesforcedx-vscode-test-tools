@@ -28,7 +28,7 @@ describe('Templates', async () => {
 
   // Set up
   step('Set up the testing environment', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Set up the testing environment`);
+    utilities.log(`Templates - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
   });
