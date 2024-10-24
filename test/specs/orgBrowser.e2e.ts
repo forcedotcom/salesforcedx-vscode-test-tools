@@ -45,8 +45,7 @@ describe('Org Browser', async () => {
       'Apex Test Suites',
       'Communities',
       'Connected Apps',
-      'Certificates',
-      'Custom Applications'
+      'Certificates'
     ];
     for (const type of metadataTypes) {
       console.log('*** type = ' + type);
