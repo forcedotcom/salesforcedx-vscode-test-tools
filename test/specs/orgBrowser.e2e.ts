@@ -58,7 +58,8 @@ describe('Org Browser', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify there are no Apex Classes available`);
     // Check there are no classes displayed
     const apexClassesLabelEl = await utilities.findTypeInOrgBrowser('Apex Classes');
-    await apexClassesLabelEl.click();
+    expect(apexClassesLabelEl).to.not.be.undefined;
+    await apexClassesLabelEl?.click();
     await utilities.pause(utilities.Duration.seconds(2));
     const noCompsAvailableLabelEl = await utilities.findElementByText('div', 'aria-label', 'No components available');
     expect(noCompsAvailableLabelEl).to.not.be.undefined;
@@ -94,7 +95,7 @@ describe('Org Browser', async () => {
     // Check MyClass is present under Apex Classes section
     const apexClassesItem = await utilities.findTypeInOrgBrowser('Apex Classes');
     expect(apexClassesItem).to.not.be.undefined;
-    const refreshComponentsButton = (await apexClassesItem.findElements(By.css('a.action-label')))[1];
+    const refreshComponentsButton = (await apexClassesItem?.findElements(By.css('a.action-label')))![1];
     expect(refreshComponentsButton).to.not.be.undefined;
     await refreshComponentsButton?.click();
     await utilities.pause(utilities.Duration.seconds(2));
@@ -106,9 +107,9 @@ describe('Org Browser', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Retrieve This Source from Org`);
     const myClassLabelEl = await utilities.findTypeInOrgBrowser('MyClass');
     expect(myClassLabelEl).to.not.be.undefined;
-    await myClassLabelEl.click();
+    await myClassLabelEl?.click();
     await utilities.pause(utilities.Duration.seconds(1));
-    const retrieveSourceButton = (await myClassLabelEl.findElements(By.css('a.action-label')))[1];
+    const retrieveSourceButton = (await myClassLabelEl?.findElements(By.css('a.action-label')))![1];
     expect(retrieveSourceButton).to.not.be.undefined;
     await retrieveSourceButton.click();
     await utilities.pause(utilities.Duration.seconds(2));
@@ -128,9 +129,9 @@ describe('Org Browser', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Retrieve and Open Source`);
     const myClassLabelEl = await utilities.findTypeInOrgBrowser('MyClass');
     expect(myClassLabelEl).to.not.be.undefined;
-    await myClassLabelEl.click();
+    await myClassLabelEl?.click();
     await utilities.pause(utilities.Duration.seconds(1));
-    const retrieveAndOpenSourceButton = (await myClassLabelEl.findElements(By.css('a.action-label')))[0];
+    const retrieveAndOpenSourceButton = (await myClassLabelEl?.findElements(By.css('a.action-label')))![0];
     expect(retrieveAndOpenSourceButton).to.not.be.undefined;
     await retrieveAndOpenSourceButton.click();
     await utilities.pause(utilities.Duration.seconds(2));

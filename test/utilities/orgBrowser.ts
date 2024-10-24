@@ -4,7 +4,7 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { SideBarView, WebElement } from 'vscode-extension-tester';
+import { By, SideBarView, WebElement } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, findElementByText } from './miscellaneous';
 import { expect } from 'chai';
@@ -20,6 +20,14 @@ export async function verifyOrgBrowserIsOpen(): Promise<void> {
   expect(title).to.equal('ORG BROWSER: METADATA');
 }
 
-export async function findTypeInOrgBrowser(type: string): Promise<WebElement> {
-  return await findElementByText('div', 'aria-label', type);
+export async function findTypeInOrgBrowser(type: string): Promise<WebElement | undefined> {
+  const orgBrowser = new SideBarView();
+  const content = orgBrowser.getContent();
+  const treeItems = await content.findElements(By.css('div.monaco-list-row'));
+  let element;
+  for (const item of treeItems) {
+    const label = await item.getAttribute('aria-label');
+    if (label.includes(type)) return item;
+  }
+  return element;
 }
