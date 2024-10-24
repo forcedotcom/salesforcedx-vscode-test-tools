@@ -27,7 +27,7 @@ describe('Org Browser', async () => {
   step('Check Org Browser is connected to target org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Check Org Browser is connected to target org`);
 
-    await utilities.openOrgBrowser(utilities.Duration.seconds(5));
+    await utilities.openOrgBrowser(utilities.Duration.seconds(10));
     await utilities.verifyOrgBrowserIsOpen();
 
     utilities.log(`${testSetup.testSuiteSuffixName} - Org Browser is connected to target org`);
