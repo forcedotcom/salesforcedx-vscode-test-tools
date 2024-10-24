@@ -49,7 +49,9 @@ describe('Org Browser', async () => {
       'Custom Applications'
     ];
     for (const type of metadataTypes) {
+      console.log('*** type = ' + type);
       const element = await utilities.findTypeInOrgBrowser(type);
+      console.log('*** element = ' + JSON.stringify(element));
       expect(element).to.not.be.undefined;
     }
   });
