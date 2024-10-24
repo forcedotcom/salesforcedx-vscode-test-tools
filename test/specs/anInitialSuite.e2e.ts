@@ -8,6 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
+import { after } from 'vscode-extension-tester';
 
 /*
 anInitialSuite.e2e.ts is a special case.  We want to validate that the Salesforce extensions and
@@ -38,11 +39,11 @@ describe('An Initial Suite', async () => {
     await utilities.zoom('Out', 4, utilities.Duration.seconds(1));
 
     const foundSfExtensions = await utilities.findExtensionsInRunningExtensionsList(
-      utilities.getExtensionsToVerifyActive().map((ext) => ext.extensionId)
+      utilities.getExtensionsToVerifyActive().map(ext => ext.extensionId)
     );
     await utilities.zoomReset();
     if (foundSfExtensions.length > 0) {
-      foundSfExtensions.forEach((ext) => {
+      foundSfExtensions.forEach(ext => {
         utilities.log(
           `AnInitialSuite - extension ${ext.extensionId} was present, but wasn't expected before the extensions loaded`
         );
@@ -94,7 +95,7 @@ describe('An Initial Suite', async () => {
     const workbench = utilities.getWorkbench();
     const prompt = await utilities.openCommandPromptWithCommand(workbench, 'SFDX:');
     const quickPicks = await prompt.getQuickPicks();
-    const commands = await Promise.all(quickPicks.map((quickPick) => quickPick.getLabel()));
+    const commands = await Promise.all(quickPicks.map(quickPick => quickPick.getLabel()));
 
     // Look for the first few SFDX commands.
     expect(commands).to.include('SFDX: Authorize a Dev Hub');

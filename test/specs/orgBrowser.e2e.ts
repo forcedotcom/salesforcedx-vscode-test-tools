@@ -36,17 +36,17 @@ describe('Org Browser', async () => {
   step('Check some metadata types are available', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Check some metadata types are available`);
     const metadataTypes = [
+      'AI Applications',
       'Apex Classes',
+      'Apex Test Suites',
       'Apex Triggers',
       'App Menus',
       'Assignment Rules',
       'Aura Components',
       'Auth Providers',
-      'Apex Test Suites',
-      'Communities',
-      'Connected Apps',
+      'Branding Sets',
       'Certificates',
-      'Custom Applications'
+      'Communities'
     ];
     for (const type of metadataTypes) {
       const element = await utilities.findTypeInOrgBrowser(type);

@@ -8,6 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
+import { after } from 'vscode-extension-tester';
 
 describe('SOQL', async () => {
   let testSetup: TestSetup;

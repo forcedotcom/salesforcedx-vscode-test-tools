@@ -8,7 +8,7 @@ import { step } from 'mocha-steps';
 import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { DefaultTreeItem, InputBox } from 'vscode-extension-tester';
+import { DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 describe('Manifest Builder', async () => {
