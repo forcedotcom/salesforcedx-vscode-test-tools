@@ -7,11 +7,9 @@
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { EnvironmentSettings } from '../environmentSettings';
-import { By, Key } from 'vscode-extension-tester';
+import { By, after } from 'vscode-extension-tester';
 import { step } from 'mocha-steps';
 import { expect } from 'chai';
-
-const CMD_KEY = process.platform === 'darwin' ? Key.COMMAND : Key.CONTROL;
 
 describe('Apex LSP', async () => {
   let testSetup: TestSetup;

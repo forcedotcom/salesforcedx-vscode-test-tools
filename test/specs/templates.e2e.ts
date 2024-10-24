@@ -12,6 +12,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import * as analyticsTemplate from '../testData/sampleAnalyticsTemplateData';
 import { expect } from 'chai';
+import { after } from 'vscode-extension-tester';
 
 const exec = util.promisify(child_process.exec);
 
@@ -28,7 +29,7 @@ describe('Templates', async () => {
 
   // Set up
   step('Set up the testing environment', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Set up the testing environment`);
+    utilities.log(`Templates - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
   });

@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { step } from 'mocha-steps';
-import { DefaultTreeItem, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
+import { DefaultTreeItem, TreeItem, ViewSection, Workbench, after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';

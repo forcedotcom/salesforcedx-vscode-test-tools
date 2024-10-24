@@ -7,6 +7,7 @@
 import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
+import { after } from 'vscode-extension-tester';
 
 describe('SFDX: Create Project', async () => {
   let testSetup: TestSetup;

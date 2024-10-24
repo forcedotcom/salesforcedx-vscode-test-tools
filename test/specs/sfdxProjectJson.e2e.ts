@@ -9,6 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import path from 'path';
 import { expect } from 'chai';
+import { after } from 'vscode-extension-tester';
 
 describe('Customize sfdx-project.json', async () => {
   let testSetup: TestSetup;

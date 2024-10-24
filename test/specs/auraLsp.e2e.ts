@@ -7,7 +7,7 @@
 import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { By } from 'vscode-extension-tester';
+import { By, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 describe('Aura LSP', async () => {
