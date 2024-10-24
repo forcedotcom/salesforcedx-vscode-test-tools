@@ -8,7 +8,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { By, ModalDialog } from 'vscode-extension-tester';
+import { By, ModalDialog, after } from 'vscode-extension-tester';
 
 describe('Org Browser', async () => {
   let testSetup: TestSetup;
