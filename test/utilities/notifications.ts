@@ -5,9 +5,10 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration } from './miscellaneous';
+import { Duration, log } from './miscellaneous';
 import { getBrowser, getWorkbench } from './workbench';
 import { executeQuickPick } from './commandPrompt';
+import { By } from 'vscode-extension-tester';
 
 export async function waitForNotificationToGoAway(
   notificationMessage: string,
@@ -17,11 +18,7 @@ export async function waitForNotificationToGoAway(
 }
 
 export async function notificationIsPresent(notificationMessage: string): Promise<boolean> {
-  const notification = await findNotification(
-    notificationMessage,
-    true,
-    Duration.milliseconds(500)
-  );
+  const notification = await findNotification(notificationMessage, true, Duration.milliseconds(500));
 
   return notification ? true : false;
 }
@@ -36,11 +33,7 @@ export async function notificationIsPresentWithTimeout(
 }
 
 export async function notificationIsAbsent(notificationMessage: string): Promise<boolean> {
-  const notification = await findNotification(
-    notificationMessage,
-    false,
-    Duration.milliseconds(500)
-  );
+  const notification = await findNotification(notificationMessage, false, Duration.milliseconds(500));
 
   return notification ? false : true;
 }
@@ -54,10 +47,7 @@ export async function notificationIsAbsentWithTimeout(
   return notification ? false : true;
 }
 
-export async function dismissNotification(
-  notificationMessage: string,
-  timeout = Duration.seconds(1)
-): Promise<void> {
+export async function dismissNotification(notificationMessage: string, timeout = Duration.seconds(1)): Promise<void> {
   const notification = await findNotification(notificationMessage, true, timeout, true);
   notification?.close();
 }
@@ -66,19 +56,21 @@ export async function acceptNotification(
   notificationMessage: string,
   actionName: string,
   timeout: Duration
-): Promise<void> {
+): Promise<boolean> {
   console.log(`${notificationMessage}, ${actionName}, ${timeout}`);
+  await executeQuickPick('Notifications: Show Notifications', Duration.seconds(1));
 
-  // const notification = await findNotification(notificationMessage, true, timeout);
-  // if (!notification) {
-  //   throw new Error(
-  //     `Could not take action ${actionName} for notification with message ${notificationMessage}`
-  //   );
-  // }
-
-  // const elemment = await notification.getL
-  // const actionButton = await elemment.$(`.//a[@role="button"][text()="${actionName}"]`);
-  // await actionButton.click();
+  const actionButtons = await getBrowser().findElements(
+    By.css(`div.notification-list-item-buttons-container > a.monaco-button.monaco-text-button`)
+  );
+  for (const button of actionButtons) {
+    if ((await button.getText()).includes(actionName)) {
+      log(`button ${actionName} found`);
+      await button.click();
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function dismissAllNotifications(): Promise<void> {
@@ -107,8 +99,8 @@ async function findNotification(
           }
         }
         return bestMatch;
-
-      }, timeout.milliseconds,
+      },
+      timeout.milliseconds,
       `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`
     );
 

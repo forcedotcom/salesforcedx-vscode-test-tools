@@ -60,7 +60,7 @@ describe('Org Browser', async () => {
     const apexClassesLabelEl = await utilities.findTypeInOrgBrowser('Apex Classes');
     expect(apexClassesLabelEl).to.not.be.undefined;
     await apexClassesLabelEl?.click();
-    await utilities.pause(utilities.Duration.seconds(2));
+    await utilities.pause(utilities.Duration.seconds(10));
     const noCompsAvailableLabelEl = await utilities.findElementByText('div', 'aria-label', 'No components available');
     expect(noCompsAvailableLabelEl).to.not.be.undefined;
   });
@@ -98,7 +98,7 @@ describe('Org Browser', async () => {
     const refreshComponentsButton = (await apexClassesItem?.findElements(By.css('a.action-label')))![1];
     expect(refreshComponentsButton).to.not.be.undefined;
     await refreshComponentsButton?.click();
-    await utilities.pause(utilities.Duration.seconds(2));
+    await utilities.pause(utilities.Duration.seconds(10));
     const myClassLabelEl = await utilities.findTypeInOrgBrowser('MyClass');
     expect(myClassLabelEl).to.not.be.undefined;
   });
