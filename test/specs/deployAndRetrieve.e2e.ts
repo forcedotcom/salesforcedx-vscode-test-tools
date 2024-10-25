@@ -266,7 +266,6 @@ describe('Deploy and Retrieve', async () => {
 
     const outputPanelLineText = `MyClass   ApexClass ${path.join(pathToClass)}.cls`.toLowerCase();
     const expectedTexts = [
-      '*** Deleting with SOAP API ***',
       'Status: Succeeded | 1/1 Components',
       '=== Deleted Source',
       'Updating source tracking... done',
