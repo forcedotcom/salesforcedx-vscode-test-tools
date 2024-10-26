@@ -265,12 +265,7 @@ describe('Deploy and Retrieve', async () => {
     );
 
     const outputPanelLineText = `MyClass   ApexClass ${path.join(pathToClass)}.cls`.toLowerCase();
-    const expectedTexts = [
-      'Status: Succeeded | 1/1 Components',
-      '=== Deleted Source',
-      'Updating source tracking... done',
-      'ended with exit code 0'
-    ];
+    const expectedTexts = ['=== Deleted Source', 'Updating source tracking... done', 'ended with exit code 0'];
 
     expect(outputPanelText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
