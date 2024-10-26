@@ -264,13 +264,19 @@ describe('Deploy and Retrieve', async () => {
       10
     );
 
-    const outputPanelLineText = `MyClass   ApexClass ${path.join(pathToClass)}.cls`.toLowerCase();
-    const expectedTexts = ['=== Deleted Source', 'Updating source tracking... done', 'ended with exit code 0'];
+    const expectedTexts = [
+      'Status: Succeeded | 1/1 Components',
+      '=== Deleted Source',
+      'MyClass',
+      'ApexClass',
+      `${path.join(pathToClass)}.cls`,
+      `${path.join(pathToClass)}.cls-meta.xml`,
+      'Updating source tracking... done',
+      'ended with exit code 0'
+    ];
 
     expect(outputPanelText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
-    expect(outputPanelText?.toLowerCase()).to.contain(outputPanelLineText);
-    expect(outputPanelText?.toLowerCase()).to.contain(`${outputPanelLineText}-meta.xml`);
   });
 
   after('Tear down and clean up the testing environment', async () => {
