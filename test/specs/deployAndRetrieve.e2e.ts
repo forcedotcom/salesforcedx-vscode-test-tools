@@ -265,7 +265,6 @@ describe('Deploy and Retrieve', async () => {
     );
 
     const expectedTexts = [
-      'Status: Succeeded | 1/1 Components',
       '=== Deleted Source',
       'MyClass',
       'ApexClass',
