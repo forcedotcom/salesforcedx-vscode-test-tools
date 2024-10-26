@@ -24,7 +24,7 @@ describe('Deploy and Retrieve', async () => {
     testSuiteSuffixName: 'DeployAndRetrieve'
   };
   step('Set up the testing environment', async () => {
-    utilities.log(`Deploy and Retrieve - SFDX: Retrieve Source in Manifest from Org`);
+    utilities.log(`Deploy and Retrieve - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
 
@@ -75,12 +75,12 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Verify Source Tracking Setting is enabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Verify Source Tracking Setting is enabled`);
+    utilities.log(`Deploy and Retrieve - Verify Source Tracking Setting is enabled`);
     expect(await utilities.isBooleanSettingEnabled(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE));
   });
 
   step('Deploy with SFDX: Deploy This Source to Org - ST enabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Deploy with SFDX: Deploy This Source to Org - ST enabled`);
+    utilities.log(`Deploy and Retrieve - Deploy with SFDX: Deploy This Source to Org - ST enabled`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -89,7 +89,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Deploy again (with no changes) - ST enabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Deploy again (with no changes) - ST enabled`);
+    utilities.log(`Deploy and Retrieve - Deploy again (with no changes) - ST enabled`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -99,7 +99,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Modify the file and deploy again - ST enabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Modify the file and deploy again - ST enabled`);
+    utilities.log(`Deploy and Retrieve - Modify the file and deploy again - ST enabled`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -114,7 +114,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Retrieve with SFDX: Retrieve This Source from Org', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Retrieve with SFDX: Retrieve This Source from Org`);
+    utilities.log(`Deploy and Retrieve - Retrieve with SFDX: Retrieve This Source from Org`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -124,7 +124,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Modify the file and retrieve again', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Modify the file and retrieve again`);
+    utilities.log(`Deploy and Retrieve - Modify the file and retrieve again`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -143,7 +143,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Prefer Deploy on Save when `Push or deploy on save` is enabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Prefer Deploy on Save when 'Push or deploy on save' is enabled`);
+    utilities.log(`Deploy and Retrieve - Prefer Deploy on Save when 'Push or deploy on save' is enabled`);
     const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -169,7 +169,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Disable Source Tracking Setting', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Disable Source Tracking Setting`);
+    utilities.log(`Deploy and Retrieve - Disable Source Tracking Setting`);
     await utilities.executeQuickPick('Notifications: Clear All Notifications', utilities.Duration.seconds(1));
 
     expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE)).to.equal(false);
@@ -183,7 +183,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Deploy with SFDX: Deploy This Source to Org - ST disabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Deploy with SFDX: Deploy This Source to Org - ST disabled`);
+    utilities.log(`Deploy and Retrieve - Deploy with SFDX: Deploy This Source to Org - ST disabled`);
     const workbench = utilities.getWorkbench();
     // Clear all notifications so clear output button is visible
     await utilities.executeQuickPick('Notifications: Clear All Notifications');
@@ -195,7 +195,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Deploy again (with no changes) - ST disabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Deploy again (with no changes) - ST enabled`);
+    utilities.log(`Deploy and Retrieve - Deploy again (with no changes) - ST enabled`);
     const workbench = await utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -205,7 +205,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('Modify the file and deploy again - ST disabled', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Modify the file and deploy again - ST disabled`);
+    utilities.log(`Deploy and Retrieve - Modify the file and deploy again - ST disabled`);
     const workbench = await utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -220,7 +220,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   step('SFDX: Delete This from Project and Org', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Delete This from Project and Org`);
+    utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org`);
     const workbench = await utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'MyClass.cls');
     // Run SFDX: Push Source to Default Org and Ignore Conflicts to be in sync with remote
@@ -279,7 +279,7 @@ describe('Deploy and Retrieve', async () => {
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`);
+    utilities.log(`Deploy and Retrieve - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 
