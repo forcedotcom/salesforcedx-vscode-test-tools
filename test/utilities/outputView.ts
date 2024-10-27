@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { debug, Duration, pause } from './miscellaneous';
+import { debug, Duration, log, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
 import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
@@ -57,7 +57,9 @@ export async function getOutputViewText(outputChannelName: string = ''): Promise
  * );
  */
 export async function verifyOutputPanelText(outputPanelText: string, expectedTexts: string[]): Promise<void> {
+  log(`Output panel text:\n ${outputPanelText}`);
   for (const expectedText of expectedTexts) {
+    log(`Expected text:\n ${expectedText}`);
     expect(outputPanelText).to.include(expectedText);
   }
 }
