@@ -1,4 +1,4 @@
-import { By, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
+import { By, DebugToolbar, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { notificationIsPresentWithTimeout } from './notifications';
 import { attemptToFindOutputPanelText } from './outputView';
@@ -166,8 +166,9 @@ export async function verifyTestItemsInSideBar(
 }
 
 export async function continueDebugging(times: number): Promise<void> {
+  const bar = await DebugToolbar.create();
   // Continue with the debug session
   for (let i = 0; i < times; i++) {
-    await executeQuickPick('Debug: Continue', Duration.seconds(2));
+    await bar.continue();
   }
 }
