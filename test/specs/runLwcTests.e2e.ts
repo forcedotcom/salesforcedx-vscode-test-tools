@@ -27,6 +27,10 @@ describe('Run LWC Tests', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
     projectFolderPath = testSetup.projectFolderPath!;
 
+    // Close both Welcome and Running Extensions tabs
+    await utilities.closeCurrentEditor();
+    await utilities.closeCurrentEditor();
+
     // Create LWC1 and test
     await utilities.createLwc('lwc1');
 
@@ -48,8 +52,8 @@ describe('Run LWC Tests', async () => {
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
     const workbench = utilities.getWorkbench();
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}`,
       'Test Suites: 2 passed, 2 total',
@@ -57,7 +61,17 @@ describe('Run LWC Tests', async () => {
       'Snapshots:   0 total',
       'Ran all test suites.'
     ];
+
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      `PASS  force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js)`,
+      'Test Suites: 2 passed, 2 total',
+      'Tests:       4 passed, 4 total',
+      'Snapshots:   0 total',
+      'Ran all test suites.'
+    ];
     expect(terminalText).to.not.be.undefined;
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
 
@@ -121,8 +135,8 @@ describe('Run LWC Tests', async () => {
 
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}`,
       'Test Suites: 2 passed, 2 total',
@@ -130,6 +144,16 @@ describe('Run LWC Tests', async () => {
       'Snapshots:   0 total',
       'Ran all test suites.'
     ];
+
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      `PASS  force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js)`,
+      'Test Suites: 2 passed, 2 total',
+      'Tests:       4 passed, 4 total',
+      'Snapshots:   0 total',
+      'Ran all test suites.'
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
 
@@ -150,7 +174,7 @@ describe('Run LWC Tests', async () => {
       'lwc1',
       'SFDX: Run Lightning Web Component Test File'
     );
-    const expectedTexts = [
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
@@ -166,6 +190,15 @@ describe('Run LWC Tests', async () => {
         'lwc1.test.js'
       )}"`
     ];
+
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       2 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
     await utilities.closeCurrentEditor();
@@ -182,7 +215,7 @@ describe('Run LWC Tests', async () => {
       'displays greeting',
       'SFDX: Run Lightning Web Component Test Case'
     );
-    const expectedTexts = [
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
@@ -198,6 +231,14 @@ describe('Run LWC Tests', async () => {
         'lwc1.test.js'
       )}"`
     ];
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       1 skipped, 1 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
@@ -223,8 +264,8 @@ describe('Run LWC Tests', async () => {
     // Verify test results are listed on vscode's Output section
     // Also verify that all tests pass
     const workbench = utilities.getWorkbench();
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
@@ -240,6 +281,14 @@ describe('Run LWC Tests', async () => {
         'lwc1.test.js'
       )}"`
     ];
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       2 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
@@ -259,8 +308,8 @@ describe('Run LWC Tests', async () => {
 
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
@@ -276,6 +325,14 @@ describe('Run LWC Tests', async () => {
         'lwc1.test.js'
       )}"`
     ];
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       2 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc1\\__tests__\\lwc1.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
@@ -294,8 +351,8 @@ describe('Run LWC Tests', async () => {
 
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
@@ -311,6 +368,14 @@ describe('Run LWC Tests', async () => {
         'lwc2.test.js'
       )}"`
     ];
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       1 skipped, 1 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
@@ -321,12 +386,6 @@ describe('Run LWC Tests', async () => {
     );
 
     // // Run SFDX: Run Current Lightning Web Component Test File
-    // const runTestButtonToolbar = await utilities.findElementByText(
-    //   'a',
-    //   'aria-label',
-    //   'SFDX: Run Current Lightning Web Component Test File'
-    // );
-    // await runTestButtonToolbar.click();
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
     const runTestButtonToolbar = await editorView.getAction('SFDX: Run Current Lightning Web Component Test File');
@@ -335,8 +394,8 @@ describe('Run LWC Tests', async () => {
 
     // Verify test results are listed on vscode's Output section
     // Also verify that all tests pass
-    const terminalText = await utilities.getTerminalViewText(workbench, 15);
-    const expectedTexts = [
+    const terminalText = await utilities.getTerminalViewText(workbench, 10);
+    const expectedTextsUnix = [
       `PASS  ${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}`,
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
@@ -352,6 +411,14 @@ describe('Run LWC Tests', async () => {
         'lwc2.test.js'
       )}"`
     ];
+    const expectedTextsWindows = [
+      `PASS  force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js)`,
+      'Test Suites: 1 passed, 1 total',
+      'Tests:       2 passed, 2 total',
+      'Snapshots:   0 total',
+      `Ran all test suites within paths "${projectFolderPath}\\force-app\\main\\default\\lwc\\lwc2\\__tests__\\lwc2.test.js"`
+    ];
+    const expectedTexts = process.platform === 'win32' ? expectedTextsWindows : expectedTextsUnix;
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
   });
