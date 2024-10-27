@@ -162,7 +162,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc1/__tests__/lwc1.test.js"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -185,15 +186,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${path.join(
-        'force-app',
-        'main',
-        'default',
-        'lwc',
-        'lwc1',
-        '__tests__',
-        'lwc1.test.js'
-      )}"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -227,15 +221,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${path.join(
-        'force-app',
-        'main',
-        'default',
-        'lwc',
-        'lwc1',
-        '__tests__',
-        'lwc1.test.js'
-      )}"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -262,15 +249,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${path.join(
-        'force-app',
-        'main',
-        'default',
-        'lwc',
-        'lwc1',
-        '__tests__',
-        'lwc1.test.js'
-      )}"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc1', '__tests__', 'lwc1.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -296,15 +276,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${path.join(
-        'force-app',
-        'main',
-        'default',
-        'lwc',
-        'lwc2',
-        '__tests__',
-        'lwc2.test.js'
-      )}"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -330,15 +303,8 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${path.join(
-        'force-app',
-        'main',
-        'default',
-        'lwc',
-        'lwc2',
-        '__tests__',
-        'lwc2.test.js'
-      )}"`
+      'Ran all test suites within paths',
+      `"${path.join('force-app', 'main', 'default', 'lwc', 'lwc2', '__tests__', 'lwc2.test.js')}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
