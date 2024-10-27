@@ -28,8 +28,7 @@ describe('Run LWC Tests', async () => {
     projectFolderPath = testSetup.projectFolderPath!;
 
     // Close both Welcome and Running Extensions tabs
-    await utilities.closeCurrentEditor();
-    await utilities.closeCurrentEditor();
+    await utilities.closeAllEditors();
 
     // Create LWC1 and test
     await utilities.createLwc('lwc1');
@@ -167,7 +166,7 @@ describe('Run LWC Tests', async () => {
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
-    await utilities.closeCurrentEditor();
+    await utilities.closeAllEditors();
   });
 
   step('Run Single Test via the Test Sidebar', async () => {
@@ -195,7 +194,8 @@ describe('Run LWC Tests', async () => {
 
   step('SFDX: Navigate to Lightning Web Component Test', async () => {
     // Verify that having clicked the test case took us to the test file.
-    await utilities.reloadWindow(utilities.Duration.seconds(10));
+    await utilities.reloadWindow();
+    await utilities.pause(utilities.Duration.seconds(10));
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
