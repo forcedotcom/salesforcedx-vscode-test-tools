@@ -192,8 +192,7 @@ describe('Run LWC Tests', async () => {
 
   step('SFDX: Navigate to Lightning Web Component Test', async () => {
     // Verify that having clicked the test case took us to the test file.
-    const input = InputBox.create();
-    (await input).cancel();
+    await utilities.reloadWindow(utilities.Duration.seconds(10));
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
