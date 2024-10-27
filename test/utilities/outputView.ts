@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { debug, Duration, log, pause } from './miscellaneous';
+import { debug, Duration, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
 import { BottomBarPanel, OutputView } from 'vscode-extension-tester';

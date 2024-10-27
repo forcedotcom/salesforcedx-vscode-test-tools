@@ -9,7 +9,7 @@ import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
-import { By, after } from 'vscode-extension-tester';
+import { after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 describe('Deploy and Retrieve', async () => {
