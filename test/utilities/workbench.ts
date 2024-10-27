@@ -25,6 +25,11 @@ export async function closeCurrentEditor(): Promise<void> {
   await executeQuickPick('View: Close Editor');
   await pause(Duration.seconds(1));
 }
+export async function closeAllEditors(): Promise<void> {
+  log(`Closing all editors`);
+  await executeQuickPick('View: Close All Editors');
+  await pause(Duration.seconds(1));
+}
 
 export async function enableAllExtensions(): Promise<void> {
   log(`Enabling all extensions`);

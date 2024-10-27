@@ -15,11 +15,9 @@ export async function getTerminalView(workbench: Workbench): Promise<TerminalVie
   return terminalView;
 }
 
-export async function getTerminalViewText(
-  workbench: Workbench,
-  seconds: Duration
-): Promise<string> {
-  const terminalView = await (await getTerminalView(workbench)).wait(seconds.milliseconds);
+export async function getTerminalViewText(workbench: Workbench, seconds: number): Promise<string> {
+  await pause(Duration.seconds(seconds));
+  const terminalView = await getTerminalView(workbench);
 
   return await terminalView.getText();
 }
@@ -29,9 +27,7 @@ export async function executeCommand(workbench: Workbench, command: string): Pro
 
   const terminalView = await (await getTerminalView(workbench)).wait();
   if (!terminalView) {
-    throw new Error(
-      'In executeCommand(), the terminal view returned from getTerminalView() was null (or undefined)'
-    );
+    throw new Error('In executeCommand(), the terminal view returned from getTerminalView() was null (or undefined)');
   }
   await pause(Duration.seconds(5));
   await terminalView.executeCommand(command);

@@ -1,12 +1,10 @@
-import { Key, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
-import { getWorkbench } from './workbench';
+import { By, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { notificationIsPresentWithTimeout } from './notifications';
 import { attemptToFindOutputPanelText } from './outputView';
 import { getTerminalViewText } from './terminalView';
 import { Duration, log, pause } from './miscellaneous';
-
-const CONTINUE = Key.F5;
+import { executeQuickPick } from './commandPrompt';
 
 export async function retrieveExpectedNumTestsFromSidebar(
   expectedNumTests: number,
@@ -14,7 +12,6 @@ export async function retrieveExpectedNumTestsFromSidebar(
   actionLabel: string
 ): Promise<TreeItem[]> {
   let testsItems = (await testsSection.getVisibleItems()) as TreeItem[];
-  await getWorkbench().sendKeys(Key.ESCAPE);
 
   // If the tests did not show up, click the refresh button on the top right corner of the Test sidebar
   for (let x = 0; x < 3; x++) {
@@ -48,14 +45,14 @@ export async function getTestsSection(workbench: Workbench, type: string) {
  * Runs a test case from the sidebar and returns the test result.
  * *
  * @param {Workbench} workbench - The workbench instance used to interact with the sidebar and views.
- * @param {string} testSuite - The name of the test suite from which to run the test (e.g., 'APEX TESTS', 'LWC TESTS').
+ * @param {string} testSuite - The name of the test suite from which to run the test (e.g., 'APEX Tests', 'LWC Tests').
  * @param {string} testName - The name of the specific test case to run.
  * @param {string} actionLabel - The label of the action button to click (e.g., 'SFDX: Run Lightning Web Component Test File', 'Run Single Test').
  *
  * @example
  * const result = await runTestCaseFromSideBar(
  *   myWorkbench,
- *   'APEX TESTS',
+ *   'APEX Tests',
  *   'MyApexTestCase',
  *   'Run Single Test'
  * );
@@ -69,34 +66,34 @@ export async function runTestCaseFromSideBar(
 ): Promise<string | undefined> {
   log(`Running ${testSuite} - ${testName} - ${actionLabel} from SideBar`);
   const testingView = await workbench.getActivityBar().getViewControl('Testing');
-  await expect(testingView).to.not.be.undefined;
+  expect(testingView).to.not.be.undefined;
 
   // Open the Test Sidebar
   const testingSideBarView = await testingView?.openView();
-  await expect(testingSideBarView).to.be.instanceOf(SideBarView);
+  expect(testingSideBarView).to.be.instanceOf(SideBarView);
 
   // Select test
   const testSection = await getTestsSection(workbench, testSuite);
   const testItem = (await testSection.findItem(testName)) as TreeItem;
-  await expect(testItem).to.not.be.undefined;
+  expect(testItem).to.not.be.undefined;
   await testItem.select();
 
   // Click button to run test
   const actionButton = await testItem.getActionButton(actionLabel);
-  await expect(actionButton).to.not.be.undefined;
+  expect(actionButton).to.not.be.undefined;
   await actionButton?.click();
 
   let testResult: string | undefined;
-  if (testSuite === 'APEX TESTS') {
+  if (testSuite === 'APEX Tests') {
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
     const successNotificationWasFound = await notificationIsPresentWithTimeout(
       'SFDX: Run Apex Tests successfully ran',
       Duration.TEN_MINUTES
     );
-    await expect(successNotificationWasFound).to.be.true;
+    expect(successNotificationWasFound).to.be.true;
     testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
-  } else if (testSuite === 'LWC TESTS') {
-    testResult = await getTerminalViewText(workbench, Duration.seconds(15));
+  } else if (testSuite === 'LWC Tests') {
+    testResult = await getTerminalViewText(workbench, 15);
   }
   await verifyTestIconColor(testItem, 'testPass');
   return testResult;
@@ -114,14 +111,14 @@ export async function runTestCaseFromSideBar(
 export async function verifyTestIconColor(testItem: TreeItem, colorLabel: string) {
   log(`Verifying icon's colors - verifyTestIconColor()`);
   // Verify the tests that are passing are labeled with a green dot on the Test sidebar
-  //   const icon = await (await testItem.elem).$('.custom-view-tree-node-item-icon');
-  //   const iconStyle = await icon.getAttribute('style');
-  //   // Try/catch used to get around arbitrary flaky failure on Ubuntu in remote
-  //   try {
-  //     expect(iconStyle).to.contain(colorLabel);
-  //   } catch {
-  //     log(`ERROR: icon color label not ${colorLabel}`);
-  //   }
+  const icon = await testItem.findElement(By.css('.custom-view-tree-node-item-icon'));
+  const iconStyle = await icon.getAttribute('style');
+  // Try/catch used to get around arbitrary flaky failure on Ubuntu in remote
+  try {
+    expect(iconStyle).to.include(colorLabel);
+  } catch {
+    log(`ERROR: icon color label not ${colorLabel}`);
+  }
 }
 
 /**
@@ -161,20 +158,16 @@ export async function verifyTestItemsInSideBar(
   }
 
   // Make sure all the tests are present in the sidebar
-  await expect(testsItems.length).to.equal(isLWCSection ? expectedNumClasses : expectedNumTests);
+  expect(testsItems.length).to.equal(isLWCSection ? expectedNumClasses : expectedNumTests);
   for (const item of expectedItems) {
-    await expect(await testsSection.findItem(item)).to.not.be.undefined;
+    expect(await testsSection.findItem(item)).to.not.be.undefined;
   }
   return testsItems;
 }
 
-export async function continueDebugging(): Promise<void> {
+export async function continueDebugging(times: number): Promise<void> {
   // Continue with the debug session
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(3));
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(3));
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(1));
-  await getWorkbench().sendKeys(Key.ESCAPE);
+  for (let i = 0; i < times; i++) {
+    await executeQuickPick('Debug: Continue', Duration.seconds(2));
+  }
 }
