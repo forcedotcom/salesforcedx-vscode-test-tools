@@ -163,6 +163,7 @@ export async function setAlias(devHubAliasName: string, devHubUserName: string):
 }
 
 export async function installJestUTToolsForLwc(projectFolder: string | undefined): Promise<void> {
+  log(`SetUp - Started Install @salesforce/sfdx-lwc-jest Node module...`);
   if (!projectFolder) {
     throw new Error('cannot setup lwc tests without a project folder.');
   }
