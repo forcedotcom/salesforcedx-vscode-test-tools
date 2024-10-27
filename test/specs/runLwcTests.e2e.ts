@@ -4,12 +4,13 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { step } from 'mocha-steps';
-import { InputBox, TreeItem, after } from 'vscode-extension-tester';
-import { TestSetup } from '../testSetup';
-import * as utilities from '../utilities/index';
 import { fail } from 'assert';
 import { expect } from 'chai';
+import { step } from 'mocha-steps';
+import path from 'path';
+import { TreeItem, after } from 'vscode-extension-tester';
+import { TestSetup } from '../testSetup';
+import * as utilities from '../utilities/index';
 
 describe('Run LWC Tests', async () => {
   let projectFolderPath: string;
@@ -184,7 +185,15 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc1/__tests__/lwc1.test.js"`
+      `Ran all test suites within paths "${path.join(
+        'force-app',
+        'main',
+        'default',
+        'lwc',
+        'lwc1',
+        '__tests__',
+        'lwc1.test.js'
+      )}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -218,7 +227,15 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc1/__tests__/lwc1.test.js"`
+      `Ran all test suites within paths "${path.join(
+        'force-app',
+        'main',
+        'default',
+        'lwc',
+        'lwc1',
+        '__tests__',
+        'lwc1.test.js'
+      )}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -245,7 +262,15 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc1/__tests__/lwc1.test.js"`
+      `Ran all test suites within paths "${path.join(
+        'force-app',
+        'main',
+        'default',
+        'lwc',
+        'lwc1',
+        '__tests__',
+        'lwc1.test.js'
+      )}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -271,7 +296,15 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       1 skipped, 1 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc2/__tests__/lwc2.test.js"`
+      `Ran all test suites within paths "${path.join(
+        'force-app',
+        'main',
+        'default',
+        'lwc',
+        'lwc2',
+        '__tests__',
+        'lwc2.test.js'
+      )}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
@@ -297,7 +330,15 @@ describe('Run LWC Tests', async () => {
       'Test Suites: 1 passed, 1 total',
       'Tests:       2 passed, 2 total',
       'Snapshots:   0 total',
-      `Ran all test suites within paths "${projectFolderPath}/force-app/main/default/lwc/lwc2/__tests__/lwc2.test.js"`
+      `Ran all test suites within paths "${path.join(
+        'force-app',
+        'main',
+        'default',
+        'lwc',
+        'lwc2',
+        '__tests__',
+        'lwc2.test.js'
+      )}"`
     ];
     expect(terminalText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(terminalText!, expectedTexts);
