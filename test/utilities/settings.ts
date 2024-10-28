@@ -5,132 +5,93 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { debug, Duration } from './miscellaneous';
-import { Setting, SettingsEditor } from 'vscode-extension-tester';
-import { getWorkbench } from './workbench';
+import { By, Setting } from 'vscode-extension-tester';
+import { executeQuickPick } from './commandPrompt';
+import { debug, Duration, findElementByText, pause } from './miscellaneous';
+import { getBrowser } from './workbench';
 
+async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; checkButtonValue: string | null }> {
+  debug(`enter findAndCheckSetting for id: ${id}`);
+  await executeQuickPick('Preferences: Clear Settings Search Results', Duration.seconds(2));
+  const input = await getBrowser().findElement(By.css('div.suggest-input-container'));
+  await input.click();
+  const textArea = await getBrowser().findElement(By.css('textarea.inputarea.monaco-mouse-cursor-text'));
+  await textArea.sendKeys(id);
+  await pause(Duration.seconds(2));
+  let checkButton: Setting | null = null;
+  let checkButtonValue: string | null = null;
 
-type Perspective = 'Workspace' | 'User';
+  await getBrowser().wait(
+    async () => {
+      checkButton = (await findElementByText('div', 'aria-label', id)) as Setting;
+      if (checkButton) {
+        checkButtonValue = await checkButton.getAttribute('aria-checked');
+        debug(`found setting checkbox with value "${checkButtonValue}"`);
+        return true;
+      }
+      return false;
+    },
+    5000,
+    `Could not find setting with name: ${id}`
+  );
 
-async function findAndCheckSetting(
-  title: string,
-  categories: string[] = [],
-  perspective: Perspective = 'Workspace'
-): Promise<{ checkButton: Setting; checkButtonValue: string | boolean | null }> {
-  debug(`enter findAndCheckSetting for id: ${title}`);
-  const settings = await openSettings(perspective);
-  debug(`openSettings - after open`);
-  const setting = await settings.findSetting(title, ...categories);
-
-  if (!setting) {
-    throw new Error(`Could not find setting with name: ${title} in catagories: ${categories.join(', ')}`);
+  if (!checkButton) {
+    throw new Error(`Could not find setting with name: ${id}`);
   }
 
-  const value = await setting.getValue();
-
-  debug(`findAndCheckSetting result for ${title} found ${!!setting} value: ${value}`);
-  return { checkButton: setting, checkButtonValue: value };
+  debug(`findAndCheckSetting result for ${id} found ${!!checkButton} value: ${checkButtonValue}`);
+  return { checkButton, checkButtonValue };
 }
 
-async function openSettings(perspective: Perspective): Promise<SettingsEditor> {
-  debug('openSettings - enter');
-  const settings = await getWorkbench().openSettings();
-  await settings.switchToPerspective(perspective);
-  debug('openSettings - after open');
-  return settings;
+export async function inWorkspaceSettings<T>(): Promise<void> {
+  await executeQuickPick('Preferences: Open Workspace Settings', Duration.seconds(5));
 }
 
-async function openSettingsAndMaybeDo<T>(
-  perspective: Perspective,
-  doThis?: (settings: SettingsEditor) => Promise<T | void>,
-  timeout: Duration = Duration.seconds(5)
-): Promise<T> {
-  debug('openSettings - enter');
-  const settings = await openSettings(perspective);
-  if (!doThis) {
-    return settings as T;
-  }
-
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(
-        new Error(
-          `openSettings doThis function timed out after ${timeout.milliseconds} milliseconds`
-        )
-      );
-    }, timeout.milliseconds);
-  });
-
-  const doThisPromise = doThis(settings).then((result) => result ?? settings);
-
-  return (await Promise.race([doThisPromise, timeoutPromise])) as T;
-}
-
-// should not be needed
-export async function inWorkspaceSettings<T>(
-  doThis?: (settings: SettingsEditor) => Promise<T | void>,
-  timeout: Duration = Duration.seconds(5)
-): Promise<T> {
-  return openSettingsAndMaybeDo('Workspace', doThis, timeout);
-}
-
-export async function inUserSettings<T>(
-  doThis?: (settings: SettingsEditor) => Promise<T | void>,
-  timeout: Duration = Duration.seconds(5)
-): Promise<T> {
-  return openSettingsAndMaybeDo('User', doThis, timeout);
+export async function inUserSettings<T>(): Promise<void> {
+  await executeQuickPick('Preferences: Open User Settings', Duration.seconds(5));
 }
 
 async function toggleBooleanSetting(
   id: string,
-  timeout: Duration,
   finalState: boolean | undefined,
   settingsType: 'user' | 'workspace'
 ): Promise<boolean> {
   const settingsFunction = settingsType === 'workspace' ? inWorkspaceSettings : inUserSettings;
-  return await settingsFunction<boolean>(async () => {
-    let result = await findAndCheckSetting(id);
+  await settingsFunction();
+  let result = await findAndCheckSetting(id);
 
-    if (finalState !== undefined) {
-      if (
-        (finalState && result.checkButtonValue === 'true') ||
-        (!finalState && result.checkButtonValue === 'false')
-      ) {
-        return true;
-      }
+  if (finalState !== undefined) {
+    if ((finalState && result.checkButtonValue === 'true') || (!finalState && result.checkButtonValue === 'false')) {
+      return true;
     }
-    await result.checkButton.click();
-    result = await findAndCheckSetting(id);
-    return result.checkButtonValue === 'true';
-  }, timeout);
+  }
+  await result.checkButton.click();
+  result = await findAndCheckSetting(id);
+  return result.checkButtonValue === 'true';
 }
 
 export async function enableBooleanSetting(
   id: string,
-  timeout: Duration = Duration.seconds(10),
   settingsType: 'user' | 'workspace' = 'workspace'
 ): Promise<boolean> {
   debug(`enableBooleanSetting ${id}`);
-  return toggleBooleanSetting(id, timeout, true, settingsType);
+  return toggleBooleanSetting(id, true, settingsType);
 }
 
 export async function disableBooleanSetting(
   id: string,
-  timeout: Duration = Duration.seconds(10),
   settingsType: 'user' | 'workspace' = 'workspace'
 ): Promise<boolean> {
   debug(`disableBooleanSetting ${id}`);
-  return toggleBooleanSetting(id, timeout, false, settingsType);
+  return toggleBooleanSetting(id, false, settingsType);
 }
 
 export async function isBooleanSettingEnabled(
   id: string,
-  timeout: Duration = Duration.seconds(5),
   settingsType: 'user' | 'workspace' = 'workspace'
 ): Promise<boolean> {
   const settingsFunction = settingsType === 'workspace' ? inWorkspaceSettings : inUserSettings;
-  return await settingsFunction<boolean>(async () => {
-    const { checkButtonValue } = await findAndCheckSetting(id);
-    return checkButtonValue === 'true';
-  }, timeout);
+  await settingsFunction();
+  const { checkButtonValue } = await findAndCheckSetting(id);
+  return checkButtonValue === 'true';
 }

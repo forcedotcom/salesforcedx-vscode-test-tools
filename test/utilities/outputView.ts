@@ -57,7 +57,7 @@ export async function getOutputViewText(outputChannelName: string = ''): Promise
  * );
  */
 export async function verifyOutputPanelText(outputPanelText: string, expectedTexts: string[]): Promise<void> {
-  log(`Output panel text:\n ${outputPanelText}`);
+  debug(`verifyOutputPanelText() - ${outputPanelText}`);
   for (const expectedText of expectedTexts) {
     log(`Expected text:\n ${expectedText}`);
     expect(outputPanelText).to.include(expectedText);

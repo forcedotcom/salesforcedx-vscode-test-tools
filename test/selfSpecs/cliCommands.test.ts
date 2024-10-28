@@ -28,9 +28,7 @@ describe('CLI Commands', async () => {
     fs.writeFileSync(authFilePath, sfdxAuthUrl);
 
     const authorizeOrg = await utilities.orgLoginSfdxUrl(authFilePath);
-    expect(authorizeOrg.stdout).to.include(
-      `Successfully authorized ${devHubUserName} with org ID ${orgId}`
-    );
+    expect(authorizeOrg.stdout).to.include(`Successfully authorized ${devHubUserName} with org ID ${orgId}`);
 
     const setAlias = await utilities.setAlias(devHubAliasName, devHubUserName);
     expect(setAlias.stdout).to.include(devHubAliasName);
@@ -48,18 +46,18 @@ describe('CLI Commands', async () => {
     expect(orgListResult.exitCode).to.equal(0);
     const orgs = JSON.parse(orgListResult.stdout);
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(orgs).to.be.ok;
+    expect(orgs).to.not.be.undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scratchOrg = orgs.result.scratchOrgs.find((org: any) => org.alias === 'foo');
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(scratchOrg).to.be.ok;
+    expect(scratchOrg).to.not.be.undefined;
   });
 
   step('Display org using org display', async () => {
     const orgDisplayResult = await utilities.orgDisplay('foo');
     const org = JSON.parse(orgDisplayResult.stdout);
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(org).to.be.ok;
+    expect(org).to.not.be.undefined;
   });
 
   after('Delete the scratch org', async () => {
