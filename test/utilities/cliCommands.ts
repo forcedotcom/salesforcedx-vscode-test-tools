@@ -1,5 +1,5 @@
 import spawn from 'cross-spawn';
-import { SpawnOptionsWithoutStdio } from 'child_process';
+import { exec, SpawnOptionsWithoutStdio } from 'child_process';
 import { debug, log } from './miscellaneous';
 import { OrgEdition, SfCommandRunResults } from './types';
 import { EnvironmentSettings } from '../environmentSettings';
@@ -10,9 +10,9 @@ export async function runCliCommand(
   command: string,
   ...args: (string | SpawnOptionsWithoutStdio)[]
 ): Promise<SfCommandRunResults> {
-  const commandArgs = args.filter((arg) => typeof arg === 'string');
-  const hadJsonFlag = commandArgs.some((arg) => arg === '--json');
-  let options = args.find((arg) => typeof arg !== 'string') as SpawnOptionsWithoutStdio;
+  const commandArgs = args.filter(arg => typeof arg === 'string');
+  const hadJsonFlag = commandArgs.some(arg => arg === '--json');
+  let options = args.find(arg => typeof arg !== 'string') as SpawnOptionsWithoutStdio;
   let message = `running CLI command ${command} ${commandArgs.join(' ')}`;
   if (options) {
     message += `\nspawn options: ${JSON.stringify(options)}`;
@@ -37,15 +37,15 @@ export async function runCliCommand(
     let stdout = '';
     let stderr = '';
 
-    sfProcess.stdout?.on('data', (data) => {
+    sfProcess.stdout?.on('data', data => {
       stdout += data.toString();
     });
 
-    sfProcess.stderr?.on('data', (data) => {
+    sfProcess.stderr?.on('data', data => {
       stderr += data.toString();
     });
 
-    sfProcess.on('close', (code) => {
+    sfProcess.on('close', code => {
       // Post-command processing
       const result: SfCommandRunResults = { stdout, stderr, exitCode: code ?? 0 };
       result.stdout = hadJsonFlag ? removeEscapedCharacters(result.stdout) : result.stdout;
@@ -55,7 +55,7 @@ export async function runCliCommand(
       resolve(result);
     });
 
-    sfProcess.on('error', (err) => {
+    sfProcess.on('error', err => {
       reject(new Error(`Failed to start process: ${err.message}`));
     });
   });
@@ -64,12 +64,7 @@ export async function runCliCommand(
 export async function deleteScratchOrg(orgAliasName: string | undefined): Promise<void> {
   if (orgAliasName) {
     // The Terminal view can be a bit unreliable, so directly call exec() instead:
-    const sfOrgDeleteResults = await runCliCommand(
-      'org:delete:scratch',
-      '--target-org',
-      orgAliasName,
-      '--no-prompt'
-    );
+    const sfOrgDeleteResults = await runCliCommand('org:delete:scratch', '--target-org', orgAliasName, '--no-prompt');
     if (sfOrgDeleteResults.exitCode > 0) {
       log(
         `deleteScratchOrg for org ${orgAliasName} failed with exit code ${sfOrgDeleteResults.exitCode}.\nRaw stderr ${sfOrgDeleteResults.stderr}.`
@@ -92,13 +87,7 @@ export async function orgLoginSfdxUrl(authFilePath: string): Promise<SfCommandRu
 }
 
 export async function orgDisplay(usernameOrAlias: string): Promise<SfCommandRunResults> {
-  const sfOrgDisplayResult = await runCliCommand(
-    'org:display',
-    '--target-org',
-    usernameOrAlias,
-    '--verbose',
-    '--json'
-  );
+  const sfOrgDisplayResult = await runCliCommand('org:display', '--target-org', usernameOrAlias, '--verbose', '--json');
   if (sfOrgDisplayResult.exitCode > 0) {
     const message = `sf org display failed with exit code: ${sfOrgDisplayResult.exitCode}.\n${sfOrgDisplayResult.stderr}`;
     log(message);
@@ -164,36 +153,37 @@ export async function scratchOrgCreate(
   return sfOrgCreateResult;
 }
 
-export async function setAlias(
-  devHubAliasName: string,
-  devHubUserName: string
-): Promise<SfCommandRunResults> {
+export async function setAlias(devHubAliasName: string, devHubUserName: string): Promise<SfCommandRunResults> {
   const setAliasResult = await runCliCommand('alias:set', `${devHubAliasName}=${devHubUserName}`);
   if (setAliasResult.exitCode > 0) {
-    log(
-      `alias failed. Exit code: ${setAliasResult.exitCode}. \nRaw stderr: ${setAliasResult.stderr}`
-    );
+    log(`alias failed. Exit code: ${setAliasResult.exitCode}. \nRaw stderr: ${setAliasResult.stderr}`);
     throw new Error(setAliasResult.stderr);
   }
   return setAliasResult;
 }
 
-export async function installJestUTToolsForLwc(projectFolder: string | undefined) {
+export async function installJestUTToolsForLwc(projectFolder: string | undefined): Promise<void> {
+  log(`SetUp - Started Install @salesforce/sfdx-lwc-jest Node module...`);
   if (!projectFolder) {
     throw new Error('cannot setup lwc tests without a project folder.');
   }
-
-  const jestInstallResult = await runCliCommand('force:lightning:lwc:test:setup', {
-    cwd: projectFolder
+  const command =
+    'npm uninstall husky --force && npm install eslint@^8 --save-dev && npm install --save-dev && npm install @salesforce/sfdx-lwc-jest --save-dev';
+  return new Promise((resolve, reject) => {
+    exec(command, { cwd: projectFolder }, (error, stdout, stderr) => {
+      if (error) {
+        log(`Error with ${command}`);
+        reject(error);
+        return;
+      }
+      if (stderr) {
+        log(`Error output for ${command}`);
+      }
+      log(stdout);
+      log(`...SetUp - Finished Install @salesforce/sfdx-lwc-jest Node module`);
+      resolve();
+    });
   });
-
-  if (jestInstallResult.exitCode > 0) {
-    log(
-      `setup lwc tests failed. Exit code: ${jestInstallResult.exitCode}. \nRaw stderr: ${jestInstallResult.stderr}`
-    );
-    throw new Error(jestInstallResult.stderr);
-  }
-  return jestInstallResult;
 }
 
 export async function createUser(
