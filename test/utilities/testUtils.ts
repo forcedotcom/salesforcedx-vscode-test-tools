@@ -4,7 +4,6 @@ import { notificationIsPresentWithTimeout } from './notifications';
 import { attemptToFindOutputPanelText } from './outputView';
 import { getTerminalViewText } from './terminalView';
 import { Duration, log, pause } from './miscellaneous';
-import { executeQuickPick } from './commandPrompt';
 
 export async function retrieveExpectedNumTestsFromSidebar(
   expectedNumTests: number,

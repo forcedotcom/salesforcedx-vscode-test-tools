@@ -62,7 +62,7 @@ describe('Debug LWC Tests', async () => {
     const debugTestsAction = await lwcTestsItems[0].getActionButton('SFDX: Debug Lightning Web Component Test File');
     expect(debugTestsAction).to.not.be.undefined;
     await debugTestsAction!.click();
-    await utilities.pause(utilities.Duration.seconds(5));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
@@ -102,7 +102,7 @@ describe('Debug LWC Tests', async () => {
     const debugTestAction = await lwcTestItem.getActionButton('SFDX: Debug Lightning Web Component Test Case');
     expect(debugTestAction).to.not.be.undefined;
     await debugTestAction!.click();
-    await utilities.pause(utilities.Duration.seconds(20));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
@@ -139,7 +139,7 @@ describe('Debug LWC Tests', async () => {
     const workbench = utilities.getWorkbench();
     await utilities.executeQuickPick(
       'SFDX: Debug Current Lightning Web Component Test File',
-      utilities.Duration.seconds(10)
+      utilities.Duration.seconds(15)
     );
 
     // Continue with the debug session
@@ -170,7 +170,7 @@ describe('Debug LWC Tests', async () => {
       fail('Could not find debug test action button');
     }
     await debugAllTestsOption.click();
-    await utilities.pause(utilities.Duration.seconds(10));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
@@ -201,7 +201,7 @@ describe('Debug LWC Tests', async () => {
       fail('Could not find debug test action button');
     }
     await debugTestOption.click();
-    await utilities.pause(utilities.Duration.seconds(10));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
@@ -232,7 +232,7 @@ describe('Debug LWC Tests', async () => {
     const debugTestButtonToolbar = await editorView.getAction('SFDX: Debug Current Lightning Web Component Test File');
     expect(debugTestButtonToolbar).to.not.be.undefined;
     await debugTestButtonToolbar?.click();
-    await utilities.pause(utilities.Duration.seconds(10));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
