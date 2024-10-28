@@ -48,10 +48,7 @@ export async function selectQuickPickWithText(prompt: InputBox | QuickOpenBox, t
   // deletes the last two characters.  This doesn't seem to affect the outcome though.
 }
 
-export async function selectQuickPickItem(
-  prompt: InputBox | QuickOpenBox | undefined,
-  text: string
-): Promise<void> {
+export async function selectQuickPickItem(prompt: InputBox | QuickOpenBox | undefined, text: string): Promise<void> {
   if (!prompt) {
     throw new Error('Prompt cannot be undefined');
   }
@@ -136,7 +133,7 @@ export async function executeQuickPick(
     const prompt = await workbench.openCommandPrompt();
     await prompt.setText(`>${command}`);
     await prompt.selectQuickPick(command);
-    await pause(Duration.seconds(1));
+    await pause(wait);
     return prompt;
   } catch (error) {
     let errorMessage: string;
