@@ -9,17 +9,9 @@ import * as utilities from '../utilities/index';
 
 describe('Settings', async () => {
   step('Test Settings', async () => {
-    await utilities.disableBooleanSetting(
-      'editor.find.addExtraSpaceOnTop',
-      utilities.Duration.seconds(5),
-      'user'
-    );
+    await utilities.disableBooleanSetting('editor.find.addExtraSpaceOnTop', 'user');
     await utilities.pause(utilities.Duration.seconds(5));
-    await utilities.enableBooleanSetting(
-      'editor.find.addExtraSpaceOnTop',
-      utilities.Duration.seconds(5),
-      'user'
-    );
+    await utilities.enableBooleanSetting('editor.find.addExtraSpaceOnTop', 'user');
     await utilities.pause(utilities.Duration.seconds(5));
   });
 });
