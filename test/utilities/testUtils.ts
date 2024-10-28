@@ -169,5 +169,6 @@ export async function continueDebugging(times: number): Promise<void> {
   // Continue with the debug session
   for (let i = 0; i < times; i++) {
     await bar.continue();
+    await pause(Duration.seconds(5));
   }
 }
