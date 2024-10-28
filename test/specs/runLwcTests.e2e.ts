@@ -288,7 +288,7 @@ describe('Run LWC Tests', async () => {
       `${testSetup.testSuiteSuffixName} - SFDX: Run Current Lightning Web Component Test File from main toolbar`
     );
 
-    // // Run SFDX: Run Current Lightning Web Component Test File
+    // Run SFDX: Run Current Lightning Web Component Test File
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
     const runTestButtonToolbar = await editorView.getAction('SFDX: Run Current Lightning Web Component Test File');
