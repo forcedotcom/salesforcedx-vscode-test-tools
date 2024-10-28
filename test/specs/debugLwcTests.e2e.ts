@@ -196,7 +196,7 @@ describe('Debug LWC Tests', async () => {
     // Click the "Debug Test" code lens at the top of one of the test methods
     const workbench = utilities.getWorkbench();
     const textEditor = await utilities.getTextEditor(workbench, 'lwc2.test.js');
-    const debugTestOption = await textEditor.getCodeLens('Run Test');
+    const debugTestOption = await textEditor.getCodeLens('Debug Test');
     if (!debugTestOption) {
       fail('Could not find debug test action button');
     }
