@@ -38,7 +38,6 @@ describe('Debug LWC Tests', async () => {
 
     // Install Jest unit testing tools for LWC
     await utilities.installJestUTToolsForLwc(testSetup.projectFolderPath);
-    await utilities.closeAllEditors();
     await utilities.reloadWindow();
   });
 
@@ -103,10 +102,10 @@ describe('Debug LWC Tests', async () => {
     const debugTestAction = await lwcTestItem.getActionButton('SFDX: Debug Lightning Web Component Test Case');
     expect(debugTestAction).to.not.be.undefined;
     await debugTestAction!.click();
-    await utilities.pause(utilities.Duration.seconds(60));
+    await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(1);
 
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
@@ -205,7 +204,7 @@ describe('Debug LWC Tests', async () => {
     await utilities.pause(utilities.Duration.seconds(15));
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(1);
 
     // Verify test results are listed on the terminal
     // Also verify that all tests pass
