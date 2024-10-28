@@ -103,7 +103,7 @@ describe('Debug LWC Tests', async () => {
     const debugTestAction = await lwcTestItem.getActionButton('SFDX: Debug Lightning Web Component Test Case');
     expect(debugTestAction).to.not.be.undefined;
     await debugTestAction!.click();
-    await utilities.pause(utilities.Duration.seconds(30));
+    await utilities.pause(utilities.Duration.seconds(60));
 
     // Continue with the debug session
     await utilities.continueDebugging(2);
