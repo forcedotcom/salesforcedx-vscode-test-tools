@@ -38,6 +38,7 @@ describe('Debug LWC Tests', async () => {
 
     // Install Jest unit testing tools for LWC
     await utilities.installJestUTToolsForLwc(testSetup.projectFolderPath);
+    await utilities.closeAllEditors();
     await utilities.reloadWindow();
   });
 
