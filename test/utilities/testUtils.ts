@@ -1,12 +1,9 @@
-import { By, Key, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
-import { getWorkbench } from './workbench';
+import { By, DebugToolbar, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { notificationIsPresentWithTimeout } from './notifications';
 import { attemptToFindOutputPanelText } from './outputView';
 import { getTerminalViewText } from './terminalView';
 import { Duration, log, pause } from './miscellaneous';
-
-const CONTINUE = Key.F5;
 
 export async function retrieveExpectedNumTestsFromSidebar(
   expectedNumTests: number,
@@ -167,13 +164,11 @@ export async function verifyTestItemsInSideBar(
   return testsItems;
 }
 
-export async function continueDebugging(): Promise<void> {
+export async function continueDebugging(times: number): Promise<void> {
+  const bar = await DebugToolbar.create();
   // Continue with the debug session
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(3));
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(3));
-  await getWorkbench().sendKeys(CONTINUE);
-  await pause(Duration.seconds(1));
-  await getWorkbench().sendKeys(Key.ESCAPE);
+  for (let i = 0; i < times; i++) {
+    await bar.continue();
+    await pause(Duration.seconds(5));
+  }
 }
