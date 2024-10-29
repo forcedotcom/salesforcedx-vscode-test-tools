@@ -85,11 +85,21 @@ export async function runTestCaseFromSideBar(
   let testResult: string | undefined;
   if (testSuite === 'Apex Tests') {
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
-    const successNotificationWasFound = await notificationIsPresentWithTimeout(
-      'SFDX: Run Apex Tests successfully ran',
-      Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await workbench.openNotificationsCenter();
+      successNotificationWasFound = await notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
     testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
   } else if (testSuite === 'LWC Tests') {
     testResult = await getTerminalViewText(workbench, 15);
