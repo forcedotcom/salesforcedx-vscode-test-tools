@@ -26,26 +26,26 @@ describe('Run Apex Tests', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Create Apex class 1 and test
-    // await utilities.createApexClassWithTest('ExampleApexClass1');
+    await utilities.createApexClassWithTest('ExampleApexClass1');
 
-    // // Create Apex class 2 and test
-    // await utilities.createApexClassWithTest('ExampleApexClass2');
+    // Create Apex class 2 and test
+    await utilities.createApexClassWithTest('ExampleApexClass2');
 
-    // // Create Apex class 3 and test
-    // await utilities.createApexClassWithTest('ExampleApexClass3');
+    // Create Apex class 3 and test
+    await utilities.createApexClassWithTest('ExampleApexClass3');
 
-    // // Push source to org
-    // await utilities.executeQuickPick(
-    //   'SFDX: Push Source to Default Org and Ignore Conflicts',
-    //   utilities.Duration.seconds(1)
-    // );
+    // Push source to org
+    await utilities.executeQuickPick(
+      'SFDX: Push Source to Default Org and Ignore Conflicts',
+      utilities.Duration.seconds(1)
+    );
 
-    // // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
-    // const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    //   'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-    //   utilities.Duration.TEN_MINUTES
-    // );
-    // expect(successPushNotificationWasFound).to.equal(true);
+    // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
+    const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+      utilities.Duration.TEN_MINUTES
+    );
+    expect(successPushNotificationWasFound).to.equal(true);
   });
 
   step('Verify LSP finished indexing', async () => {
