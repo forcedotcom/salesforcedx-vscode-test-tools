@@ -456,11 +456,21 @@ describe('Run Apex Tests', async () => {
     );
 
     // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
-    const successPushNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successPushNotification2WasFound).to.equal(true);
+    let successPushNotification2WasFound;
+    try {
+      successPushNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotification2WasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotification2WasFound).to.equal(true);
+    }
 
     // Clear the Output view.
     await utilities.dismissAllNotifications();
