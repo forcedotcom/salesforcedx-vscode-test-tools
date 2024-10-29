@@ -40,6 +40,7 @@ export class TestSetup {
         await utilities.setUpScratchOrg(testSetup, scratchOrgEdition);
       await utilities.reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
+    testSetup.setWorkbenchHoverDelay();
     utilities.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
     return testSetup;
   }
@@ -50,9 +51,7 @@ export class TestSetup {
       await utilities.deleteScratchOrg(this.scratchOrgAliasName);
       await utilities.deleteScratchOrgInfo(this);
     } catch (error) {
-      utilities.log(
-        `Deleting scratch org (or info) failed with Error: ${(error as Error).message}`
-      );
+      utilities.log(`Deleting scratch org (or info) failed with Error: ${(error as Error).message}`);
     }
   }
 
@@ -77,15 +76,11 @@ export class TestSetup {
           // verify if folder matches the github repo url
           const repoExists = await utilities.gitRepoExists(projectConfig.githubRepoUrl);
           if (!repoExists) {
-            this.throwError(
-              `Repository does not exist or is inaccessible: ${projectConfig.githubRepoUrl}`
-            );
+            this.throwError(`Repository does not exist or is inaccessible: ${projectConfig.githubRepoUrl}`);
           }
           const repoName = utilities.getRepoNameFromUrl(projectConfig.githubRepoUrl);
           if (!repoName) {
-            this.throwError(
-              `Unable to determine repository name from URL: ${projectConfig.githubRepoUrl}`
-            );
+            this.throwError(`Unable to determine repository name from URL: ${projectConfig.githubRepoUrl}`);
           } else {
             projectName = repoName;
             if (projectConfig.folderPath) {
@@ -148,16 +143,9 @@ export class TestSetup {
 
   public updateScratchOrgDefWithEdition(scratchOrgEdition: utilities.OrgEdition) {
     if (scratchOrgEdition === 'enterprise') {
-      const projectScratchDefPath = path.join(
-        this.projectFolderPath!,
-        'config',
-        'project-scratch-def.json'
-      );
+      const projectScratchDefPath = path.join(this.projectFolderPath!, 'config', 'project-scratch-def.json');
       let projectScratchDef = fs.readFileSync(projectScratchDefPath, 'utf8');
-      projectScratchDef = projectScratchDef.replace(
-        `"edition": "Developer"`,
-        `"edition": "Enterprise"`
-      );
+      projectScratchDef = projectScratchDef.replace(`"edition": "Developer"`, `"edition": "Enterprise"`);
       fs.writeFileSync(projectScratchDefPath, projectScratchDef, 'utf8');
     }
   }
@@ -171,19 +159,33 @@ export class TestSetup {
       fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
     }
 
-    let settings = fs.existsSync(vscodeSettingsPath)
-      ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8'))
-      : {};
+    let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
 
     settings = {
       ...settings,
-      ...(process.env.JAVA_HOME
-        ? { 'salesforcedx-vscode-apex.java.home': process.env.JAVA_HOME }
-        : {})
+      ...(process.env.JAVA_HOME ? { 'salesforcedx-vscode-apex.java.home': process.env.JAVA_HOME } : {})
     };
     fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
     utilities.log(
       `${this.testSuiteSuffixName} - Set 'salesforcedx-vscode-apex.java.home' to '${process.env.JAVA_HOME}' in ${vscodeSettingsPath}`
     );
+  }
+  private setWorkbenchHoverDelay(): void {
+    const vscodeSettingsPath = path.join(this.projectFolderPath!, '.vscode', 'settings.json');
+
+    if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
+      fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
+    }
+
+    let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
+
+    // Update settings to set workbench.hover.delay
+    settings = {
+      ...settings,
+      'workbench.hover.delay': 300000
+    };
+
+    fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    utilities.log(`${this.testSuiteSuffixName} - Set 'workbench.hover.delay' to '300000' in ${vscodeSettingsPath}`);
   }
 }
