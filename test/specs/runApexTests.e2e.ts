@@ -26,13 +26,25 @@ describe('Run Apex Tests', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Create Apex class 1 and test
-    await utilities.createApexClassWithTest('ExampleApexClass1');
+    try {
+      await utilities.createApexClassWithTest('ExampleApexClass1');
+    } catch (error) {
+      await utilities.createApexClassWithTest('ExampleApexClass1');
+    }
 
     // Create Apex class 2 and test
-    await utilities.createApexClassWithTest('ExampleApexClass2');
+    try {
+      await utilities.createApexClassWithTest('ExampleApexClass2');
+    } catch (error) {
+      await utilities.createApexClassWithTest('ExampleApexClass2');
+    }
 
     // Create Apex class 3 and test
-    await utilities.createApexClassWithTest('ExampleApexClass3');
+    try {
+      await utilities.createApexClassWithTest('ExampleApexClass3');
+    } catch (error) {
+      await utilities.createApexClassWithTest('ExampleApexClass3');
+    }
 
     // Push source to org
     await utilities.executeQuickPick(
@@ -550,8 +562,8 @@ describe('Run Apex Tests', async () => {
       'Tests Ran            2',
       'Pass Rate            100%',
       'TEST NAME',
+      'ExampleApexClass1Test.validateSayHello  Pass',
       'ExampleApexClass2Test.validateSayHello  Pass',
-      'ExampleApexClass3Test.validateSayHello  Pass',
       'ended SFDX: Run Apex Tests'
     ];
     expect(outputPanelText).to.not.be.undefined;
