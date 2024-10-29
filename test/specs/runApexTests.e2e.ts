@@ -339,7 +339,8 @@ describe('Run Apex Tests', async () => {
     prompt = await utilities.executeQuickPick('SFDX: Run Apex Tests', utilities.Duration.seconds(1));
 
     // Select the "AccountServiceTest" file
-    await prompt.selectQuickPick('AccountServiceTest');
+    await prompt.setText('AccountServiceTest');
+    await prompt.confirm();
 
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -383,7 +384,8 @@ describe('Run Apex Tests', async () => {
     prompt = await utilities.executeQuickPick('SFDX: Run Apex Tests', utilities.Duration.seconds(1));
 
     // Select the "AccountServiceTest" file
-    await prompt.selectQuickPick('AccountServiceTest');
+    await prompt.setText('AccountServiceTest');
+    await prompt.confirm();
 
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
     const successNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
@@ -411,7 +413,7 @@ describe('Run Apex Tests', async () => {
   step('Create Apex Test Suite', async () => {
     utilities.log(`RunApexTests - Create Apex Test Suite`);
     // Run SFDX: Create Apex Test Suite.
-    prompt = await utilities.executeQuickPick('SFDX: Create Apex Test Suite', utilities.Duration.seconds(1));
+    prompt = await utilities.executeQuickPick('SFDX: Create Apex Test Suite', utilities.Duration.seconds(2));
 
     // Set the name of the new Apex Test Suite
     await prompt.setText('ApexTestSuite');
@@ -419,10 +421,7 @@ describe('Run Apex Tests', async () => {
     await utilities.pause(utilities.Duration.seconds(2));
 
     // Choose tests that will belong to the new Apex Test Suite
-    await utilities.waitForQuickPick(prompt, 'ExampleApexClass1Test', {
-      msg: 'Expected extension salesforcedx-core to be available within 5 seconds',
-      timeout: utilities.Duration.seconds(5)
-    });
+    await prompt.selectQuickPick('ExampleApexClass1Test');
     await utilities.clickFilePathOkButton();
 
     // Look for the success notification that appears which says, "SFDX: Build Apex Test Suite successfully ran".

@@ -37,7 +37,7 @@ describe('Notifications', async () => {
       utilities.Duration.seconds(2)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(isPresent).to.be.true;
+    expect(isPresent).to.equal(true);
     await utilities.dismissNotification('Modify the file and retrieve again');
     await utilities.pause(utilities.Duration.seconds(1));
     const isNotPresent = await utilities.notificationIsAbsentWithTimeout(
@@ -45,7 +45,7 @@ describe('Notifications', async () => {
       utilities.Duration.seconds(1)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(isNotPresent).to.be.true;
+    expect(isNotPresent).to.equal(true);
     await utilities.pause(utilities.Duration.seconds(2));
   });
   it('should show a notification with two actions', async () => {
@@ -55,7 +55,7 @@ describe('Notifications', async () => {
       utilities.Duration.seconds(1)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(isPresent).to.be.true;
+    expect(isPresent).to.equal(true);
     await utilities.pause(utilities.Duration.seconds(1));
 
     await utilities.acceptNotification('Choose an action:', 'A', utilities.Duration.seconds(1));
@@ -65,6 +65,6 @@ describe('Notifications', async () => {
       utilities.Duration.seconds(5)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(isNotPresent).to.be.true;
+    expect(isNotPresent).to.equal(true);
   });
 });

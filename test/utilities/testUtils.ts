@@ -89,7 +89,7 @@ export async function runTestCaseFromSideBar(
       'SFDX: Run Apex Tests successfully ran',
       Duration.TEN_MINUTES
     );
-    expect(successNotificationWasFound).to.be.true;
+    expect(successNotificationWasFound).to.equal(true);
     testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
   } else if (testSuite === 'LWC Tests') {
     testResult = await getTerminalViewText(workbench, 15);
