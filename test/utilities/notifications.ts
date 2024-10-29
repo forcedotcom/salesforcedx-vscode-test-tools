@@ -74,6 +74,7 @@ export async function acceptNotification(
 }
 
 export async function dismissAllNotifications(): Promise<void> {
+  log(`calling dismissAllNotifications()`);
   await executeQuickPick('Notifications: Clear All Notifications');
 }
 
@@ -91,7 +92,7 @@ async function findNotification(
     const notifications = await workbench.getNotifications();
     for (const notification of notifications) {
       const notificationMessage = await notification.getMessage();
-      if (notificationMessage === message || notificationMessage.startsWith(message)) {
+      if (notificationMessage === message || notificationMessage.includes(message)) {
         return notification as unknown as Notification;
       }
     }
