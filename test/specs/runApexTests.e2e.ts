@@ -421,7 +421,9 @@ describe('Run Apex Tests', async () => {
     await utilities.pause(utilities.Duration.seconds(2));
 
     // Choose tests that will belong to the new Apex Test Suite
-    await prompt.selectQuickPick('ExampleApexClass1Test');
+    await prompt.setText('ExampleApexClass1Test');
+    const checkbox = await prompt.findElement(By.css('input.quick-input-list-checkbox'));
+    await checkbox.click();
     await utilities.clickFilePathOkButton();
 
     // Look for the success notification that appears which says, "SFDX: Build Apex Test Suite successfully ran".
@@ -442,10 +444,9 @@ describe('Run Apex Tests', async () => {
     await utilities.pause(utilities.Duration.seconds(2));
 
     // Choose tests that will belong to the already created Apex Test Suite
-    await utilities.waitForQuickPick(prompt, 'ExampleApexClass2Test', {
-      msg: 'Expected extension salesforcedx-core to be available within 5 seconds',
-      timeout: utilities.Duration.seconds(5)
-    });
+    await prompt.setText('ExampleApexClass2Test');
+    const checkbox = await prompt.findElement(By.css('input.quick-input-list-checkbox'));
+    await checkbox.click();
     await utilities.clickFilePathOkButton();
 
     // Look for the success notification that appears which says, "SFDX: Build Apex Test Suite successfully ran".

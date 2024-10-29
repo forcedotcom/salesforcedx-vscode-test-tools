@@ -88,6 +88,7 @@ async function findNotification(
   try {
     const foundNotification = await getBrowser().wait(
       async () => {
+        await workbench.openNotificationsCenter();
         const notifications = await workbench.getNotifications();
         let bestMatch: Notification | null = null;
 
