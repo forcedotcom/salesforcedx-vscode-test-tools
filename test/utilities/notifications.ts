@@ -84,33 +84,42 @@ async function findNotification(
   throwOnTimeout: boolean = false // New parameter to control throwing on timeout
 ): Promise<Notification | null> {
   const workbench = getWorkbench();
+  const timeoutMessage = `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`;
+
+  const getMatchingNotification = async (): Promise<Notification | null> => {
+    await workbench.openNotificationsCenter();
+    const notifications = await workbench.getNotifications();
+    for (const notification of notifications) {
+      const notificationMessage = await notification.getMessage();
+      if (notificationMessage === message || notificationMessage.startsWith(message)) {
+        return notification as unknown as Notification;
+      }
+    }
+    return null;
+  };
 
   try {
-    const foundNotification = await getBrowser().wait(
-      async () => {
-        await workbench.openNotificationsCenter();
-        const notifications = await workbench.getNotifications();
-        let bestMatch: Notification | null = null;
+    const endTime = Date.now() + timeout.milliseconds;
+    let foundNotification: Notification | null = null;
 
-        for (const notification of notifications) {
-          const notificationMessage = await notification.getMessage();
-          if (notificationMessage === message || notificationMessage.startsWith(message)) {
-            bestMatch = notification as unknown as Notification;
-            break;
-          }
-        }
-        return bestMatch;
-      },
-      timeout.milliseconds,
-      `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`
-    );
+    // Retry until timeout is reached or the notification status matches `shouldBePresent`
+    do {
+      foundNotification = await getMatchingNotification();
+      if (foundNotification) {
+        return foundNotification;
+      }
+      await new Promise(res => setTimeout(res, 100)); // Short delay before retrying
+    } while (Date.now() < endTime);
 
-    return shouldBePresent ? foundNotification : null;
+    // Throw or return based on `throwOnTimeout`
+    if (throwOnTimeout) {
+      throw new Error(timeoutMessage);
+    }
+    return null;
   } catch (error) {
     if (throwOnTimeout) {
-      throw error; // Re-throw the error if throwOnTimeout is true
+      throw error;
     }
-    // Handle the timeout gracefully
     return null;
   }
 }
