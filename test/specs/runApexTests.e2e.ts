@@ -53,11 +53,21 @@ describe('Run Apex Tests', async () => {
     );
 
     // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
-    const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successPushNotificationWasFound).to.equal(true);
+    let successPushNotificationWasFound;
+    try {
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    }
   });
 
   step('Verify LSP finished indexing', async () => {
