@@ -44,14 +44,14 @@ export async function getTestsSection(workbench: Workbench, type: string) {
  * Runs a test case from the sidebar and returns the test result.
  * *
  * @param {Workbench} workbench - The workbench instance used to interact with the sidebar and views.
- * @param {string} testSuite - The name of the test suite from which to run the test (e.g., 'APEX Tests', 'LWC Tests').
+ * @param {string} testSuite - The name of the test suite from which to run the test (e.g., 'Apex Tests', 'LWC Tests').
  * @param {string} testName - The name of the specific test case to run.
  * @param {string} actionLabel - The label of the action button to click (e.g., 'SFDX: Run Lightning Web Component Test File', 'Run Single Test').
  *
  * @example
  * const result = await runTestCaseFromSideBar(
  *   myWorkbench,
- *   'APEX Tests',
+ *   'Apex Tests',
  *   'MyApexTestCase',
  *   'Run Single Test'
  * );
@@ -83,13 +83,23 @@ export async function runTestCaseFromSideBar(
   await actionButton?.click();
 
   let testResult: string | undefined;
-  if (testSuite === 'APEX Tests') {
+  if (testSuite === 'Apex Tests') {
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
-    const successNotificationWasFound = await notificationIsPresentWithTimeout(
-      'SFDX: Run Apex Tests successfully ran',
-      Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.be.true;
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await workbench.openNotificationsCenter();
+      successNotificationWasFound = await notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
     testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
   } else if (testSuite === 'LWC Tests') {
     testResult = await getTerminalViewText(workbench, 15);

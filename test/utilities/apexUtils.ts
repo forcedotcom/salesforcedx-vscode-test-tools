@@ -11,6 +11,7 @@ import { getWorkbench } from './workbench';
 import { getTextEditor } from './textEditorView';
 
 export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
+  log(`calling createApexClass(${name})`);
   // Using the Command palette, run SFDX: Create Apex Class to create the main class
   const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
 
@@ -32,6 +33,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
 }
 
 export async function createApexClassWithTest(name: string): Promise<void> {
+  log(`callig createApexClassWithTest()`);
   const classText = [
     `public with sharing class ${name} {`,
     `\tpublic static void SayHello(string name){`,
@@ -57,6 +59,7 @@ export async function createApexClassWithTest(name: string): Promise<void> {
 }
 
 export async function createApexClassWithBugs(): Promise<void> {
+  log(`calling createApexClassWithBugs()`);
   const classText = [
     `public with sharing class AccountService {`,
     `\tpublic Account createAccount(String accountName, String accountNumber, String tickerSymbol) {`,
@@ -96,6 +99,7 @@ export async function createApexClassWithBugs(): Promise<void> {
 }
 
 export async function createAnonymousApexFile(): Promise<void> {
+  log(`calling createAnonymousApexFile()`);
   const workbench = getWorkbench();
 
   // Using the Command palette, run File: New File...
