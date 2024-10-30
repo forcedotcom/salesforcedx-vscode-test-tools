@@ -145,7 +145,7 @@ describe('Debug Apex Tests', async () => {
     await utilities.executeQuickPick('Testing: Focus on Apex Tests View', utilities.Duration.seconds(1));
 
     // Open the Test Sidebar
-    const apexTestsSection = await utilities.getTestsSection(workbench, 'APEX TESTS');
+    const apexTestsSection = await utilities.getTestsSection(workbench, 'Apex Tests');
     const expectedItems = ['ExampleApexClass1Test', 'ExampleApexClass2Test'];
 
     await utilities.verifyTestItemsInSideBar(apexTestsSection, 'Refresh Tests', expectedItems, 4, 2);
@@ -186,7 +186,7 @@ describe('Debug Apex Tests', async () => {
     await utilities.executeQuickPick('Testing: Focus on Apex Tests View', utilities.Duration.seconds(1));
 
     // Open the Test Sidebar
-    const apexTestsSection = await utilities.getTestsSection(workbench, 'APEX TESTS');
+    const apexTestsSection = await utilities.getTestsSection(workbench, 'Apex Tests');
 
     // Hover a test name under one of the test class sections and click the debug button that is shown to the right of the test name on the Test sidebar
     await apexTestsSection.click();
