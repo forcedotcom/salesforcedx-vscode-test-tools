@@ -102,7 +102,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 15);
+    await utilities.continueDebugging(2, 30);
   });
 
   step('Debug Single Test via Apex Class', async () => {
@@ -136,7 +136,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 15);
+    await utilities.continueDebugging(2, 30);
   });
 
   step('Debug all Apex Methods on a Class via the Test Sidebar', async () => {
@@ -177,7 +177,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 15);
+    await utilities.continueDebugging(2, 30);
   });
 
   step('Debug a Single Apex Test Method via the Test Sidebar', async () => {
@@ -215,7 +215,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 15);
+    await utilities.continueDebugging(2, 30);
   });
 
   after('Tear down and clean up the testing environment', async () => {

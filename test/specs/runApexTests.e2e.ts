@@ -64,7 +64,7 @@ describe('Run Apex Tests', async () => {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.ONE_MINUTE
       );
       expect(successPushNotificationWasFound).to.equal(true);
     }
@@ -403,7 +403,7 @@ describe('Run Apex Tests', async () => {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.ONE_MINUTE
       );
       expect(successPushNotificationWasFound).to.equal(true);
     }
@@ -467,7 +467,7 @@ describe('Run Apex Tests', async () => {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
         'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.ONE_MINUTE
       );
       expect(successPushNotification2WasFound).to.equal(true);
     }
