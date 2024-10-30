@@ -174,11 +174,11 @@ export async function verifyTestItemsInSideBar(
   return testsItems;
 }
 
-export async function continueDebugging(times: number): Promise<void> {
+export async function continueDebugging(times: number, seconds = 5): Promise<void> {
   const bar = await DebugToolbar.create();
   // Continue with the debug session
   for (let i = 0; i < times; i++) {
     await bar.continue();
-    await pause(Duration.seconds(5));
+    await pause(Duration.seconds(seconds));
   }
 }

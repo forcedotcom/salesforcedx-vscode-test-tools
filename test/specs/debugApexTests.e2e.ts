@@ -78,7 +78,6 @@ describe('Debug Apex Tests', async () => {
 
     // Clear the Output view.
     await utilities.dismissAllNotifications();
-    await utilities.clearOutputView(utilities.Duration.seconds(2));
 
     // Click the "Debug All Tests" code lens at the top of the class
     const debugAllTestsOption = await textEditor.getCodeLens('Debug All Tests');
@@ -102,7 +101,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(2, 15);
   });
 
   step('Debug Single Test via Apex Class', async () => {
@@ -112,7 +111,6 @@ describe('Debug Apex Tests', async () => {
 
     // Clear the Output view.
     await utilities.dismissAllNotifications();
-    await utilities.clearOutputView(utilities.Duration.seconds(2));
 
     // Click the "Debug Test" code lens at the top of one of the test methods
     const debugTestOption = await textEditor.getCodeLens('Debug Test');
@@ -136,7 +134,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(2, 15);
   });
 
   step('Debug all Apex Methods on a Class via the Test Sidebar', async () => {
@@ -177,7 +175,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(2, 15);
   });
 
   step('Debug a Single Apex Test Method via the Test Sidebar', async () => {
@@ -215,7 +213,7 @@ describe('Debug Apex Tests', async () => {
     }
 
     // Continue with the debug session
-    await utilities.continueDebugging(2);
+    await utilities.continueDebugging(2, 15);
   });
 
   after('Tear down and clean up the testing environment', async () => {
