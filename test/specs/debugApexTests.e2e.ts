@@ -82,6 +82,7 @@ describe('Debug Apex Tests', async () => {
     // Click the "Debug All Tests" code lens at the top of the class
     const debugAllTestsOption = await textEditor.getCodeLens('Debug All Tests');
     await debugAllTestsOption!.click();
+    await utilities.pause(utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "Debug Test(s) successfully ran".
     let successNotificationWasFound;
@@ -115,6 +116,7 @@ describe('Debug Apex Tests', async () => {
     // Click the "Debug Test" code lens at the top of one of the test methods
     const debugTestOption = await textEditor.getCodeLens('Debug Test');
     await debugTestOption!.click();
+    await utilities.pause(utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "Debug Test(s) successfully ran".
     let successNotificationWasFound;
@@ -155,7 +157,7 @@ describe('Debug Apex Tests', async () => {
     const debugTestsAction = await apexTestItem.getActionButton('Debug Tests');
     expect(debugTestsAction).to.not.be.undefined;
     await debugTestsAction?.click();
-    await utilities.pause(utilities.Duration.seconds(1));
+    await utilities.pause(utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "Debug Test(s) successfully ran".
     let successNotificationWasFound;
@@ -193,7 +195,7 @@ describe('Debug Apex Tests', async () => {
     const debugTestAction = await apexTestItem.getActionButton('Debug Single Test');
     expect(debugTestAction).to.not.be.undefined;
     await debugTestAction?.click();
-    await utilities.pause(utilities.Duration.seconds(1));
+    await utilities.pause(utilities.Duration.seconds(10));
 
     // Look for the success notification that appears which says, "Debug Test(s) successfully ran".
     let successNotificationWasFound;
