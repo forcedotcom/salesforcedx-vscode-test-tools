@@ -39,11 +39,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
       utilities.Duration.seconds(1)
     );
 
-    const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successPushNotificationWasFound).to.equal(true);
+    let successPushNotificationWasFound;
+    try {
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    }
   });
 
   step('Verify LSP finished indexing', async () => {
@@ -64,11 +74,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     // Select the "AccountServiceTest" file
     await prompt.selectQuickPick('AccountServiceTest');
 
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Run Apex Tests successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
 
     // Verify test results are listed on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
@@ -146,11 +166,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     // Select the "AccountServiceTest" file
     await prompt.selectQuickPick('AccountServiceTest');
 
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Run Apex Tests successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
 
     // Verify test results are listed on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
@@ -229,11 +259,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
       utilities.Duration.seconds(1)
     );
 
-    const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successPushNotificationWasFound).to.equal(true);
+    let successPushNotificationWasFound;
+    try {
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    }
   });
 
   step('Run Apex Tests to Verify Fix', async () => {
@@ -245,11 +285,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     // Select the "AccountServiceTest" file
     await prompt.selectQuickPick('AccountServiceTest');
 
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Run Apex Tests successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Run Apex Tests successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
 
     // Verify test results are listed on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
