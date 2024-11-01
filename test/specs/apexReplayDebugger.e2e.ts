@@ -10,6 +10,7 @@ import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
+import { Duration } from '@salesforce/kit';
 
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -85,7 +86,11 @@ describe('Apex Replay Debugger', async () => {
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
 
     // Select text
-    await textEditor.selectText("ExampleApexClass.SayHello('Cody');");
+    const findWidget = await textEditor.openFindWidget();
+    await findWidget.setSearchText("ExampleApexClass.SayHello('Cody');");
+    await utilities.pause(utilities.Duration.seconds(1));
+    // Close finder tool
+    await findWidget.close();
     await utilities.pause(utilities.Duration.seconds(1));
 
     // Clear output before running the command
@@ -136,6 +141,7 @@ describe('Apex Replay Debugger', async () => {
     const quickPicks = await prompt.getQuickPicks();
     expect(quickPicks).not.to.be.undefined;
     expect(quickPicks.length).greaterThanOrEqual(1);
+    // TODO: `selectQuickPick()` does not work!
     await prompt.selectQuickPick('User User - Api');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
