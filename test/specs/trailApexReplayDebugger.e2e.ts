@@ -108,9 +108,6 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     // Run SFDX: Toggle Checkpoint.
     prompt = await utilities.executeQuickPick('SFDX: Toggle Checkpoint', utilities.Duration.seconds(1));
 
-    // Switch back to the AccountService.cls tab
-    await utilities.getTextEditor(workbench, 'AccountService.cls');
-
     // Verify checkpoint is present
     const breakpoints = await workbench.findElements(By.css('div.codicon-debug-breakpoint-conditional'));
     expect(breakpoints.length).to.equal(1);
@@ -193,11 +190,11 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     utilities.log(`TrailApexReplayDebugger - SFDX: Get Apex Debug Logs`);
     // Run SFDX: Get Apex Debug Logs
     const workbench = utilities.getWorkbench();
-    prompt = await utilities.executeQuickPick('SFDX: Get Apex Debug Logs', utilities.Duration.seconds(1));
+    prompt = await utilities.executeQuickPick('SFDX: Get Apex Debug Logs', utilities.Duration.seconds(0));
 
     // Wait for the command to execute
     await utilities.waitForNotificationToGoAway('Getting Apex debug logs', utilities.Duration.TEN_MINUTES);
-
+    await utilities.pause(utilities.Duration.seconds(2));
     // Select a log file
     const quickPicks = await prompt.getQuickPicks();
     expect(quickPicks).to.not.be.undefined;
