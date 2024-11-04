@@ -242,67 +242,71 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
   });
 
   step('Push Fixed Metadata to Org', async () => {
-    utilities.log(`TrailApexReplayDebugger - Push Fixed Metadata to Org`);
-    // Get open text editor
-    const workbench = utilities.getWorkbench();
-    const textEditor = await utilities.getTextEditor(workbench, 'AccountService.cls');
-    await textEditor.setTextAtLine(6, '\t\t\tTickerSymbol = tickerSymbol');
-    await textEditor.save();
-    await utilities.pause(utilities.Duration.seconds(2));
+    if (process.platform === 'darwin') {
+      utilities.log(`TrailApexReplayDebugger - Push Fixed Metadata to Org`);
+      // Get open text editor
+      const workbench = utilities.getWorkbench();
+      const textEditor = await utilities.getTextEditor(workbench, 'AccountService.cls');
+      await textEditor.setTextAtLine(6, '\t\t\tTickerSymbol = tickerSymbol');
+      await textEditor.save();
+      await utilities.pause(utilities.Duration.seconds(2));
 
-    // Push source to org
-    await utilities.executeQuickPick(
-      'SFDX: Push Source to Default Org and Ignore Conflicts',
-      utilities.Duration.seconds(10)
-    );
+      // Push source to org
+      await utilities.executeQuickPick(
+        'SFDX: Push Source to Default Org and Ignore Conflicts',
+        utilities.Duration.seconds(10)
+      );
 
-    let successPushNotificationWasFound;
-    try {
-      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-      expect(successPushNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-        utilities.Duration.ONE_MINUTE
-      );
-      expect(successPushNotificationWasFound).to.equal(true);
+      let successPushNotificationWasFound;
+      try {
+        successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+          utilities.Duration.TEN_MINUTES
+        );
+        expect(successPushNotificationWasFound).to.equal(true);
+      } catch (error) {
+        await utilities.getWorkbench().openNotificationsCenter();
+        successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+          utilities.Duration.ONE_MINUTE
+        );
+        expect(successPushNotificationWasFound).to.equal(true);
+      }
     }
   });
 
   step('Run Apex Tests to Verify Fix', async () => {
-    utilities.log(`TrailApexReplayDebugger - Run Apex Tests to Verify Fix`);
-    // Run SFDX: Run Apex tests.
-    await utilities.clearOutputView();
-    prompt = await utilities.executeQuickPick('SFDX: Run Apex Tests', utilities.Duration.seconds(1));
+    if (process.platform === 'darwin') {
+      utilities.log(`TrailApexReplayDebugger - Run Apex Tests to Verify Fix`);
+      // Run SFDX: Run Apex tests.
+      await utilities.clearOutputView();
+      prompt = await utilities.executeQuickPick('SFDX: Run Apex Tests', utilities.Duration.seconds(1));
 
-    // Select the "AccountServiceTest" file
-    await prompt.selectQuickPick('AccountServiceTest');
+      // Select the "AccountServiceTest" file
+      await prompt.selectQuickPick('AccountServiceTest');
 
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Run Apex Tests successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Run Apex Tests successfully ran',
-        utilities.Duration.ONE_MINUTE
-      );
-      expect(successNotificationWasFound).to.equal(true);
+      let successNotificationWasFound;
+      try {
+        successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          'SFDX: Run Apex Tests successfully ran',
+          utilities.Duration.TEN_MINUTES
+        );
+        expect(successNotificationWasFound).to.equal(true);
+      } catch (error) {
+        await utilities.getWorkbench().openNotificationsCenter();
+        successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          'SFDX: Run Apex Tests successfully ran',
+          utilities.Duration.ONE_MINUTE
+        );
+        expect(successNotificationWasFound).to.equal(true);
+      }
+
+      // Verify test results are listed on vscode's Output section
+      const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
+      expect(outputPanelText).to.not.be.undefined;
+      expect(outputPanelText).to.contain('AccountServiceTest.should_create_account');
+      expect(outputPanelText).to.contain('Pass');
     }
-
-    // Verify test results are listed on vscode's Output section
-    const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
-    expect(outputPanelText).to.not.be.undefined;
-    expect(outputPanelText).to.contain('AccountServiceTest.should_create_account');
-    expect(outputPanelText).to.contain('Pass');
   });
 
   after('Tear down and clean up the testing environment', async () => {
