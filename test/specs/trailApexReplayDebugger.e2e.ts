@@ -254,11 +254,21 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     await utilities.executeQuickPick('SFDX: Deploy This Source to Org', utilities.Duration.seconds(5));
 
     // Verify the deploy was successful
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Deploy This Source to Org successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Deploy This Source to Org successfully ran',
-      utilities.Duration.FIVE_MINUTES
+        utilities.Duration.ONE_MINUTE
       );
     expect(successNotificationWasFound).to.equal(true);
+    }
   });
 
   step('Run Apex Tests to Verify Fix', async () => {
