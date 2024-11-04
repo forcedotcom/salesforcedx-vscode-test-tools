@@ -250,24 +250,26 @@ describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async
     await textEditor.save();
     await utilities.pause(utilities.Duration.seconds(2));
 
-    // Deploy source to org
-    await utilities.executeQuickPick('SFDX: Deploy This Source to Org', utilities.Duration.seconds(5));
+    // Push source to org
+    await utilities.executeQuickPick(
+      'SFDX: Push Source to Default Org and Ignore Conflicts',
+      utilities.Duration.seconds(10)
+    );
 
-    // Verify the deploy was successful
-    let successNotificationWasFound;
+    let successPushNotificationWasFound;
     try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Deploy This Source to Org successfully ran',
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
         utilities.Duration.TEN_MINUTES
       );
-      expect(successNotificationWasFound).to.equal(true);
+      expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
       await utilities.getWorkbench().openNotificationsCenter();
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Deploy This Source to Org successfully ran',
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
         utilities.Duration.ONE_MINUTE
       );
-    expect(successNotificationWasFound).to.equal(true);
+      expect(successPushNotificationWasFound).to.equal(true);
     }
   });
 
