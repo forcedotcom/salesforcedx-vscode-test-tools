@@ -253,6 +253,6 @@ export async function openFile(path: string) {
   // Set the location of the project
   await prompt.setText(path);
   await pause(Duration.seconds(2));
-  const fileName = path.substring(path.lastIndexOf('/') + 1);
+  const fileName = path.substring(path.lastIndexOf(process.platform === 'win32' ? '\\' : '/') + 1);
   await prompt.selectQuickPick(fileName);
 }
