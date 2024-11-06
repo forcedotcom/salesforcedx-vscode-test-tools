@@ -127,6 +127,8 @@ describe('Org Browser', async () => {
 
   step('Retrieve and Open Source', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Retrieve and Open Source`);
+    // Close all notifications
+    await utilities.dismissAllNotifications();
     const myClassLabelEl = await utilities.findTypeInOrgBrowser('MyClass');
     expect(myClassLabelEl).to.not.be.undefined;
     await myClassLabelEl?.click();
