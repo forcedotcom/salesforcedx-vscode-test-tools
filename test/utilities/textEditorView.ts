@@ -44,7 +44,7 @@ export async function checkFileOpen(
 
 export async function attemptToFindTextEditorText(filePath: string): Promise<string> {
   await openFile(filePath);
-  const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+  const fileName = filePath.substring(filePath.lastIndexOf(process.platform === 'win32' ? '\\' : '/') + 1);
   const editorView = new EditorView();
   const editor = await editorView.openEditor(fileName);
   return await editor.getText();
