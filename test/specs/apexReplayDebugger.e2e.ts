@@ -204,7 +204,7 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause();
 
     // Continue with the debug session
-    await continueDebugging();
+    await utilities.continueDebugging(2, 30);
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
@@ -215,7 +215,7 @@ describe('Apex Replay Debugger', async () => {
     );
 
     // Continue with the debug session
-    await continueDebugging();
+    await utilities.continueDebugging(2, 30);
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
@@ -228,7 +228,7 @@ describe('Apex Replay Debugger', async () => {
     );
 
     // Continue with the debug session
-    await continueDebugging();
+    await utilities.continueDebugging(2, 30);
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'Debug Test(s) successfully ran',
@@ -302,12 +302,12 @@ describe('Apex Replay Debugger', async () => {
     await testSetup?.tearDown();
   });
 
-  const continueDebugging = async (): Promise<void> => {
-    // TODO: why isn't the input box created in the log file?
-    const inputBox = await InputBox.create();
-    await inputBox.sendKeys(CONTINUE);
-    await utilities.pause(utilities.Duration.seconds(1));
-    await inputBox.sendKeys(CONTINUE);
-    await utilities.pause(utilities.Duration.seconds(1));
-  };
+  // const continueDebugging = async (): Promise<void> => {
+  //   // TODO: why isn't the input box created in the log file?
+  //   const inputBox = await InputBox.create();
+  //   await inputBox.sendKeys(CONTINUE);
+  //   await utilities.pause(utilities.Duration.seconds(1));
+  //   await inputBox.sendKeys(CONTINUE);
+  //   await utilities.pause(utilities.Duration.seconds(1));
+  // };
 });
