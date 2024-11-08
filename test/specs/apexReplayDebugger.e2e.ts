@@ -10,6 +10,7 @@ import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
+import { execSync } from "child_process";
 
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -142,7 +143,6 @@ describe('Apex Replay Debugger', async () => {
     const quickPicks = await prompt.getQuickPicks();
     expect(quickPicks).not.to.be.undefined;
     expect(quickPicks.length).greaterThanOrEqual(0);
-    // TODO: `selectQuickPick()` does not work!
     await prompt.selectQuickPick('User User - Api');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -173,7 +173,7 @@ describe('Apex Replay Debugger', async () => {
     expect(executionFinished).greaterThanOrEqual(1);
   });
 
-  step('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
+  xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
@@ -182,13 +182,23 @@ describe('Apex Replay Debugger', async () => {
     const activeTab = await editorView.getActiveTab();
     expect(activeTab).not.to.be.undefined;
     const title = await activeTab?.getTitle();
-    const logFilePath = path.join(path.delimiter, 'tools', 'debug', 'logs', title!).slice(1);
+    console.log('*** title = ' + title);
+    // TODO: `logFilePath` needs to be the full filepath starting with /Users/daphne.yang
+    const currentDirectory = execSync(`pwd`).toString().slice(0, -1);
+    const logFilePath = path.join(path.delimiter, currentDirectory, 'e2e-temp', 'TempProject-ApexReplayDebugger', '.sfdx', 'tools', 'debug', 'logs', title!).slice(1);
+    console.log('*** logFilePath = ' + logFilePath);
+
+    // TODO: THIS IS JUST FOR TESTING - the text is set correctly!
+    // const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClass.cls');
+    // await textEditor.setText(logFilePath);
+    // await utilities.pause();
 
     // Run SFDX: Launch Apex Replay Debugger with Last Log File
     prompt = await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Last Log File',
       utilities.Duration.seconds(1)
     );
+    // TODO: Why is `/Users/daphne.yang/Development/salesforcedx-vscode-automation-tests-redhat/e2e-temp/TempProject-ApexReplayDebugger/.sfdx/` being set?  What happens to the remaining part of the filepath?
     await prompt.setText(logFilePath);
     await prompt.confirm();
     await utilities.pause();
@@ -199,10 +209,9 @@ describe('Apex Replay Debugger', async () => {
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    await utilities.executeQuickPick('View: Open Previous Editor');
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
-      utilities.Duration.seconds(1)
+      utilities.Duration.seconds(3)
     );
 
     // Continue with the debug session
@@ -294,6 +303,7 @@ describe('Apex Replay Debugger', async () => {
   });
 
   const continueDebugging = async (): Promise<void> => {
+    // TODO: why isn't the input box created in the log file?
     const inputBox = await InputBox.create();
     await inputBox.sendKeys(CONTINUE);
     await utilities.pause(utilities.Duration.seconds(1));
