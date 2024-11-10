@@ -190,10 +190,21 @@ describe('Apex Replay Debugger', async () => {
     console.log('J');
 
     // Verify content on log file
-    const editorView = workbench.getEditorView();
+    let editorView;
+    try {
+      editorView = workbench.getEditorView();
+    } catch {
+      editorView = workbench.getEditorView();
+    }
     console.log('K');
     utilities.pause(utilities.Duration.seconds(1));
-    const activeTab = await editorView.getActiveTab();
+    let activeTab;
+    try {
+      activeTab = await editorView.getActiveTab();
+    } catch {
+      activeTab = await editorView.getActiveTab();
+    }
+    console.log('activeTab = ' + activeTab);
     console.log('L');
     utilities.pause(utilities.Duration.seconds(1));
     const title = await activeTab?.getTitle();
