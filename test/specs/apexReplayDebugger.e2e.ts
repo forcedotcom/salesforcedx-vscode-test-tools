@@ -11,7 +11,6 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { execSync } from "child_process";
-import { Duration } from '@salesforce/kit';
 
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -141,7 +140,7 @@ describe('Apex Replay Debugger', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Get Apex Debug Logs`);
 
     // Run SFDX: Get Apex Debug Logs
-    const workbench = utilities.getWorkbench();
+    // const workbench = utilities.getWorkbench();
     await utilities.clearOutputView();
     console.log('A');
     await utilities.pause(utilities.Duration.seconds(2));
@@ -246,6 +245,7 @@ describe('Apex Replay Debugger', async () => {
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - log file`);
+    utilities.pause(utilities.Duration.seconds(10));
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
     await utilities.executeQuickPick(
