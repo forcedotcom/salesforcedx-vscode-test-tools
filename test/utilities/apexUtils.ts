@@ -17,15 +17,20 @@ export async function createApexClass(name: string, classText: string, breakpoin
 
   // Set the name of the new Apex Class
   await inputBox.setText(name);
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
   await pause(Duration.seconds(1));
 
   // Modify class content
   const workbench = getWorkbench();
   const textEditor = await getTextEditor(workbench, name + '.cls');
+  await pause(Duration.seconds(1));
   await textEditor.setText(classText);
+  await pause(Duration.seconds(1));
   await textEditor.save();
+  await pause(Duration.seconds(1));
   if (breakpoint) {
     await textEditor.toggleBreakpoint(breakpoint);
   }
@@ -33,7 +38,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
 }
 
 export async function createApexClassWithTest(name: string): Promise<void> {
-  log(`callig createApexClassWithTest()`);
+  log(`calling createApexClassWithTest()`);
   const classText = [
     `public with sharing class ${name} {`,
     `\tpublic static void SayHello(string name){`,
