@@ -22,9 +22,9 @@ describe('Apex Replay Debugger', async () => {
     isOrgRequired: true,
     testSuiteSuffixName: 'ApexReplayDebugger'
   }
-  const CONTINUE = 'F5';
 
   step('Set up the testing environment', async () => {
+    utilities.log(`ApexReplayDebugger - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Create Apex class file
@@ -36,11 +36,21 @@ describe('Apex Replay Debugger', async () => {
       utilities.Duration.seconds(1)
     );
 
-    const successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successPushNotificationWasFound).to.equal(true);
+    let successPushNotificationWasFound;
+    try {
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    }
   });
 
   step('Verify LSP finished indexing', async () => {
