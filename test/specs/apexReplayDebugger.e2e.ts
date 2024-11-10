@@ -11,6 +11,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { execSync } from "child_process";
+import { Duration } from '@salesforce/kit';
 
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -146,7 +147,7 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause(utilities.Duration.seconds(2));
     prompt = await utilities.executeQuickPick(
       'SFDX: Get Apex Debug Logs',
-      utilities.Duration.seconds(10)
+      utilities.Duration.seconds(2)
     );
     console.log('B');
 
@@ -191,10 +192,13 @@ describe('Apex Replay Debugger', async () => {
     // Verify content on log file
     const editorView = workbench.getEditorView();
     console.log('K');
+    utilities.pause(utilities.Duration.seconds(1));
     const activeTab = await editorView.getActiveTab();
     console.log('L');
+    utilities.pause(utilities.Duration.seconds(1));
     const title = await activeTab?.getTitle();
     console.log('M');
+    utilities.pause(utilities.Duration.seconds(1));
     const textEditor = (await editorView.openEditor(title!)) as TextEditor;
     console.log('N');
     const executionStarted = await textEditor.getLineOfText('|EXECUTION_STARTED');
