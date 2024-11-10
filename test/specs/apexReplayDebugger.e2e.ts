@@ -6,7 +6,7 @@
  */
 import { step } from 'mocha-steps';
 import path from 'path';
-import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, TextEditor } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
@@ -153,7 +153,7 @@ describe('Apex Replay Debugger', async () => {
     //   'Getting Apex debug logs',
     //   utilities.Duration.TEN_MINUTES
     // );
-    await utilities.pause(utilities.Duration.seconds(2));
+    await utilities.pause(utilities.Duration.seconds(10));
 
     // Select a log file
     const quickPicks = await prompt.getQuickPicks();
