@@ -142,11 +142,13 @@ describe('Apex Replay Debugger', async () => {
     // Run SFDX: Get Apex Debug Logs
     const workbench = utilities.getWorkbench();
     await utilities.clearOutputView();
+    console.log('A');
     await utilities.pause(utilities.Duration.seconds(2));
     prompt = await utilities.executeQuickPick(
       'SFDX: Get Apex Debug Logs',
       utilities.Duration.seconds(10)
     );
+    console.log('B');
 
     // Wait for the command to execute
     // await utilities.waitForNotificationToGoAway(
@@ -157,15 +159,20 @@ describe('Apex Replay Debugger', async () => {
 
     // Select a log file
     const quickPicks = await prompt.getQuickPicks();
+    console.log('C');
     expect(quickPicks).not.to.be.undefined;
+    console.log('D');
     expect(quickPicks.length).greaterThanOrEqual(0);
+    console.log('E');
     await prompt.selectQuickPick('User User - Api');
+    console.log('F');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Get Apex Debug Logs successfully ran',
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
+    console.log('G');
 
     // Verify content on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -173,20 +180,31 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Get Apex Debug Logs',
       10
     );
+    console.log('H');
     expect(outputPanelText).not.to.be.undefined;
+    console.log('I');
     expect(outputPanelText).to.contain('|EXECUTION_STARTED');
     expect(outputPanelText).to.contain('|EXECUTION_FINISHED');
     expect(outputPanelText).to.contain('ended SFDX: Get Apex Debug Logs');
+    console.log('J');
 
     // Verify content on log file
     const editorView = workbench.getEditorView();
+    console.log('K');
     const activeTab = await editorView.getActiveTab();
+    console.log('L');
     const title = await activeTab?.getTitle();
+    console.log('M');
     const textEditor = (await editorView.openEditor(title!)) as TextEditor;
+    console.log('N');
     const executionStarted = await textEditor.getLineOfText('|EXECUTION_STARTED');
+    console.log('O');
     const executionFinished = await textEditor.getLineOfText('|EXECUTION_FINISHED');
+    console.log('P');
     expect(executionStarted).greaterThanOrEqual(1);
+    console.log('Q');
     expect(executionFinished).greaterThanOrEqual(1);
+    console.log('R');
   });
 
   xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
