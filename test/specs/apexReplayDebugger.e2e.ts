@@ -300,10 +300,18 @@ describe('Apex Replay Debugger', async () => {
 
     await utilities.pause(utilities.Duration.seconds(1));
     console.log('FF');
-    await utilities.executeQuickPick(
-      'SFDX: Launch Apex Replay Debugger with Current File',
-      utilities.Duration.seconds(3)
-    );
+    try {
+      await utilities.executeQuickPick(
+        'SFDX: Launch Apex Replay Debugger with Current File',
+        utilities.Duration.seconds(3)
+      );
+    } catch {
+      await utilities.executeQuickPick(
+        'SFDX: Launch Apex Replay Debugger with Current File',
+        utilities.Duration.seconds(3)
+      );
+    }
+
     console.log('HH');
 
     // Continue with the debug session
