@@ -248,6 +248,7 @@ describe('Apex Replay Debugger', async () => {
     utilities.pause(utilities.Duration.seconds(10));
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
+    await utilities.reloadWindow();
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
@@ -262,14 +263,7 @@ describe('Apex Replay Debugger', async () => {
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
     const workbench = utilities.getWorkbench();
-    utilities.pause(utilities.Duration.seconds(1));
-    try {
-      await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
-    }
-    catch {
-      await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
-    }
-    utilities.pause(utilities.Duration.seconds(1));
+    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
