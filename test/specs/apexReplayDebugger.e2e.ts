@@ -271,16 +271,23 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause(utilities.Duration.minutes(1));
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    const workbench = utilities.getWorkbench();
+    // const workbench = utilities.getWorkbench();
     await utilities.executeQuickPick(
       'View: Close All Editors',
       utilities.Duration.seconds(3)
     );
-    utilities.pause(utilities.Duration.seconds(1));
-    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
+    await utilities.pause(utilities.Duration.seconds(1));
+    // TODO: Why does ExampleApexClass.cls also get opened?
+    // await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     // utilities.pause(utilities.Duration.seconds(1));
     // await utilities.openFile('ExampleApexClassTest.cls');
-    utilities.pause(utilities.Duration.seconds(1));
+    const prompt = await utilities.executeQuickPick(
+      'Go to File...',
+      utilities.Duration.seconds(3)
+    );
+    await utilities.pause(utilities.Duration.seconds(1));
+    await prompt.setText('ExampleApexClassTest.cls');
+    await utilities.pause(utilities.Duration.seconds(1));
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
