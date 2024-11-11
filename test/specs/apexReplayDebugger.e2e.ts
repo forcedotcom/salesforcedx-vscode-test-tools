@@ -271,7 +271,7 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause(utilities.Duration.minutes(1));
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    // const workbench = utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     await utilities.executeQuickPick(
       'View: Close All Editors',
       utilities.Duration.seconds(3)
@@ -281,12 +281,19 @@ describe('Apex Replay Debugger', async () => {
     // await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     // utilities.pause(utilities.Duration.seconds(1));
     // await utilities.openFile('ExampleApexClassTest.cls');
-    const prompt = await utilities.executeQuickPick(
-      'Go to File...',
-      utilities.Duration.seconds(3)
-    );
-    await utilities.pause(utilities.Duration.seconds(1));
-    await prompt.setText('ExampleApexClassTest.cls');
+
+    if (process.platform === 'darwin') {
+      await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
+    } else {
+      // To get around a flapper where ExampleApexClass.cls also gets opened
+      const prompt = await utilities.executeQuickPick(
+        'Go to File...',
+        utilities.Duration.seconds(3)
+      );
+      await utilities.pause(utilities.Duration.seconds(1));
+      await prompt.setText('ExampleApexClassTest.cls');
+    }
+
     await utilities.pause(utilities.Duration.seconds(1));
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
