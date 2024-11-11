@@ -6,7 +6,7 @@
  */
 import { step } from 'mocha-steps';
 import path from 'path';
-import { InputBox, QuickOpenBox, TextEditor } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
@@ -358,17 +358,21 @@ describe('Apex Replay Debugger', async () => {
 
     // Run SFDX: Turn Off Apex Debug Log for Replay Debugger
     await utilities.clearOutputView();
+    console.log('U');
     prompt = await utilities.executeQuickPick(
       'SFDX: Turn Off Apex Debug Log for Replay Debugger',
       utilities.Duration.seconds(1)
     );
+    console.log('V');
 
     // Look for the success notification that appears which says, "SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
       utilities.Duration.TEN_MINUTES
     );
+    console.log('W');
     expect(successNotificationWasFound).to.equal(true);
+    console.log('X');
 
     // Verify content on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -376,11 +380,13 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Turn Off Apex Debug Log for Replay Debugger',
       10
     );
+    console.log('Y');
     expect(outputPanelText).not.to.be.undefined;
     expect(outputPanelText).to.contain('Deleting Record...');
     expect(outputPanelText).to.contain('Success');
     expect(outputPanelText).to.contain('Successfully deleted record:');
     expect(outputPanelText).to.contain('ended with exit code 0');
+    console.log('Z');
   });
 
   after('Tear down and clean up the testing environment', async () => {
