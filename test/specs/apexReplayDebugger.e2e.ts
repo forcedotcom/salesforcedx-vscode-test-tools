@@ -366,10 +366,19 @@ describe('Apex Replay Debugger', async () => {
     console.log('V');
 
     // Look for the success notification that appears which says, "SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran".
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+    }
     console.log('W');
     expect(successNotificationWasFound).to.equal(true);
     console.log('X');
