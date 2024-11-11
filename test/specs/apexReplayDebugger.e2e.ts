@@ -249,6 +249,10 @@ describe('Apex Replay Debugger', async () => {
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
     await utilities.reloadWindow();
+    await utilities.verifyExtensionsAreRunning(
+      utilities.getExtensionsToVerifyActive(),
+      utilities.Duration.seconds(100)
+    );
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
