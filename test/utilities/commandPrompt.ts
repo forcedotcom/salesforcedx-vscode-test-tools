@@ -128,27 +128,39 @@ export async function executeQuickPick(
   wait: Duration = Duration.seconds(1)
 ): Promise<InputBox | QuickOpenBox> {
   debug(`executeQuickPick command: ${command}`);
+  console.log('1');
   try {
+    console.log('2');
     const workbench = getWorkbench();
+    console.log('3');
     const prompt = await workbench.openCommandPrompt();
+    console.log('4');
     await prompt.setText(`>${command}`);
+    console.log('5');
     await prompt.selectQuickPick(command);
+    console.log('6');
     await pause(wait);
     return prompt;
   } catch (error) {
+    console.log('7');
     let errorMessage: string;
 
     if (error instanceof Error) {
+      console.log('8');
       errorMessage = error.message;
     } else if (typeof error === 'string') {
+      console.log('9');
       errorMessage = error;
     } else {
+      console.log('10');
       throw new Error(`Unknown error: ${error}`);
     }
 
     if (errorMessage.includes('Command not found')) {
+      console.log('11');
       throw new Error(`Command not found: ${command}`);
     } else {
+      console.log('12');
       throw error;
     }
   }
