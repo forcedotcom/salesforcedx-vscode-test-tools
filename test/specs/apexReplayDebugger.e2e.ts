@@ -272,6 +272,8 @@ describe('Apex Replay Debugger', async () => {
     utilities.pause(utilities.Duration.seconds(1));
     await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     utilities.pause(utilities.Duration.seconds(1));
+    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
+    utilities.pause(utilities.Duration.seconds(1));
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
