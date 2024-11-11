@@ -300,9 +300,6 @@ describe('Apex Replay Debugger', async () => {
 
     await utilities.pause(utilities.Duration.seconds(1));
     console.log('FF');
-    await utilities.reloadWindow();
-    await utilities.pause(utilities.Duration.minutes(1));
-    console.log('GG');
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
