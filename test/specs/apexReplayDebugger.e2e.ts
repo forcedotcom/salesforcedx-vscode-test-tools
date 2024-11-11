@@ -266,7 +266,7 @@ describe('Apex Replay Debugger', async () => {
 
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - test class`);
-
+    console.log('AA');
     // await utilities.reloadWindow();
     // await utilities.pause(utilities.Duration.minutes(1));
 
@@ -277,39 +277,48 @@ describe('Apex Replay Debugger', async () => {
       utilities.Duration.seconds(3)
     );
     await utilities.pause(utilities.Duration.seconds(1));
+    console.log('BB');
     // TODO: Why does ExampleApexClass.cls also get opened?
     // await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     // utilities.pause(utilities.Duration.seconds(1));
     // await utilities.openFile('ExampleApexClassTest.cls');
 
     if (process.platform === 'darwin') {
+      console.log('CC');
       await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     } else {
+      console.log('DD');
       // To get around a flapper where ExampleApexClass.cls also gets opened
       const prompt = await utilities.executeQuickPick(
         'Go to File...',
         utilities.Duration.seconds(3)
       );
+      console.log('EE');
       await utilities.pause(utilities.Duration.seconds(1));
       await prompt.setText('ExampleApexClassTest.cls');
     }
 
     await utilities.pause(utilities.Duration.seconds(1));
+    console.log('FF');
     await utilities.reloadWindow();
     await utilities.pause(utilities.Duration.minutes(1));
+    console.log('GG');
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
     );
+    console.log('HH');
 
     // Continue with the debug session
     await utilities.continueDebugging(2, 30);
+    console.log('II');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'Debug Test(s) successfully ran',
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
+    console.log('JJ');
   });
 
   step('Run the Anonymous Apex Debugger using the Command Palette', async () => {
