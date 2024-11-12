@@ -6,7 +6,7 @@
  */
 import { step } from 'mocha-steps';
 import path from 'path';
-import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
@@ -54,7 +54,7 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('Verify LSP finished indexing', async () => {
-    utilities.log(`ApexReplayDebugger - Verify LSP finished indexing`);
+    utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
 
     // Get Apex LSP Status Bar
     const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
@@ -63,8 +63,6 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Turn On Apex Debug Log for Replay Debugger', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Turn On Apex Debug Log for Replay Debugger`);
-
     // Clear output before running the command
     await utilities.clearOutputView();
 
@@ -93,8 +91,6 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('Run the Anonymous Apex Debugger with Currently Selected Text', async () => {
-    utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger with Currently Selected Text`);
-
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
@@ -137,42 +133,33 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Get Apex Debug Logs', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Get Apex Debug Logs`);
-
     // Run SFDX: Get Apex Debug Logs
-    // const workbench = utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     await utilities.clearOutputView();
-    console.log('A');
     await utilities.pause(utilities.Duration.seconds(2));
     prompt = await utilities.executeQuickPick(
       'SFDX: Get Apex Debug Logs',
-      utilities.Duration.seconds(2)
+      utilities.Duration.seconds(10)
     );
-    console.log('B');
 
     // Wait for the command to execute
     // await utilities.waitForNotificationToGoAway(
     //   'Getting Apex debug logs',
     //   utilities.Duration.TEN_MINUTES
     // );
-    await utilities.pause(utilities.Duration.seconds(10));
+    await utilities.pause(utilities.Duration.seconds(2));
 
     // Select a log file
     const quickPicks = await prompt.getQuickPicks();
-    console.log('C');
     expect(quickPicks).not.to.be.undefined;
-    console.log('D');
     expect(quickPicks.length).greaterThanOrEqual(0);
-    console.log('E');
     await prompt.selectQuickPick('User User - Api');
-    console.log('F');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Get Apex Debug Logs successfully ran',
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
-    console.log('G');
 
     // Verify content on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -180,36 +167,23 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Get Apex Debug Logs',
       10
     );
-    console.log('H');
     expect(outputPanelText).not.to.be.undefined;
-    console.log('I');
     expect(outputPanelText).to.contain('|EXECUTION_STARTED');
     expect(outputPanelText).to.contain('|EXECUTION_FINISHED');
     expect(outputPanelText).to.contain('ended SFDX: Get Apex Debug Logs');
-    console.log('J');
 
     // Verify content on log file
-    // const editorView = workbench.getEditorView();
-    // console.log('K');
-    // const activeTab = await editorView.getActiveTab();
-    // console.log('L');
-    // const title = await activeTab?.getTitle();
-    // console.log('M');
-    // const textEditor = (await editorView.openEditor(title!)) as TextEditor;
-    // console.log('N');
-    // const executionStarted = await textEditor.getLineOfText('|EXECUTION_STARTED');
-    // console.log('O');
-    // const executionFinished = await textEditor.getLineOfText('|EXECUTION_FINISHED');
-    // console.log('P');
-    // expect(executionStarted).greaterThanOrEqual(1);
-    // console.log('Q');
-    // expect(executionFinished).greaterThanOrEqual(1);
-    // console.log('R');
+    const editorView = workbench.getEditorView();
+    const activeTab = await editorView.getActiveTab();
+    const title = await activeTab?.getTitle();
+    const textEditor = (await editorView.openEditor(title!)) as TextEditor;
+    const executionStarted = await textEditor.getLineOfText('|EXECUTION_STARTED');
+    const executionFinished = await textEditor.getLineOfText('|EXECUTION_FINISHED');
+    expect(executionStarted).greaterThanOrEqual(1);
+    expect(executionFinished).greaterThanOrEqual(1);
   });
 
   xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Last Log File`);
-
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
@@ -244,17 +218,7 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - log file`);
-    utilities.pause(utilities.Duration.seconds(10));
-
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    await utilities.reloadWindow();
-    // await utilities.verifyExtensionsAreRunning(
-    //   utilities.getExtensionsToVerifyActive(),
-    //   utilities.Duration.seconds(100)
-    // );
-    await utilities.pause(utilities.Duration.minutes(1));
-
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
@@ -265,79 +229,25 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - test class`);
-    console.log('AA');
-    // await utilities.reloadWindow();
-    // await utilities.pause(utilities.Duration.minutes(1));
-
     // Run SFDX: Launch Apex Replay Debugger with Current File
     const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     await utilities.executeQuickPick(
-      'View: Close All Editors',
+      'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
     );
-    await utilities.pause(utilities.Duration.seconds(1));
-    console.log('BB');
-    // TODO: Why does ExampleApexClass.cls also get opened?
-    // await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
-    // utilities.pause(utilities.Duration.seconds(1));
-    // await utilities.openFile('ExampleApexClassTest.cls');
-
-    if (process.platform === 'darwin') {
-      console.log('CC');
-      await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
-    } else {
-      console.log('DD');
-      // To get around a flapper where ExampleApexClass.cls also gets opened
-      const prompt = await utilities.executeQuickPick(
-        'Go to File...',
-        utilities.Duration.seconds(3)
-      );
-      console.log('EE');
-      await utilities.pause(utilities.Duration.seconds(1));
-      await prompt.setText('ExampleApexClassTest.cls');
-    }
-
-    await utilities.pause(utilities.Duration.seconds(1));
-    console.log('FF');
-    try {
-      await utilities.executeQuickPick(
-        'SFDX: Launch Apex Replay Debugger with Current File',
-        utilities.Duration.seconds(3)
-      );
-    } catch {
-      await utilities.executeQuickPick(
-        'SFDX: Launch Apex Replay Debugger with Current File',
-        utilities.Duration.seconds(3)
-      );
-    }
-
-    console.log('HH');
 
     // Continue with the debug session
     await utilities.continueDebugging(2, 30);
-    console.log('II');
 
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-    } catch {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-    }
-
+    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'Debug Test(s) successfully ran',
+      utilities.Duration.TEN_MINUTES
+    );
     expect(successNotificationWasFound).to.equal(true);
-    console.log('JJ');
   });
 
   step('Run the Anonymous Apex Debugger using the Command Palette', async () => {
-    utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger using the Command Palette`);
-
     // Create anonymous apex file
     await utilities.createAnonymousApexFile();
 
@@ -371,34 +281,19 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Turn Off Apex Debug Log for Replay Debugger', async () => {
-    utilities.log(`ApexReplayDebugger - SFDX: Turn Off Apex Debug Log for Replay Debugger`);
-
     // Run SFDX: Turn Off Apex Debug Log for Replay Debugger
     await utilities.clearOutputView();
-    console.log('U');
     prompt = await utilities.executeQuickPick(
       'SFDX: Turn Off Apex Debug Log for Replay Debugger',
       utilities.Duration.seconds(1)
     );
-    console.log('V');
 
     // Look for the success notification that appears which says, "SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran".
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
-        utilities.Duration.ONE_MINUTE
-      );
-    }
-    console.log('W');
+    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'SFDX: Turn Off Apex Debug Log for Replay Debugger successfully ran',
+      utilities.Duration.TEN_MINUTES
+    );
     expect(successNotificationWasFound).to.equal(true);
-    console.log('X');
 
     // Verify content on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -406,17 +301,23 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Turn Off Apex Debug Log for Replay Debugger',
       10
     );
-    console.log('Y');
     expect(outputPanelText).not.to.be.undefined;
     expect(outputPanelText).to.contain('Deleting Record...');
     expect(outputPanelText).to.contain('Success');
     expect(outputPanelText).to.contain('Successfully deleted record:');
     expect(outputPanelText).to.contain('ended with exit code 0');
-    console.log('Z');
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(`ApexReplayDebugger - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
+
+  // const continueDebugging = async (): Promise<void> => {
+  //   // TODO: why isn't the input box created in the log file?
+  //   const inputBox = await InputBox.create();
+  //   await inputBox.sendKeys(CONTINUE);
+  //   await utilities.pause(utilities.Duration.seconds(1));
+  //   await inputBox.sendKeys(CONTINUE);
+  //   await utilities.pause(utilities.Duration.seconds(1));
+  // };
 });
