@@ -223,11 +223,15 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause();
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 60);
+    await utilities.continueDebugging(2, 30);
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - log file`);
+
+    await utilities.reloadWindow();
+    await utilities.verifyExtensionsAreRunning(utilities.getExtensionsToVerifyActive());
+    await utilities.closeCurrentEditor();
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
     await utilities.executeQuickPick(
@@ -236,7 +240,7 @@ describe('Apex Replay Debugger', async () => {
     );
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 60);
+    await utilities.continueDebugging(2, 30);
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
@@ -251,7 +255,7 @@ describe('Apex Replay Debugger', async () => {
     );
 
     // Continue with the debug session
-    await utilities.continueDebugging(2, 60);
+    await utilities.continueDebugging(2, 30);
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'Debug Test(s) successfully ran',
