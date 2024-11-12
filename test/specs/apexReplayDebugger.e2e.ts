@@ -145,14 +145,14 @@ describe('Apex Replay Debugger', async () => {
     await utilities.pause(utilities.Duration.seconds(2));
     prompt = await utilities.executeQuickPick(
       'SFDX: Get Apex Debug Logs',
-      utilities.Duration.seconds(10)
+      utilities.Duration.seconds(0)
     );
 
     // Wait for the command to execute
-    // await utilities.waitForNotificationToGoAway(
-    //   'Getting Apex debug logs',
-    //   utilities.Duration.TEN_MINUTES
-    // );
+    await utilities.waitForNotificationToGoAway(
+      'Getting Apex debug logs',
+      utilities.Duration.TEN_MINUTES
+    );
     await utilities.pause(utilities.Duration.seconds(2));
 
     // Select a log file
