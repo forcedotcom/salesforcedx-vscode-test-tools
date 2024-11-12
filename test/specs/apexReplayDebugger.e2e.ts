@@ -181,7 +181,7 @@ describe('Apex Replay Debugger', async () => {
     // expect(executionFinished).to.be.greaterThanOrEqual(1);
   });
 
-  xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
+  step('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Last Log File`);
 
     // Get open text editor
