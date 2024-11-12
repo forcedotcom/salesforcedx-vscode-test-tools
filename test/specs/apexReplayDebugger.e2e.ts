@@ -54,7 +54,7 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('Verify LSP finished indexing', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
+    utilities.log(`ApexReplayDebugger - Verify LSP finished indexing`);
 
     // Get Apex LSP Status Bar
     const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
@@ -63,6 +63,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Turn On Apex Debug Log for Replay Debugger', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Turn On Apex Debug Log for Replay Debugger`);
+
     // Clear output before running the command
     await utilities.clearOutputView();
 
@@ -91,6 +93,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('Run the Anonymous Apex Debugger with Currently Selected Text', async () => {
+    utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger with Currently Selected Text`);
+
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
@@ -133,6 +137,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Get Apex Debug Logs', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Get Apex Debug Logs`);
+
     // Run SFDX: Get Apex Debug Logs
     const workbench = utilities.getWorkbench();
     await utilities.clearOutputView();
@@ -184,6 +190,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Last Log File`);
+
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const editorView = workbench.getEditorView();
@@ -218,6 +226,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - log file`);
+
     // Run SFDX: Launch Apex Replay Debugger with Current File
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
@@ -229,6 +239,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - test class`);
+
     // Run SFDX: Launch Apex Replay Debugger with Current File
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
@@ -248,6 +260,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('Run the Anonymous Apex Debugger using the Command Palette', async () => {
+    utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger using the Command Palette`);
+
     // Create anonymous apex file
     await utilities.createAnonymousApexFile();
 
@@ -281,6 +295,8 @@ describe('Apex Replay Debugger', async () => {
   });
 
   step('SFDX: Turn Off Apex Debug Log for Replay Debugger', async () => {
+    utilities.log(`ApexReplayDebugger - SFDX: Turn Off Apex Debug Log for Replay Debugger`);
+
     // Run SFDX: Turn Off Apex Debug Log for Replay Debugger
     await utilities.clearOutputView();
     prompt = await utilities.executeQuickPick(
@@ -309,6 +325,7 @@ describe('Apex Replay Debugger', async () => {
   });
 
   after('Tear down and clean up the testing environment', async () => {
+    utilities.log(`ApexReplayDebugger - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 
