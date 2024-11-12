@@ -15,6 +15,7 @@ import { execSync } from 'child_process';
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
+  let projectFolderPath: string;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
       projectShape: utilities.ProjectShapeOption.NEW
@@ -26,6 +27,7 @@ describe('Apex Replay Debugger', async () => {
   step('Set up the testing environment', async () => {
     utilities.log(`ApexReplayDebugger - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
+    projectFolderPath = testSetup.projectFolderPath!;
 
     // Create Apex class file
     await utilities.createApexClassWithTest('ExampleApexClass');
@@ -192,13 +194,10 @@ describe('Apex Replay Debugger', async () => {
     const title = await activeTab?.getTitle();
     console.log('*** title = ' + title);
     // TODO: `logFilePath` needs to be the full filepath starting with /Users/daphne.yang
-    const currentDirectory = execSync(`pwd`).toString().slice(0, -1);
+    // const currentDirectory = execSync(`pwd`).toString().slice(0, -1);
     const logFilePath = path
       .join(
-        path.delimiter,
-        currentDirectory,
-        'e2e-temp',
-        'TempProject-ApexReplayDebugger',
+        projectFolderPath,
         '.sfdx',
         'tools',
         'debug',
