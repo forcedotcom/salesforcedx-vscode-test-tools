@@ -179,6 +179,7 @@ describe('Apex Replay Debugger', async () => {
     expect(outputPanelText).to.contain('ended SFDX: Get Apex Debug Logs');
 
     // Verify content on log file
+    await utilities.reloadWindow();
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
     const title = await activeTab?.getTitle();
