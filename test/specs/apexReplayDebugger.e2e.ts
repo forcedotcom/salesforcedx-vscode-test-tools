@@ -10,18 +10,18 @@ import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
-import { execSync } from "child_process";
+import { execSync } from 'child_process';
 
 describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
-      projectShape: utilities.ProjectShapeOption.NEW,
+      projectShape: utilities.ProjectShapeOption.NEW
     },
     isOrgRequired: true,
     testSuiteSuffixName: 'ApexReplayDebugger'
-  }
+  };
 
   step('Set up the testing environment', async () => {
     utilities.log(`ApexReplayDebugger - Set up the testing environment`);
@@ -87,7 +87,7 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Turn On Apex Debug Log for Replay Debugger',
       10
     );
-    expect(outputPanelText).not.to.be.undefined;
+    expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain('SFDX: Turn On Apex Debug Log for Replay Debugger ');
     expect(outputPanelText).to.contain('ended with exit code 0');
   });
@@ -123,12 +123,8 @@ describe('Apex Replay Debugger', async () => {
     expect(successNotificationWasFound).to.equal(true);
 
     // Verify content on vscode's Output section
-    const outputPanelText = await utilities.attemptToFindOutputPanelText(
-      'Apex',
-      'Starting Execute Anonymous Apex',
-      10
-    );
-    expect(outputPanelText).not.to.be.undefined;
+    const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', 'Starting Execute Anonymous Apex', 10);
+    expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain('Compiled successfully.');
     expect(outputPanelText).to.contain('Executed successfully.');
     expect(outputPanelText).to.contain('|EXECUTION_STARTED');
@@ -143,22 +139,16 @@ describe('Apex Replay Debugger', async () => {
     const workbench = utilities.getWorkbench();
     await utilities.clearOutputView();
     await utilities.pause(utilities.Duration.seconds(2));
-    prompt = await utilities.executeQuickPick(
-      'SFDX: Get Apex Debug Logs',
-      utilities.Duration.seconds(0)
-    );
+    prompt = await utilities.executeQuickPick('SFDX: Get Apex Debug Logs', utilities.Duration.seconds(0));
 
     // Wait for the command to execute
-    await utilities.waitForNotificationToGoAway(
-      'Getting Apex debug logs',
-      utilities.Duration.TEN_MINUTES
-    );
+    await utilities.waitForNotificationToGoAway('Getting Apex debug logs', utilities.Duration.TEN_MINUTES);
     await utilities.pause(utilities.Duration.seconds(2));
 
     // Select a log file
     const quickPicks = await prompt.getQuickPicks();
-    expect(quickPicks).not.to.be.undefined;
-    expect(quickPicks.length).greaterThanOrEqual(0);
+    expect(quickPicks).to.not.be.undefined;
+    expect(quickPicks.length).to.be.greaterThanOrEqual(1);
     await prompt.selectQuickPick('User User - Api');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -173,21 +163,20 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Get Apex Debug Logs',
       10
     );
-    expect(outputPanelText).not.to.be.undefined;
+    expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain('|EXECUTION_STARTED');
     expect(outputPanelText).to.contain('|EXECUTION_FINISHED');
     expect(outputPanelText).to.contain('ended SFDX: Get Apex Debug Logs');
 
     // Verify content on log file
-    await utilities.reloadWindow();
     const editorView = workbench.getEditorView();
     const activeTab = await editorView.getActiveTab();
     const title = await activeTab?.getTitle();
     const textEditor = (await editorView.openEditor(title!)) as TextEditor;
     const executionStarted = await textEditor.getLineOfText('|EXECUTION_STARTED');
     const executionFinished = await textEditor.getLineOfText('|EXECUTION_FINISHED');
-    expect(executionStarted).greaterThanOrEqual(1);
-    expect(executionFinished).greaterThanOrEqual(1);
+    expect(executionStarted).to.be.greaterThanOrEqual(1);
+    expect(executionFinished).to.be.greaterThanOrEqual(1);
   });
 
   xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
@@ -199,12 +188,24 @@ describe('Apex Replay Debugger', async () => {
 
     // Get file path from open text editor
     const activeTab = await editorView.getActiveTab();
-    expect(activeTab).not.to.be.undefined;
+    expect(activeTab).to.not.be.undefined;
     const title = await activeTab?.getTitle();
     console.log('*** title = ' + title);
     // TODO: `logFilePath` needs to be the full filepath starting with /Users/daphne.yang
     const currentDirectory = execSync(`pwd`).toString().slice(0, -1);
-    const logFilePath = path.join(path.delimiter, currentDirectory, 'e2e-temp', 'TempProject-ApexReplayDebugger', '.sfdx', 'tools', 'debug', 'logs', title!).slice(1);
+    const logFilePath = path
+      .join(
+        path.delimiter,
+        currentDirectory,
+        'e2e-temp',
+        'TempProject-ApexReplayDebugger',
+        '.sfdx',
+        'tools',
+        'debug',
+        'logs',
+        title!
+      )
+      .slice(1);
     console.log('*** logFilePath = ' + logFilePath);
 
     // TODO: THIS IS JUST FOR TESTING - the text is set correctly!
@@ -282,12 +283,8 @@ describe('Apex Replay Debugger', async () => {
     expect(successNotificationWasFound).to.equal(true);
 
     // Verify content on vscode's Output section
-    const outputPanelText = await utilities.attemptToFindOutputPanelText(
-      'Apex',
-      'Starting Execute Anonymous Apex',
-      10
-    );
-    expect(outputPanelText).not.to.be.undefined;
+    const outputPanelText = await utilities.attemptToFindOutputPanelText('Apex', 'Starting Execute Anonymous Apex', 10);
+    expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain('Compiled successfully.');
     expect(outputPanelText).to.contain('Executed successfully.');
     expect(outputPanelText).to.contain('|EXECUTION_STARTED');
@@ -318,7 +315,7 @@ describe('Apex Replay Debugger', async () => {
       'Starting SFDX: Turn Off Apex Debug Log for Replay Debugger',
       10
     );
-    expect(outputPanelText).not.to.be.undefined;
+    expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain('Deleting Record...');
     expect(outputPanelText).to.contain('Success');
     expect(outputPanelText).to.contain('Successfully deleted record:');
