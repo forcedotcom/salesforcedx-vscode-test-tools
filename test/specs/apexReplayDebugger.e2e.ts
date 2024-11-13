@@ -180,7 +180,7 @@ describe('Apex Replay Debugger', async () => {
     expect(executionFinished).to.be.greaterThanOrEqual(1);
   });
 
-  xstep('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
+  step('SFDX: Launch Apex Replay Debugger with Last Log File', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Last Log File`);
 
     // Get open text editor
@@ -191,32 +191,14 @@ describe('Apex Replay Debugger', async () => {
     const activeTab = await editorView.getActiveTab();
     expect(activeTab).to.not.be.undefined;
     const title = await activeTab?.getTitle();
-    console.log('*** title = ' + title);
-    // TODO: `logFilePath` needs to be the full filepath starting with /Users/daphne.yang
-    // const currentDirectory = execSync(`pwd`).toString().slice(0, -1);
-    const logFilePath = path
-      .join(
-        projectFolderPath,
-        '.sfdx',
-        'tools',
-        'debug',
-        'logs',
-        title!
-      )
-      .slice(1);
+    const logFilePath = path.join(projectFolderPath, '.sfdx', 'tools', 'debug', 'logs', title!);
     console.log('*** logFilePath = ' + logFilePath);
-
-    // TODO: THIS IS JUST FOR TESTING - the text is set correctly!
-    // const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClass.cls');
-    // await textEditor.setText(logFilePath);
-    // await utilities.pause();
 
     // Run SFDX: Launch Apex Replay Debugger with Last Log File
     prompt = await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Last Log File',
       utilities.Duration.seconds(1)
     );
-    // TODO: Why is `/Users/daphne.yang/Development/salesforcedx-vscode-automation-tests-redhat/e2e-temp/TempProject-ApexReplayDebugger/.sfdx/` being set?  What happens to the remaining part of the filepath?
     await prompt.setText(logFilePath);
     await prompt.confirm();
     await utilities.pause();
