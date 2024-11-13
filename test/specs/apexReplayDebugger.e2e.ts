@@ -15,6 +15,7 @@ describe('Apex Replay Debugger', async () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   let projectFolderPath: string;
+  let logFileTitle: string;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
       projectShape: utilities.ProjectShapeOption.NEW
@@ -76,11 +77,21 @@ describe('Apex Replay Debugger', async () => {
     );
 
     // Look for the success notification that appears which says, "SFDX: Turn On Apex Debug Log for Replay Debugger successfully ran".
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Turn On Apex Debug Log for Replay Debugger successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Turn On Apex Debug Log for Replay Debugger successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Turn On Apex Debug Log for Replay Debugger successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
 
     // Verify content on vscode's Output section
     const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -191,7 +202,8 @@ describe('Apex Replay Debugger', async () => {
     const activeTab = await editorView.getActiveTab();
     expect(activeTab).to.not.be.undefined;
     const title = await activeTab?.getTitle();
-    const logFilePath = path.join(projectFolderPath, '.sfdx', 'tools', 'debug', 'logs', title!);
+    if (title) logFileTitle = title;
+    const logFilePath = path.join(projectFolderPath, '.sfdx', 'tools', 'debug', 'logs', logFileTitle);
     console.log('*** logFilePath = ' + logFilePath);
 
     // Run SFDX: Launch Apex Replay Debugger with Last Log File
@@ -209,6 +221,9 @@ describe('Apex Replay Debugger', async () => {
 
   step('SFDX: Launch Apex Replay Debugger with Current File - log file', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - log file`);
+
+    const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, logFileTitle);
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
     await utilities.executeQuickPick(
