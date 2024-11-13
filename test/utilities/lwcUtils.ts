@@ -11,8 +11,8 @@ import { getTextEditor } from './textEditorView';
 import { getWorkbench } from './workbench';
 
 export async function createLwc(name: string): Promise<void> {
-  log('createLwc() - calling browser.getWorkbench()');
-  const workbench = await getWorkbench();
+  log('createLwc() - calling getWorkbench()');
+  const workbench = getWorkbench();
 
   log('createLwc() - Running SFDX: Create Lightning Web Component');
   // Using the Command palette, run SFDX: Create Lightning Web Component.
@@ -21,13 +21,16 @@ export async function createLwc(name: string): Promise<void> {
   log('createLwc() - Set the name of the new component');
   // Set the name of the new component
   await inputBox.setText(name);
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
   await pause(Duration.seconds(1));
 
   log('createLwc() - Modify js content');
   // Modify js content
   let textEditor = await getTextEditor(workbench, name + '.js');
+  await pause(Duration.seconds(1));
   const jsText = [
     `import { LightningElement } from 'lwc';`,
     ``,
@@ -36,6 +39,7 @@ export async function createLwc(name: string): Promise<void> {
     `}`
   ].join('\n');
   await textEditor.setText(jsText);
+  await pause(Duration.seconds(1));
   await textEditor.save();
   await pause(Duration.seconds(1));
 
@@ -98,7 +102,7 @@ export async function createLwc(name: string): Promise<void> {
 }
 
 export async function createAura(name: string): Promise<void> {
-  const workbench = await getWorkbench();
+  const workbench = getWorkbench();
 
   log('createAura() - Running SFDX: Create Aura Component');
   const inputBox = await executeQuickPick('SFDX: Create Aura Component', Duration.seconds(1));
@@ -106,13 +110,16 @@ export async function createAura(name: string): Promise<void> {
   log('createAura() - Set the name of the new component');
   // Set the name of the new component
   await inputBox.setText(name);
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
+  await pause(Duration.seconds(1));
   await inputBox.confirm();
   await pause(Duration.seconds(1));
 
   log('createAura() - Modify html content');
   // Modify html content
   const textEditor = await getTextEditor(workbench, name + '.cmp');
+  await pause(Duration.seconds(1));
   const htmlText = [
     '<aura:component>',
     '\t',
@@ -126,6 +133,7 @@ export async function createAura(name: string): Promise<void> {
     '</aura:component>'
   ].join('\n');
   await textEditor.setText(htmlText);
+  await pause(Duration.seconds(1));
   await textEditor.save();
   await pause(Duration.seconds(1));
 }
