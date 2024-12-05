@@ -179,6 +179,7 @@ export async function clickFilePathOkButton(): Promise<void> {
         `Overwrite button not clickable within 5 seconds`
       );
       await item.click();
+      break;
     }
   }
   await pause(Duration.seconds(2));
