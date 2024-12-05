@@ -119,6 +119,7 @@ export class TestSetup {
       case ProjectShapeOption.NONE:
         // NONE: no project open in the workspace by default
         /* create the e2e-temp folder to benefit further testing */
+        this.projectFolderPath = path.join(this.tempFolderPath, this.tempProjectName);
         if (!fs.existsSync(this.tempFolderPath)) {
           utilities.createFolder(this.tempFolderPath);
         }
