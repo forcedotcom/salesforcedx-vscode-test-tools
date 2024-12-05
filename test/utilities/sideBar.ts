@@ -147,7 +147,7 @@ export async function verifyProjectLoaded(projectName: string) {
   log(`${projectName} - Verifying project was created...`);
 
   // Reload the VS Code window
-  const workbench = await getWorkbench();
+  const workbench = getWorkbench();
   await reloadWindow();
   await showExplorerView();
 
