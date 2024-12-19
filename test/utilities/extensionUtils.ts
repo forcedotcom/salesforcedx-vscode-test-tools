@@ -181,6 +181,7 @@ export async function verifyExtensionsAreRunning(
 
   const extensionsToVerify = extensions.map((extension) => extension.extensionId);
 
+  await utilities.showRunningExtensions();
   await utilities.zoom('Out', 4, Duration.seconds(1));
 
   let extensionsStatus: ExtensionActivation[] = [];
