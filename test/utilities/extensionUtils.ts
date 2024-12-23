@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration, log } from './miscellaneous';
+import { Duration, log, pause } from './miscellaneous';
 import * as utilities from './index';
 import { executeQuickPick } from './commandPrompt';
 import { By, Editor } from 'vscode-extension-tester';
@@ -186,6 +186,7 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
 
   const extensionsToVerify = extensions.map(extension => extension.extensionId);
 
+  await pause(Duration.seconds(10));
   await utilities.zoom('Out', 4, Duration.seconds(1));
 
   let extensionsStatus: ExtensionActivation[] = [];
