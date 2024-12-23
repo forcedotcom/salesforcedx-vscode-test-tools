@@ -191,7 +191,7 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
   let extensionsStatus: ExtensionActivation[] = [];
   let allActivated = false;
 
-  const timeoutPromise = new Promise((_, reject) =>
+  const timeoutPromise = new Promise<boolean>((_, reject) =>
     setTimeout(() => reject(new Error('findExtensionsInRunningExtensionsList timeout')), timeout.milliseconds)
   );
 
