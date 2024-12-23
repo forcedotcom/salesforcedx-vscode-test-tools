@@ -137,7 +137,11 @@ export const extensions: ExtensionType[] = [
 ];
 
 export async function showRunningExtensions(): Promise<Editor | undefined> {
-  await executeQuickPick('Developer: Show Running Extensions', Duration.seconds(5));
+  await utilities.runCommandFromCommandPrompt(
+    getWorkbench(),
+    'Developer: Show Running Extensions',
+    Duration.seconds(5)
+  );
   let re: Editor | undefined = undefined;
   await getBrowser().wait(
     async () => {
