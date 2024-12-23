@@ -7,8 +7,10 @@
 
 import { Duration, log } from './miscellaneous';
 import * as utilities from './index';
+import { executeQuickPick } from './commandPrompt';
 import { By, Editor } from 'vscode-extension-tester';
 import { expect } from 'chai';
+import { getBrowser, getWorkbench } from './workbench';
 
 export type ExtensionId =
   | 'salesforcedx-vscode'
@@ -135,11 +137,11 @@ export const extensions: ExtensionType[] = [
 ];
 
 export async function showRunningExtensions(): Promise<Editor | undefined> {
-  await utilities.executeQuickPick('Developer: Show Running Extensions', Duration.seconds(5));
+  await executeQuickPick('Developer: Show Running Extensions', Duration.seconds(5));
   let re: Editor | undefined = undefined;
-  await utilities.getBrowser().wait(
+  await getBrowser().wait(
     async () => {
-      const wb = utilities.getWorkbench();
+      const wb = getWorkbench();
       const ev = wb.getEditorView();
       re = await ev.openEditor('Running Extensions');
       return re.isDisplayed();
