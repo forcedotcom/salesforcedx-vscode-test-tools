@@ -139,11 +139,7 @@ export const extensions: ExtensionType[] = [
 export async function showRunningExtensions(): Promise<Editor | undefined> {
   log('');
   log(`Starting showRunningExtensions()...`);
-  await utilities.runCommandFromCommandPrompt(
-    getWorkbench(),
-    'Developer: Show Running Extensions',
-    Duration.seconds(5)
-  );
+  await executeQuickPick('Developer: Show Running Extensions');
   let re: Editor | undefined = undefined;
   await getBrowser().wait(
     async () => {
@@ -186,7 +182,7 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
 
   const extensionsToVerify = extensions.map(extension => extension.extensionId);
 
-  await pause(Duration.seconds(10));
+  await pause(Duration.seconds(15));
   await utilities.zoom('Out', 4, Duration.seconds(1));
 
   let extensionsStatus: ExtensionActivation[] = [];
