@@ -135,7 +135,7 @@ export const extensions: ExtensionType[] = [
 ];
 
 export async function showRunningExtensions(): Promise<Editor | undefined> {
-  await utilities.executeQuickPick('Developer: Show Running Extensions');
+  await utilities.executeQuickPick('Developer: Show Running Extensions', Duration.seconds(5));
   let re: Editor | undefined = undefined;
   await utilities.getBrowser().wait(
     async () => {
@@ -157,29 +157,24 @@ export async function reloadAndEnableExtensions(): Promise<void> {
 }
 
 export function getExtensionsToVerifyActive(
-  predicate: (ext: ExtensionType) => boolean = (ext) => !!ext
+  predicate: (ext: ExtensionType) => boolean = ext => !!ext
 ): ExtensionType[] {
   return extensions
-    .filter((ext) => {
+    .filter(ext => {
       return ext.shouldVerifyActivation;
     })
     .filter(predicate);
 }
 
-export async function verifyExtensionsAreRunning(
-  extensions: ExtensionType[],
-  timeout = VERIFY_EXTENSIONS_TIMEOUT
-) {
+export async function verifyExtensionsAreRunning(extensions: ExtensionType[], timeout = VERIFY_EXTENSIONS_TIMEOUT) {
   log('');
   log(`Starting verifyExtensionsAreRunning()...`);
   if (extensions.length === 0) {
-    log(
-      'verifyExtensionsAreRunning - No extensions to verify, continuing test run w/o extension verification'
-    );
+    log('verifyExtensionsAreRunning - No extensions to verify, continuing test run w/o extension verification');
     return true;
   }
 
-  const extensionsToVerify = extensions.map((extension) => extension.extensionId);
+  const extensionsToVerify = extensions.map(extension => extension.extensionId);
 
   await utilities.zoom('Out', 4, Duration.seconds(1));
 
@@ -187,10 +182,7 @@ export async function verifyExtensionsAreRunning(
   let allActivated = false;
 
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(
-      () => reject(new Error('findExtensionsInRunningExtensionsList timeout')),
-      timeout.milliseconds
-    )
+    setTimeout(() => reject(new Error('findExtensionsInRunningExtensionsList timeout')), timeout.milliseconds)
   );
 
   try {
@@ -208,10 +200,9 @@ export async function verifyExtensionsAreRunning(
           }
 
           allActivated = extensionsToVerify.every(
-            (extensionId) =>
-              extensionsStatus.find(
-                (extensionStatus) => extensionStatus.extensionId === extensionId
-              )?.isActivationComplete
+            extensionId =>
+              extensionsStatus.find(extensionStatus => extensionStatus.extensionId === extensionId)
+                ?.isActivationComplete
           );
         } while (!allActivated);
       })(),
@@ -250,9 +241,7 @@ export async function findExtensionsInRunningExtensionsList(
     throw new Error('Could not find the running extensions editor');
   }
   // Get all extensions
-  const allExtensions = await runningExtensionsEditor.findElements(
-    By.css('div.monaco-list-row > div.extension')
-  );
+  const allExtensions = await runningExtensionsEditor.findElements(By.css('div.monaco-list-row > div.extension'));
 
   const runningExtensions: ExtensionActivation[] = [];
   for (const extension of allExtensions) {
@@ -278,7 +267,7 @@ export async function findExtensionsInRunningExtensionsList(
   }
 
   // limit runningExtensions to those whose property extensionId is in the list of extensionIds
-  return runningExtensions.filter((extension) => extensionIds.includes(extension.extensionId));
+  return runningExtensions.filter(extension => extensionIds.includes(extension.extensionId));
 }
 
 export async function checkForUncaughtErrors(): Promise<void> {
@@ -289,13 +278,13 @@ export async function checkForUncaughtErrors(): Promise<void> {
 
   const uncaughtErrors = (
     await utilities.findExtensionsInRunningExtensionsList(
-      utilities.getExtensionsToVerifyActive().map((ext) => ext.extensionId)
+      utilities.getExtensionsToVerifyActive().map(ext => ext.extensionId)
     )
-  ).filter((ext) => ext.hasBug);
+  ).filter(ext => ext.hasBug);
 
   await utilities.zoomReset();
 
-  uncaughtErrors.forEach((ext) => {
+  uncaughtErrors.forEach(ext => {
     utilities.log(`Extension ${ext.extensionId}:${ext.version ?? 'unknown'} has a bug`);
   });
 
