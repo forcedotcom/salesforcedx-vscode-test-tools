@@ -8,7 +8,6 @@
 import {
   By,
   DefaultTreeItem,
-  Key,
   Locator,
   TreeItem,
   ViewItem,
@@ -16,7 +15,7 @@ import {
   WebElement,
   Workbench
 } from 'vscode-extension-tester';
-import { debug, log } from './miscellaneous';
+import { debug, Duration, log, pause } from './miscellaneous';
 import { expect } from 'chai';
 import { getWorkbench, reloadWindow, showExplorerView } from './workbench';
 
@@ -147,8 +146,9 @@ export async function verifyProjectLoaded(projectName: string) {
   log(`${projectName} - Verifying project was created...`);
 
   // Reload the VS Code window
+  await pause(Duration.seconds(5));
   const workbench = getWorkbench();
-  await reloadWindow();
+  await reloadWindow(Duration.seconds(10));
   await showExplorerView();
 
   const sidebar = await workbench.getSideBar().wait();

@@ -5,10 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { Duration, log } from './miscellaneous';
+import { Duration, log, pause } from './miscellaneous';
 import * as utilities from './index';
+import { executeQuickPick } from './commandPrompt';
 import { By, Editor } from 'vscode-extension-tester';
 import { expect } from 'chai';
+import { getBrowser, getWorkbench } from './workbench';
 
 export type ExtensionId =
   | 'salesforcedx-vscode'
@@ -135,11 +137,13 @@ export const extensions: ExtensionType[] = [
 ];
 
 export async function showRunningExtensions(): Promise<Editor | undefined> {
-  await utilities.executeQuickPick('Developer: Show Running Extensions');
+  log('');
+  log(`Starting showRunningExtensions()...`);
+  await executeQuickPick('Developer: Show Running Extensions');
   let re: Editor | undefined = undefined;
-  await utilities.getBrowser().wait(
+  await getBrowser().wait(
     async () => {
-      const wb = utilities.getWorkbench();
+      const wb = getWorkbench();
       const ev = wb.getEditorView();
       re = await ev.openEditor('Running Extensions');
       return re.isDisplayed();
@@ -148,6 +152,8 @@ export async function showRunningExtensions(): Promise<Editor | undefined> {
     'Expected "Running Extensions" tab to be visible after 5 seconds',
     500
   );
+  log(`... Finished showRunningExtensions()`);
+  log('');
   return re;
 }
 
@@ -157,40 +163,33 @@ export async function reloadAndEnableExtensions(): Promise<void> {
 }
 
 export function getExtensionsToVerifyActive(
-  predicate: (ext: ExtensionType) => boolean = (ext) => !!ext
+  predicate: (ext: ExtensionType) => boolean = ext => !!ext
 ): ExtensionType[] {
   return extensions
-    .filter((ext) => {
+    .filter(ext => {
       return ext.shouldVerifyActivation;
     })
     .filter(predicate);
 }
 
-export async function verifyExtensionsAreRunning(
-  extensions: ExtensionType[],
-  timeout = VERIFY_EXTENSIONS_TIMEOUT
-) {
+export async function verifyExtensionsAreRunning(extensions: ExtensionType[], timeout = VERIFY_EXTENSIONS_TIMEOUT) {
   log('');
   log(`Starting verifyExtensionsAreRunning()...`);
   if (extensions.length === 0) {
-    log(
-      'verifyExtensionsAreRunning - No extensions to verify, continuing test run w/o extension verification'
-    );
+    log('verifyExtensionsAreRunning - No extensions to verify, continuing test run w/o extension verification');
     return true;
   }
 
-  const extensionsToVerify = extensions.map((extension) => extension.extensionId);
+  const extensionsToVerify = extensions.map(extension => extension.extensionId);
 
+  await pause(Duration.seconds(15));
   await utilities.zoom('Out', 4, Duration.seconds(1));
 
   let extensionsStatus: ExtensionActivation[] = [];
   let allActivated = false;
 
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(
-      () => reject(new Error('findExtensionsInRunningExtensionsList timeout')),
-      timeout.milliseconds
-    )
+  const timeoutPromise = new Promise<boolean>((_, reject) =>
+    setTimeout(() => reject(new Error('findExtensionsInRunningExtensionsList timeout')), timeout.milliseconds)
   );
 
   try {
@@ -208,10 +207,9 @@ export async function verifyExtensionsAreRunning(
           }
 
           allActivated = extensionsToVerify.every(
-            (extensionId) =>
-              extensionsStatus.find(
-                (extensionStatus) => extensionStatus.extensionId === extensionId
-              )?.isActivationComplete
+            extensionId =>
+              extensionsStatus.find(extensionStatus => extensionStatus.extensionId === extensionId)
+                ?.isActivationComplete
           );
         } while (!allActivated);
       })(),
@@ -233,11 +231,13 @@ export async function findExtensionsInRunningExtensionsList(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   extensionIds: string[]
 ): Promise<ExtensionActivation[]> {
+  log('');
+  log('Starting findExtensionsInRunningExtensionsList()...');
   // This function assumes the Extensions list was opened.
 
   // Close the panel and clear notifications so we can see as many of the running extensions as we can.
   try {
-    const center = await utilities.getWorkbench().openNotificationsCenter();
+    const center = await getWorkbench().openNotificationsCenter();
     await center.clearAllNotifications();
     await center.close();
   } catch (error) {
@@ -250,9 +250,7 @@ export async function findExtensionsInRunningExtensionsList(
     throw new Error('Could not find the running extensions editor');
   }
   // Get all extensions
-  const allExtensions = await runningExtensionsEditor.findElements(
-    By.css('div.monaco-list-row > div.extension')
-  );
+  const allExtensions = await runningExtensionsEditor.findElements(By.css('div.monaco-list-row > div.extension'));
 
   const runningExtensions: ExtensionActivation[] = [];
   for (const extension of allExtensions) {
@@ -277,8 +275,10 @@ export async function findExtensionsInRunningExtensionsList(
     });
   }
 
+  log('... Finished findExtensionsInRunningExtensionsList()');
+  log('');
   // limit runningExtensions to those whose property extensionId is in the list of extensionIds
-  return runningExtensions.filter((extension) => extensionIds.includes(extension.extensionId));
+  return runningExtensions.filter(extension => extensionIds.includes(extension.extensionId));
 }
 
 export async function checkForUncaughtErrors(): Promise<void> {
@@ -289,13 +289,13 @@ export async function checkForUncaughtErrors(): Promise<void> {
 
   const uncaughtErrors = (
     await utilities.findExtensionsInRunningExtensionsList(
-      utilities.getExtensionsToVerifyActive().map((ext) => ext.extensionId)
+      utilities.getExtensionsToVerifyActive().map(ext => ext.extensionId)
     )
-  ).filter((ext) => ext.hasBug);
+  ).filter(ext => ext.hasBug);
 
   await utilities.zoomReset();
 
-  uncaughtErrors.forEach((ext) => {
+  uncaughtErrors.forEach(ext => {
     utilities.log(`Extension ${ext.extensionId}:${ext.version ?? 'unknown'} has a bug`);
   });
 
