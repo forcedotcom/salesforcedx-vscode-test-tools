@@ -137,6 +137,8 @@ export const extensions: ExtensionType[] = [
 ];
 
 export async function showRunningExtensions(): Promise<Editor | undefined> {
+  log('');
+  log(`Starting showRunningExtensions()...`);
   await utilities.runCommandFromCommandPrompt(
     getWorkbench(),
     'Developer: Show Running Extensions',
@@ -154,6 +156,8 @@ export async function showRunningExtensions(): Promise<Editor | undefined> {
     'Expected "Running Extensions" tab to be visible after 5 seconds',
     500
   );
+  log(`... Finished showRunningExtensions()`);
+  log('');
   return re;
 }
 
@@ -230,11 +234,13 @@ export async function findExtensionsInRunningExtensionsList(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   extensionIds: string[]
 ): Promise<ExtensionActivation[]> {
+  log('');
+  log('Starting findExtensionsInRunningExtensionsList()...');
   // This function assumes the Extensions list was opened.
 
   // Close the panel and clear notifications so we can see as many of the running extensions as we can.
   try {
-    const center = await utilities.getWorkbench().openNotificationsCenter();
+    const center = await getWorkbench().openNotificationsCenter();
     await center.clearAllNotifications();
     await center.close();
   } catch (error) {
@@ -272,6 +278,8 @@ export async function findExtensionsInRunningExtensionsList(
     });
   }
 
+  log('... Finished findExtensionsInRunningExtensionsList()');
+  log('');
   // limit runningExtensions to those whose property extensionId is in the list of extensionIds
   return runningExtensions.filter(extension => extensionIds.includes(extension.extensionId));
 }
