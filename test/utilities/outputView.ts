@@ -116,7 +116,9 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
   // await executeQuickPick('View: Clear Output', wait);
   const outputView = await new BottomBarPanel().openOutputView();
+  log('AAAAA Output view opened');
   const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
+  log('AAAAA Clear button found');
   await clearButton.click();
   log(`AAAAA Output view cleared`);
 }
