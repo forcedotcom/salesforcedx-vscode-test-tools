@@ -8,7 +8,7 @@
 import { debug, Duration, log, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
-import { BottomBarPanel, By, OutputView } from 'vscode-extension-tester';
+import { BottomBarPanel, By, OutputView, until } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { getWorkbench } from './workbench';
 
@@ -119,6 +119,8 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   log('AAAAA Output view opened');
   const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
   log('AAAAA Clear button found');
+  await outputView.getDriver().wait(until.elementIsVisible(clearButton), 5000);
+  log('AAAAA Clear button visible');
   await clearButton.click();
   log(`AAAAA Output view cleared`);
 }
