@@ -6,6 +6,7 @@
  */
 
 import { debug, Duration, log, pause } from './miscellaneous';
+import * as vscode from 'vscode';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
 import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
@@ -113,7 +114,8 @@ export async function getOperationTime(outputText: string): Promise<string> {
 
 export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
-  await executeQuickPick('View: Clear Output', wait);
+  // await executeQuickPick('View: Clear Output', wait);
+  await vscode.commands.executeCommand('workbench.action.output.clearOutput');
   log(`AAAAA Output view cleared`);
 }
 
