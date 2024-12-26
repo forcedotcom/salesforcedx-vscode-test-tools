@@ -119,9 +119,10 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   log('AAAAA Output view opened');
   const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
   log('AAAAA Clear button found');
-  await outputView.getDriver().wait(until.elementIsVisible(clearButton), 5000);
-  log('AAAAA Clear button visible');
-  await clearButton.click();
+  // await outputView.getDriver().wait(until.elementIsVisible(clearButton), 5000);
+  // log('AAAAA Clear button visible');
+  // await clearButton.click();
+  await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
   log(`AAAAA Output view cleared`);
 }
 
