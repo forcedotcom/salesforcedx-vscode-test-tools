@@ -114,6 +114,7 @@ export async function getOperationTime(outputText: string): Promise<string> {
 export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
   await executeQuickPick('View: Clear Output', wait);
+  log(`AAAAA Output view cleared`);
 }
 
 function formatTimeComponent(component: number, padLength: number = 2): string {
