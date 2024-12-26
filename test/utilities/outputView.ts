@@ -6,11 +6,11 @@
  */
 
 import { debug, Duration, log, pause } from './miscellaneous';
-import * as vscode from 'vscode';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
-import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
+import { BottomBarPanel, By, OutputView } from 'vscode-extension-tester';
 import { expect } from 'chai';
+import { getWorkbench } from './workbench';
 
 export async function selectOutputChannel(name: string): Promise<OutputView> {
   // Wait for all notifications to go away.  If there is a notification that is overlapping and hiding the Output channel's
@@ -115,7 +115,9 @@ export async function getOperationTime(outputText: string): Promise<string> {
 export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
   // await executeQuickPick('View: Clear Output', wait);
-  await vscode.commands.executeCommand('workbench.action.output.clearOutput');
+  const outputView = await new BottomBarPanel().openOutputView();
+  const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
+  await clearButton.click();
   log(`AAAAA Output view cleared`);
 }
 
