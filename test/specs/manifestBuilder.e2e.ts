@@ -99,6 +99,7 @@ describe('Manifest Builder', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Deploy Source in Manifest to Org`);
     // Clear output before running the command
     await utilities.clearOutputView();
+    await utilities.pause(utilities.Duration.seconds(1));
     // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
     await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
 
