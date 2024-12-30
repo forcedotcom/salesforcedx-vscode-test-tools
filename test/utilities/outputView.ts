@@ -8,9 +8,8 @@
 import { debug, Duration, log, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
-import { BottomBarPanel, By, OutputView, until } from 'vscode-extension-tester';
+import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
 import { expect } from 'chai';
-import { getWorkbench } from './workbench';
 
 export async function selectOutputChannel(name: string): Promise<OutputView> {
   // Wait for all notifications to go away.  If there is a notification that is overlapping and hiding the Output channel's
@@ -114,16 +113,7 @@ export async function getOperationTime(outputText: string): Promise<string> {
 
 export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
-  // await executeQuickPick('View: Clear Output', wait);
-  const outputView = await new BottomBarPanel().openOutputView();
-  log('AAAAA Output view opened');
-  const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
-  log('AAAAA Clear button found');
-  // await outputView.getDriver().wait(until.elementIsVisible(clearButton), 5000);
-  // log('AAAAA Clear button visible');
-  // await clearButton.click();
-  await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
-  log(`AAAAA Output view cleared`);
+  await executeQuickPick('View: Clear Output', wait);
 }
 
 function formatTimeComponent(component: number, padLength: number = 2): string {
