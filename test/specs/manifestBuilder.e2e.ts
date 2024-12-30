@@ -122,7 +122,7 @@ describe('Manifest Builder', async () => {
       await (await objectTreeItem.wait()).expand();
 
       const contextMenu = await objectTreeItem.openContextMenu();
-      await contextMenu.select('SFDX: Generate Manifest File');
+      await contextMenu.select('SFDX: Deploy Source in Manifest to Org');
     } else {
       // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
       await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
