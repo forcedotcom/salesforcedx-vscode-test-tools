@@ -101,8 +101,8 @@ describe('Manifest Builder', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Deploy Source in Manifest to Org`);
     // Clear output before running the command
     await utilities.clearOutputView();
-    await utilities.dismissAllNotifications();
-    utilities.log(`BBBBB Dismissed all notifications`);
+    // await utilities.dismissAllNotifications();
+    // utilities.log(`BBBBB Dismissed all notifications`);
     if (process.platform === 'linux') {
       utilities.log(`BBBBB Deploy Source in Manifest to Org - Linux`);
       // Using the Context menu, run SFDX: Deploy Source in Manifest to Org
