@@ -8,8 +8,10 @@ import { step } from 'mocha-steps';
 import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
+import { By, DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
+import { getBrowser } from '../utilities/workbench';
+
 
 describe('Manifest Builder', async () => {
   let testSetup: TestSetup;
@@ -111,17 +113,26 @@ describe('Manifest Builder', async () => {
         );
       }
 
-      const objectTreeItem = (await treeViewSection.findItem('objects')) as DefaultTreeItem;
-      if (!objectTreeItem) {
+      const manifestTreeItem = (await treeViewSection.findItem('manifest')) as DefaultTreeItem;
+      if (!manifestTreeItem) {
         throw new Error(
           'In verifyProjectLoaded(), findItem() returned a forceAppTreeItem with a value of null (or undefined)'
         );
       }
 
-      expect(objectTreeItem).to.not.be.undefined;
-      await (await objectTreeItem.wait()).expand();
+      expect(manifestTreeItem).to.not.be.undefined;
+      await (await manifestTreeItem.wait()).expand();
 
-      const contextMenu = await objectTreeItem.openContextMenu();
+      // Locate the "manifest.xml" file within the expanded "manifest" folder
+      const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
+      if (!manifestXmlFile) {
+        throw new Error(
+          'No manifest.xml file found'
+        );
+      }
+      expect(manifestXmlFile).to.not.be.undefined;
+
+      const contextMenu = await manifestXmlFile.openContextMenu();
       await contextMenu.select('SFDX: Deploy Source in Manifest to Org');
     } else {
       // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
