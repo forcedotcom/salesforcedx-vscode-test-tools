@@ -8,7 +8,7 @@
 import { debug, Duration, log, pause } from './miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
-import { BottomBarPanel, OutputView } from 'vscode-extension-tester';
+import { BottomBarPanel, By, OutputView } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 export async function selectOutputChannel(name: string): Promise<OutputView> {
@@ -113,7 +113,16 @@ export async function getOperationTime(outputText: string): Promise<string> {
 
 export async function clearOutputView(wait = Duration.seconds(1)) {
   log(`calling clearOutputView()`);
-  await executeQuickPick('View: Clear Output', wait);
+  if (process.platform === 'linux') {
+    log(`clearOutputView() - Linux`);
+    const outputView = await new BottomBarPanel().openOutputView();
+    const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
+    await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
+  } else {
+    log(`clearOutputView() - Mac or Windows`);
+    // In Mac and Windows, clear the output by calling the "View: Clear Output" command in the command palette
+    await executeQuickPick('View: Clear Output', wait);
+  }
 }
 
 function formatTimeComponent(component: number, padLength: number = 2): string {
