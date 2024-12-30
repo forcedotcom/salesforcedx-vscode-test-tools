@@ -116,8 +116,11 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   if (process.platform === 'linux') {
     log(`clearOutputView() - Linux`);
     const outputView = await new BottomBarPanel().openOutputView();
+    log('AAAAA Output view opened');
     const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
+    log('AAAAA Clear button found');
     await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
+    log(`AAAAA Output view cleared`);
   } else {
     log(`clearOutputView() - Mac or Windows`);
     // In Mac and Windows, clear the output by calling the "View: Clear Output" command in the command palette
