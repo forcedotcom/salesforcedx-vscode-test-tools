@@ -78,7 +78,7 @@ describe('Manifest Builder', async () => {
       await inputBox.confirm();
       await inputBox.confirm();
 
-      const workbench = await utilities.getWorkbench();
+      const workbench = utilities.getWorkbench();
       const textEditor = await utilities.getTextEditor(workbench, 'manifest.xml');
       const content = [
         `<?xml version="1.0" encoding="UTF-8"?>`,
@@ -152,12 +152,22 @@ describe('Manifest Builder', async () => {
       await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
     }
 
-    // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Deploy This Source to Org successfully ran',
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
+    let successNotificationWasFound;
+    try {
+      // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Deploy This Source to Org successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Deploy This Source to Org successfully ran',
+        utilities.Duration.ONE_MINUTE
+      );
+      expect(successNotificationWasFound).to.equal(true);
+    }
 
     const expectedTexts = [
       'Deployed Source',
@@ -192,7 +202,7 @@ describe('Manifest Builder', async () => {
   step('SFDX: Retrieve Source in Manifest from Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Retrieve Source in Manifest from Org`);
     // Using the Command palette, run SFDX: Retrieve Source in Manifest from Org
-    const workbench = await utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'manifest.xml');
     // Clear output before running the command
     await utilities.clearOutputView();
