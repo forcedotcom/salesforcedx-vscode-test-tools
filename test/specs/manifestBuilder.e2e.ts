@@ -36,7 +36,7 @@ describe('Manifest Builder', async () => {
     if (process.platform !== 'darwin') {
       utilities.log(`${testSetup.testSuiteSuffixName} - creating manifest file`);
 
-      const workbench = await utilities.getWorkbench();
+      const workbench = utilities.getWorkbench();
       const sidebar = await workbench.getSideBar().wait();
       const content = await sidebar.getContent().wait();
       const treeViewSection = await content.getSection(testSetup.tempProjectName);
@@ -99,8 +99,34 @@ describe('Manifest Builder', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Deploy Source in Manifest to Org`);
     // Clear output before running the command
     await utilities.clearOutputView();
-    // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
-    await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
+    if (process.platform === 'linux') {
+      // Using the Context menu, run SFDX: Deploy Source in Manifest to Org
+      const workbench = utilities.getWorkbench();
+      const sidebar = await workbench.getSideBar().wait();
+      const content = await sidebar.getContent().wait();
+      const treeViewSection = await content.getSection(testSetup.tempProjectName);
+      if (!treeViewSection) {
+        throw new Error(
+          'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
+        );
+      }
+
+      const objectTreeItem = (await treeViewSection.findItem('objects')) as DefaultTreeItem;
+      if (!objectTreeItem) {
+        throw new Error(
+          'In verifyProjectLoaded(), findItem() returned a forceAppTreeItem with a value of null (or undefined)'
+        );
+      }
+
+      expect(objectTreeItem).to.not.be.undefined;
+      await (await objectTreeItem.wait()).expand();
+
+      const contextMenu = await objectTreeItem.openContextMenu();
+      await contextMenu.select('SFDX: Generate Manifest File');
+    } else {
+      // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
+      await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
+    }
 
     // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
