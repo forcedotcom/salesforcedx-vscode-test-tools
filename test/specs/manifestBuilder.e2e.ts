@@ -9,7 +9,7 @@ import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { By, DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
-import { expect } from 'chai';
+import { expect, util } from 'chai';
 import { getBrowser } from '../utilities/workbench';
 
 
@@ -102,16 +102,21 @@ describe('Manifest Builder', async () => {
     // Clear output before running the command
     await utilities.clearOutputView();
     if (process.platform === 'linux') {
+      utilities.log(`BBBBB Deploy Source in Manifest to Org - Linux`);
       // Using the Context menu, run SFDX: Deploy Source in Manifest to Org
       const workbench = utilities.getWorkbench();
+      utilities.log(`BBBBB got workbench`);
       const sidebar = await workbench.getSideBar().wait();
+      utilities.log(`BBBBB got sidebar`);
       const content = await sidebar.getContent().wait();
+      utilities.log(`BBBBB got content`);
       const treeViewSection = await content.getSection(testSetup.tempProjectName);
       if (!treeViewSection) {
         throw new Error(
           'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
         );
       }
+      utilities.log(`BBBBB got treeViewSection`);
 
       const manifestTreeItem = (await treeViewSection.findItem('manifest')) as DefaultTreeItem;
       if (!manifestTreeItem) {
@@ -119,9 +124,11 @@ describe('Manifest Builder', async () => {
           'In verifyProjectLoaded(), findItem() returned a forceAppTreeItem with a value of null (or undefined)'
         );
       }
+      utilities.log(`BBBBB got manifestTreeItem`);
 
       expect(manifestTreeItem).to.not.be.undefined;
       await (await manifestTreeItem.wait()).expand();
+      utilities.log(`BBBBB expanded manifestTreeItem`);
 
       // Locate the "manifest.xml" file within the expanded "manifest" folder
       const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
@@ -131,11 +138,15 @@ describe('Manifest Builder', async () => {
         );
       }
       expect(manifestXmlFile).to.not.be.undefined;
+      utilities.log(`BBBBB found manifest.xml file`);
 
       const contextMenu = await manifestXmlFile.openContextMenu();
+      utilities.log(`BBBBB opened context menu`);
       await contextMenu.select('SFDX: Deploy Source in Manifest to Org');
+      utilities.log(`BBBBB selected SFDX: Deploy Source in Manifest to Org`);
     } else {
       // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
+      utilities.log(`BBBBB Deploy Source in Manifest to Org - Mac or Windows`);
       await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
     }
 
