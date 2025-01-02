@@ -95,6 +95,9 @@ describe('Manifest Builder', async () => {
       await textEditor.save();
       await utilities.pause(utilities.Duration.seconds(1));
     }
+
+    await utilities.dismissAllNotifications();
+    utilities.log(`CCCCC Dismissed all notifications`);
   });
 
   step('SFDX: Deploy Source in Manifest to Org', async () => {
