@@ -8,9 +8,8 @@ import { step } from 'mocha-steps';
 import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { By, DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
-import { expect, util } from 'chai';
-import { getBrowser } from '../utilities/workbench';
+import { DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
+import { expect } from 'chai';
 
 
 describe('Manifest Builder', async () => {
@@ -113,19 +112,15 @@ describe('Manifest Builder', async () => {
         await notificationsCenter.clearAllNotifications();
       }
 
-      utilities.log(`BBBBB Deploy Source in Manifest to Org - Linux`);
       // Using the Context menu, run SFDX: Deploy Source in Manifest to Org
       const sidebar = await workbench.getSideBar().wait();
-      utilities.log(`BBBBB got sidebar`);
       const content = await sidebar.getContent().wait();
-      utilities.log(`BBBBB got content`);
       const treeViewSection = await content.getSection(testSetup.tempProjectName);
       if (!treeViewSection) {
         throw new Error(
           'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
         );
       }
-      utilities.log(`BBBBB got treeViewSection`);
 
       const manifestTreeItem = (await treeViewSection.findItem('manifest')) as DefaultTreeItem;
       if (!manifestTreeItem) {
@@ -133,11 +128,9 @@ describe('Manifest Builder', async () => {
           'In verifyProjectLoaded(), findItem() returned a forceAppTreeItem with a value of null (or undefined)'
         );
       }
-      utilities.log(`BBBBB got manifestTreeItem`);
 
       expect(manifestTreeItem).to.not.be.undefined;
       await (await manifestTreeItem.wait()).expand();
-      utilities.log(`BBBBB expanded manifestTreeItem`);
 
       // Locate the "manifest.xml" file within the expanded "manifest" folder
       const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
@@ -147,34 +140,20 @@ describe('Manifest Builder', async () => {
         );
       }
       expect(manifestXmlFile).to.not.be.undefined;
-      utilities.log(`BBBBB found manifest.xml file`);
 
       const contextMenu = await manifestXmlFile.openContextMenu();
-      utilities.log(`BBBBB opened context menu`);
       await contextMenu.select('SFDX: Deploy Source in Manifest to Org');
-      utilities.log(`BBBBB selected SFDX: Deploy Source in Manifest to Org`);
     } else {
       // Using the Command palette, run SFDX: Deploy Source in Manifest to Org
-      utilities.log(`BBBBB Deploy Source in Manifest to Org - Mac or Windows`);
       await utilities.executeQuickPick('SFDX: Deploy Source in Manifest to Org', utilities.Duration.seconds(10));
     }
 
     // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
-    // let successNotificationWasFound;
-    // try {
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Deploy This Source to Org successfully ran',
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
-    // } catch (error) {
-    //   await utilities.getWorkbench().openNotificationsCenter();
-    //   successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    //     'SFDX: Deploy This Source to Org successfully ran',
-    //     utilities.Duration.ONE_MINUTE
-    //   );
-    //   expect(successNotificationWasFound).to.equal(true);
-    // }
 
     const expectedTexts = [
       'Deployed Source',
@@ -208,7 +187,7 @@ describe('Manifest Builder', async () => {
 
   step('SFDX: Retrieve Source in Manifest from Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Retrieve Source in Manifest from Org`);
-    // Using the Command palette, run SFDX: Retrieve Source in Manifest from Org
+
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'manifest.xml');
     // Clear output before running the command
@@ -225,17 +204,15 @@ describe('Manifest Builder', async () => {
         await notificationsCenter.clearAllNotifications();
       }
 
+      // Using the Context menu, run SFDX: Retrieve Source in Manifest from Org
       const sidebar = await workbench.getSideBar().wait();
-      utilities.log(`CCCCC got sidebar`);
       const content = await sidebar.getContent().wait();
-      utilities.log(`CCCCC got content`);
       const treeViewSection = await content.getSection(testSetup.tempProjectName);
       if (!treeViewSection) {
         throw new Error(
           'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
         );
       }
-      utilities.log(`CCCCC got treeViewSection`);
 
       const manifestTreeItem = (await treeViewSection.findItem('manifest')) as DefaultTreeItem;
       if (!manifestTreeItem) {
@@ -243,11 +220,9 @@ describe('Manifest Builder', async () => {
           'In verifyProjectLoaded(), findItem() returned a forceAppTreeItem with a value of null (or undefined)'
         );
       }
-      utilities.log(`CCCCC got manifestTreeItem`);
 
       expect(manifestTreeItem).to.not.be.undefined;
       await (await manifestTreeItem.wait()).expand();
-      utilities.log(`CCCCC expanded manifestTreeItem`);
 
       // Locate the "manifest.xml" file within the expanded "manifest" folder
       const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
@@ -257,32 +232,20 @@ describe('Manifest Builder', async () => {
         );
       }
       expect(manifestXmlFile).to.not.be.undefined;
-      utilities.log(`CCCCC found manifest.xml file`);
 
       const contextMenu = await manifestXmlFile.openContextMenu();
-      utilities.log(`CCCCC opened context menu`);
       await contextMenu.select('SFDX: Retrieve Source in Manifest from Org');
-      utilities.log(`CCCCC selected SFDX: Retrieve Source in Manifest from Org`);
     } else {
+      // Using the Command palette, run SFDX: Retrieve Source in Manifest from Org
       await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(10));
     }
 
     // Look for the success notification that appears which says, "SFDX: Retrieve This Source from Org successfully ran".
-    // let successNotificationWasFound;
-    // try {
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'SFDX: Retrieve This Source from Org successfully ran',
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
-    // } catch (error) {
-    //   await utilities.getWorkbench().openNotificationsCenter();
-    //   successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    //     'SFDX: Retrieve This Source from Org successfully ran',
-    //     utilities.Duration.ONE_MINUTE
-    //   );
-    //   expect(successNotificationWasFound).to.equal(true);
-    // }
 
     const expectedTexts = [
       'Retrieved Source',
