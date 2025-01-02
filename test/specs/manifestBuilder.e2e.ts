@@ -11,7 +11,6 @@ import * as utilities from '../utilities/index';
 import { DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
-
 describe('Manifest Builder', async () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
@@ -98,6 +97,7 @@ describe('Manifest Builder', async () => {
 
   step('SFDX: Deploy Source in Manifest to Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Deploy Source in Manifest to Org`);
+
     // Clear output before running the command
     await utilities.clearOutputView();
 
@@ -187,9 +187,9 @@ describe('Manifest Builder', async () => {
 
   step('SFDX: Retrieve Source in Manifest from Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Retrieve Source in Manifest from Org`);
-
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'manifest.xml');
+
     // Clear output before running the command
     await utilities.clearOutputView();
 
