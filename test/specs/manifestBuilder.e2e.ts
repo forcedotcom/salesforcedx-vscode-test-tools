@@ -95,21 +95,26 @@ describe('Manifest Builder', async () => {
       await textEditor.save();
       await utilities.pause(utilities.Duration.seconds(1));
     }
-
-    await utilities.dismissAllNotifications();
-    utilities.log(`CCCCC Dismissed all notifications`);
   });
 
   step('SFDX: Deploy Source in Manifest to Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Deploy Source in Manifest to Org`);
     // Clear output before running the command
     await utilities.clearOutputView();
-    // await utilities.dismissAllNotifications();
-    // utilities.log(`BBBBB Dismissed all notifications`);
     if (process.platform === 'linux') {
+      // Dismiss all notifications using the button in the status bar
+      const workbench = utilities.getWorkbench();
+      const statusBar = workbench.getStatusBar();
+      const notificationsButton = await statusBar.getItem('Notifications');
+      if (notificationsButton) {
+        await notificationsButton.click();
+        const notificationsCenter = await workbench.openNotificationsCenter();
+        await notificationsCenter.clearAllNotifications();
+      }
+
       utilities.log(`BBBBB Deploy Source in Manifest to Org - Linux`);
       // Using the Context menu, run SFDX: Deploy Source in Manifest to Org
-      const workbench = utilities.getWorkbench();
+      // const workbench = utilities.getWorkbench();
       utilities.log(`BBBBB got workbench`);
       const sidebar = await workbench.getSideBar().wait();
       utilities.log(`BBBBB got sidebar`);
