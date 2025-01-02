@@ -160,21 +160,21 @@ describe('Manifest Builder', async () => {
     }
 
     // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Deploy This Source to Org successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Deploy This Source to Org successfully ran',
-        utilities.Duration.ONE_MINUTE
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    }
+    // let successNotificationWasFound;
+    // try {
+    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'SFDX: Deploy This Source to Org successfully ran',
+      utilities.Duration.TEN_MINUTES
+    );
+    expect(successNotificationWasFound).to.equal(true);
+    // } catch (error) {
+    //   await utilities.getWorkbench().openNotificationsCenter();
+    //   successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+    //     'SFDX: Deploy This Source to Org successfully ran',
+    //     utilities.Duration.ONE_MINUTE
+    //   );
+    //   expect(successNotificationWasFound).to.equal(true);
+    // }
 
     const expectedTexts = [
       'Deployed Source',
@@ -268,21 +268,21 @@ describe('Manifest Builder', async () => {
     }
 
     // Look for the success notification that appears which says, "SFDX: Retrieve This Source from Org successfully ran".
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Retrieve This Source from Org successfully ran',
-        utilities.Duration.TEN_MINUTES
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Retrieve This Source from Org successfully ran',
-        utilities.Duration.ONE_MINUTE
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    }
+    // let successNotificationWasFound;
+    // try {
+    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      'SFDX: Retrieve This Source from Org successfully ran',
+      utilities.Duration.TEN_MINUTES
+    );
+    expect(successNotificationWasFound).to.equal(true);
+    // } catch (error) {
+    //   await utilities.getWorkbench().openNotificationsCenter();
+    //   successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+    //     'SFDX: Retrieve This Source from Org successfully ran',
+    //     utilities.Duration.ONE_MINUTE
+    //   );
+    //   expect(successNotificationWasFound).to.equal(true);
+    // }
 
     const expectedTexts = [
       'Retrieved Source',
