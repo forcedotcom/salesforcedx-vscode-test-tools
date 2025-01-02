@@ -261,8 +261,8 @@ describe('Manifest Builder', async () => {
 
       const contextMenu = await manifestXmlFile.openContextMenu();
       utilities.log(`CCCCC opened context menu`);
-      await contextMenu.select('SFDX: Retrieve Source in Manifest to Org');
-      utilities.log(`CCCCC selected SFDX: Retrieve Source in Manifest to Org`);
+      await contextMenu.select('SFDX: Retrieve Source in Manifest from Org');
+      utilities.log(`CCCCC selected SFDX: Retrieve Source in Manifest from Org`);
     } else {
       await utilities.executeQuickPick('SFDX: Retrieve Source in Manifest from Org', utilities.Duration.seconds(10));
     }
