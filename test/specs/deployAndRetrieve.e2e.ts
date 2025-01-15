@@ -270,7 +270,6 @@ describe('Deploy and Retrieve', async () => {
       'ApexClass',
       `${path.join(pathToClass)}.cls`,
       `${path.join(pathToClass)}.cls-meta.xml`,
-      'Updating source tracking... done',
       'ended with exit code 0'
     ];
 
