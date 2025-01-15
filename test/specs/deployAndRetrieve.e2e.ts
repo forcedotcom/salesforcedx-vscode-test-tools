@@ -196,7 +196,7 @@ describe('Deploy and Retrieve', async () => {
 
   step('Deploy again (with no changes) - ST disabled', async () => {
     utilities.log(`Deploy and Retrieve - Deploy again (with no changes) - ST enabled`);
-    const workbench = await utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
@@ -206,7 +206,7 @@ describe('Deploy and Retrieve', async () => {
 
   step('Modify the file and deploy again - ST disabled', async () => {
     utilities.log(`Deploy and Retrieve - Modify the file and deploy again - ST disabled`);
-    const workbench = await utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
 
@@ -221,7 +221,7 @@ describe('Deploy and Retrieve', async () => {
 
   step('SFDX: Delete This from Project and Org', async () => {
     utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org`);
-    const workbench = await utilities.getWorkbench();
+    const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'MyClass.cls');
     // Run SFDX: Push Source to Default Org and Ignore Conflicts to be in sync with remote
     await utilities.executeQuickPick(
@@ -263,6 +263,7 @@ describe('Deploy and Retrieve', async () => {
       'Starting SFDX: Delete from Project and Org',
       10
     );
+    utilities.log('Output panel text is: ' + outputPanelText);
 
     const expectedTexts = [
       '=== Deleted Source',
