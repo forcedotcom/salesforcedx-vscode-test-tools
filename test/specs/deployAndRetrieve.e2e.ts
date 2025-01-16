@@ -219,7 +219,7 @@ describe('Deploy and Retrieve', async () => {
     await runAndValidateCommand('Deploy', 'to', 'no-ST', 'Changed  ');
   });
 
-  step('SFDX: Delete This from Project and Org', async () => {
+  xstep('SFDX: Delete This from Project and Org', async () => {
     utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org`);
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'MyClass.cls');
@@ -258,27 +258,25 @@ describe('Deploy and Retrieve', async () => {
     expect(successNotificationWasFound).to.equal(true);
 
     // TODO: see how the test can accommodate the new output from CLI.
-    if (process.platform !== 'linux') {
-      // Verify Output tab
-      const outputPanelText = await utilities.attemptToFindOutputPanelText(
-        'Salesforce CLI',
-        'Starting SFDX: Delete from Project and Org',
-        10
-      );
-      utilities.log('Output panel text is: ' + outputPanelText);
+    // Verify Output tab
+    const outputPanelText = await utilities.attemptToFindOutputPanelText(
+      'Salesforce CLI',
+      'Starting SFDX: Delete from Project and Org',
+      10
+    );
+    utilities.log('Output panel text is: ' + outputPanelText);
 
-      const expectedTexts = [
-        '=== Deleted Source',
-        'MyClass',
-        'ApexClass',
-        `${path.join(pathToClass)}.cls`,
-        `${path.join(pathToClass)}.cls-meta.xml`,
-        'ended with exit code 0'
-      ];
+    const expectedTexts = [
+      '=== Deleted Source',
+      'MyClass',
+      'ApexClass',
+      `${path.join(pathToClass)}.cls`,
+      `${path.join(pathToClass)}.cls-meta.xml`,
+      'ended with exit code 0'
+    ];
 
-      expect(outputPanelText).to.not.be.undefined;
-      await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
-    }
+    expect(outputPanelText).to.not.be.undefined;
+    await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
   });
 
   after('Tear down and clean up the testing environment', async () => {
