@@ -21,7 +21,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   };
 
   step('Set up the testing environment', async () => {
-    utilities.log(`DebugApexTests - Set up the testing environment`);
+    utilities.log(`CreateOASDoc - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
     // TODO: Install A4D extension
     // TODO: Verify A4D extension is installed
@@ -171,7 +171,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(`DebugApexTests - Tear down and clean up the testing environment`);
+    utilities.log(`CreateOASDoc - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 });
