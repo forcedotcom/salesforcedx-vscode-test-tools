@@ -1,0 +1,177 @@
+/*
+ * Copyright (c) 2025, salesforce.com, inc.
+ * All rights reserved.
+ * Licensed under the BSD 3-Clause license.
+ * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import { step } from 'mocha-steps';
+import { TestSetup } from '../testSetup';
+import * as utilities from '../utilities/index';
+import { after } from 'vscode-extension-tester';
+import { expect } from 'chai';
+
+describe('Create OpenAPI v3 Specifications', async () => {
+  let testSetup: TestSetup;
+  const testReqConfig: utilities.TestReqConfig = {
+    projectConfig: {
+      projectShape: utilities.ProjectShapeOption.NEW
+    },
+    isOrgRequired: true,
+    testSuiteSuffixName: 'CreateOASDoc'
+  };
+
+  step('Set up the testing environment', async () => {
+    utilities.log(`DebugApexTests - Set up the testing environment`);
+    testSetup = await TestSetup.setUp(testReqConfig);
+    // TODO: Install A4D extension
+    // TODO: Verify A4D extension is installed
+    // TODO: Verify A4D extension is enabled
+    // TODO: Update sfdx-project.json with the "decomposeExternalServiceRegistrationBeta" setting
+
+    // Create the Apex class which the decomposed OAS doc will be generated from
+    try {
+      await utilities.createApexClass('ValidApexClass1', 'placeholder for the class body');
+    } catch (error) {
+      await utilities.createApexClass('ValidApexClass1', 'placeholder for the class body');
+    }
+
+    // Create the Apex class which the composed OAS doc will be generated from
+    try {
+      await utilities.createApexClass('ValidApexClass2', 'placeholder for the class body');
+    } catch (error) {
+      await utilities.createApexClass('ValidApexClass2', 'placeholder for the class body');
+    }
+
+    // Create an ineligible Apex class
+    try {
+      await utilities.createApexClass('IneligibleApexClass', 'placeholder for the class body');
+    } catch (error) {
+      await utilities.createApexClass('IneligibleApexClass', 'placeholder for the class body');
+    }
+
+    // Push source to org
+    await utilities.executeQuickPick(
+      'SFDX: Push Source to Default Org and Ignore Conflicts',
+      utilities.Duration.seconds(1)
+    );
+
+    // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
+    let successPushNotificationWasFound;
+    try {
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.getWorkbench().openNotificationsCenter();
+      successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successPushNotificationWasFound).to.equal(true);
+    }
+  });
+
+  xstep('Listing all the cases that need to be tested', async () => {
+    // 1. Generate OAS doc from an invalid Apex class ✅
+    // 2. Generate OAS doc from a valid Apex class using command palette ✅
+    // 3. Generate OAS doc from a valid Apex class using context menu in Editor View (Windows and Ubuntu only) ✅
+    // 4. Generate OAS doc from a valid Apex class using context menu in Explorer View (Windows and Ubuntu only) ✅
+    // 5. Manual merge ✅
+    // 6. Overwrite ✅
+    // 7. Check for warnings and errors in the Problems Tab ✅
+    // 8. Revalidate the OAS doc in decomposed mode ✅
+    // 9. Revalidate the OAS doc in composed mode ✅
+    // 10. Turn on decomposed ESR in sfdx-project.json ✅
+    // 11. Turn off decomposed ESR in sfdx-project.json ✅
+    // 12. Deploy the OAS doc to the org ✅
+    // 13. Disable A4D extension and ensure the command to generate OAS docs is not present ✅
+  });
+
+  step('Verify LSP finished indexing', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
+
+    // Get Apex LSP Status Bar
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
+    await statusBar.click();
+    expect(await statusBar.getAttribute('aria-label')).to.contain('Indexing complete');
+  });
+
+  step('Try to generate OAS doc from an ineligible Apex class', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
+  });
+
+  describe('Decomposed mode', async () => {
+    step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+    });
+
+    step('Check for warnings and errors in the Problems Tab', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
+    });
+
+    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+      // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
+      utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
+    });
+
+    step('Revalidate the OAS doc', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
+    });
+
+    step('Deploy the decomposed ESR to the org', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the decomposed ESR to the org`);
+    });
+
+    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+      // NOTE: Windows and Ubuntu only
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+    });
+
+    step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
+      // NOTE: Windows and Ubuntu only
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+    });
+  });
+
+  describe('Composed mode', async () => {
+    step('Remove "decomposeExternalServiceRegistrationBeta" setting in sfdx-project.json', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Remove "decomposeExternalServiceRegistrationBeta" setting in sfdx-project.json`);
+    });
+
+    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+    });
+
+    step('Check for warnings and errors in the Problems Tab', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
+    });
+
+    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+      // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
+      utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
+    });
+
+    step('Revalidate the OAS doc', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
+    });
+
+    step('Deploy the composed ESR to the org', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the composed ESR to the org`);
+    });
+
+    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+    });
+  });
+
+  step('Disable A4D extension and ensure the commands to generate and validate OAS docs is not present', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Disable A4D extension and ensure the commands to generate and validate OAS docs is not present`);
+  });
+
+  after('Tear down and clean up the testing environment', async () => {
+    utilities.log(`DebugApexTests - Tear down and clean up the testing environment`);
+    await testSetup?.tearDown();
+  });
+});
