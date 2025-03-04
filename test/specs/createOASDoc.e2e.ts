@@ -29,24 +29,124 @@ describe('Create OpenAPI v3 Specifications', async () => {
     // TODO: Update sfdx-project.json with the "decomposeExternalServiceRegistrationBeta" setting
 
     // Create the Apex class which the decomposed OAS doc will be generated from
+    const caseManagerText = [
+      `@RestResource(urlMapping='/apex-rest-examples/v1/Cases/*')`,
+      `global with sharing class CaseManager {`,
+      `\t@HttpGet`,
+      `\tglobal static Case getCaseById() {`,
+      `\t\tRestRequest request = RestContext.request;`,
+      `\t\t// grab the caseId from the end of the URL`,
+      `\t\tString caseId = request.requestURI.substring(`,
+      `\t\t  request.requestURI.lastIndexOf('/')+1);`,
+      `\t\tCase result =  [SELECT CaseNumber,Subject,Status,Origin,Priority`,
+      `\t\t\t\t\t\tFROM Case`,
+      `\t\t\t\t\t\tWHERE Id = :caseId];`,
+      `\t\treturn result;`,
+      `\t}`,
+      `\t@HttpPost`,
+      `\tglobal static ID createCase(String subject, String status,`,
+      `\t\tString origin, String priority) {`,
+      `\t\tCase thisCase = new Case(`,
+      `\t\t\tSubject=subject,`,
+      `\t\t\tStatus=status,`,
+      `\t\t\tOrigin=origin,`,
+      `\t\t\tPriority=priority);`,
+      `\t\tinsert thisCase;`,
+      `\t\treturn thisCase.Id;`,
+      `\t}`,
+      `\t@HttpDelete`,
+      `\tglobal static void deleteCase() {`,
+      `\t\tRestRequest request = RestContext.request;`,
+      `\t\tString caseId = request.requestURI.substring(`,
+      `\t\t\trequest.requestURI.lastIndexOf('/')+1);`,
+      `\t\tCase thisCase = [SELECT Id FROM Case WHERE Id = :caseId];`,
+      `\t\tdelete thisCase;`,
+      `\t}`,
+      `\t@HttpPut`,
+      `\tglobal static ID upsertCase(String subject, String status,`,
+      `\t\tString origin, String priority, String id) {`,
+      `\t\tCase thisCase = new Case(`,
+      `\t\t\t\tId=id,`,
+      `\t\t\t\tSubject=subject,`,
+      `\t\t\t\tStatus=status,`,
+      `\t\t\t\tOrigin=origin,`,
+      `\t\t\t\tPriority=priority);`,
+      `\t\t// Match case by Id, if present.`,
+      `\t\t// Otherwise, create new case.`,
+      `\t\tupsert thisCase;`,
+      `\t\t// Return the case ID.`,
+      `\t\treturn thisCase.Id;`,
+      `\t}`,
+      `\t@HttpPatch`,
+      `\tglobal static ID updateCaseFields() {`,
+      `\t\tRestRequest request = RestContext.request;`,
+      `\t\tString caseId = request.requestURI.substring(`,
+      `\t\t\trequest.requestURI.lastIndexOf('/')+1);`,
+      `\t\tCase thisCase = [SELECT Id FROM Case WHERE Id = :caseId];`,
+      `\t\t// Deserialize the JSON string into name-value pairs`,
+      `\t\tMap<String, Object> params = (Map<String, Object>)JSON.deserializeUntyped(request.requestbody.tostring());`,
+      `\t\t// Iterate through each parameter field and value`,
+      `\t\tfor(String fieldName : params.keySet()) {`,
+      `\t\t\t// Set the field and value on the Case sObject`,
+      `\t\t\tthisCase.put(fieldName, params.get(fieldName));`,
+      `\t\t}`,
+      `\t\tupdate thisCase;`,
+      `\t\treturn thisCase.Id;`,
+      `\t}`,
+      `}`
+    ].join('\n');
+
     try {
-      await utilities.createApexClass('ValidApexClass1', 'placeholder for the class body');
+      await utilities.createApexClass('CaseManager', caseManagerText);
     } catch (error) {
-      await utilities.createApexClass('ValidApexClass1', 'placeholder for the class body');
+      await utilities.createApexClass('CaseManager', caseManagerText);
     }
 
     // Create the Apex class which the composed OAS doc will be generated from
+    const simpleAccountResourceText = [
+      `@RestResource(urlMapping='/apex-rest-examples/v1/*')`,
+      `global with sharing class SimpleAccountResource{`,
+      ``,
+      `\t@HttpDelete`,
+      `\tglobal static void deleteAccount() {`,
+      `\t\tRestRequest req = RestContext.request;`,
+      `\t\tRestResponse res = RestContext.response;`,
+      `\t\tString accountId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);`,
+      `\t\tAccount account = [SELECT Id FROM Account WHERE Id = :accountId];`,
+      `\t\tdelete account;`,
+      `\t}`,
+      `\t@HttpGet`,
+      `\tglobal static Account getAccount() {`,
+      `\t\tRestRequest req = RestContext.request;`,
+      `\t\tRestResponse res = RestContext.response;`,
+      `\t\tString accountId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);`,
+      `\t\tAccount result = [SELECT Id, Name, Phone, Website FROM Account WHERE Id = :accountId];`,
+      `\t\treturn result;`,
+      `\t}`,
+      `\t@HttpPost`,
+      `\tglobal static String createAccount(String name,`,
+      `\t\tString phone, String website) {`,
+      `\t\tAccount account = new Account();`,
+      `\t\taccount.Name = name;`,
+      `\t\taccount.phone = phone;`,
+      `\t\taccount.website = website;`,
+      `\t\tinsert account;`,
+      `\t\treturn account.Id;`,
+      `\t}`,
+      `}`
+    ].join('\n');
+
     try {
-      await utilities.createApexClass('ValidApexClass2', 'placeholder for the class body');
+      await utilities.createApexClass('SimpleAccountResource', simpleAccountResourceText);
     } catch (error) {
-      await utilities.createApexClass('ValidApexClass2', 'placeholder for the class body');
+      await utilities.createApexClass('SimpleAccountResource', simpleAccountResourceText);
     }
 
-    // Create an ineligible Apex class
+    // Create an ineligible Apex class (the default Apex class from the template is a good example)
     try {
-      await utilities.createApexClass('IneligibleApexClass', 'placeholder for the class body');
+      await utilities.createCommand('Apex Class', 'IneligibleApexClass', 'classes', 'cls');
     } catch (error) {
-      await utilities.createApexClass('IneligibleApexClass', 'placeholder for the class body');
+      await utilities.createCommand('Apex Class', 'IneligibleApexClass', 'classes', 'cls');
     }
 
     // Push source to org
