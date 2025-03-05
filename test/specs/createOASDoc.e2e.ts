@@ -10,8 +10,10 @@ import * as utilities from '../utilities/index';
 import { after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import path from 'path';
+import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
+  let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
@@ -140,6 +142,22 @@ describe('Create OpenAPI v3 Specifications', async () => {
   describe('Composed mode', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
+      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      await prompt.confirm();
+
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'OpenAPI Document created for class: CaseManager.',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      // Verify the generated OAS doc is open in the editor
+      const workbench = utilities.getWorkbench();
+      const editorView = workbench.getEditorView();
+      const activeTab = await editorView.getActiveTab();
+      const title = await activeTab?.getTitle();
+      expect(title).to.equal('CaseManager.externalServiceRegistration-meta.xml');
     });
 
     step('Check for warnings and errors in the Problems Tab', async () => {
