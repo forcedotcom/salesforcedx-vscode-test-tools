@@ -10,7 +10,7 @@ import * as utilities from '../utilities/index';
 import { after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, TextEditor, Key } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -26,6 +26,13 @@ describe('Create OpenAPI v3 Specifications', async () => {
   step('Set up the testing environment', async () => {
     utilities.log(`CreateOASDoc - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
+
+    // Set SF_LOG_LEVEL to 'debug' to get the logs in the 'llm_logs' folder when the OAS doc is generated
+    await utilities.inWorkspaceSettings();
+    const settingsEditor = new SettingsEditor();
+    const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
+    await logLevelSetting?.setValue('debug');
+    await utilities.reloadWindow();
 
     // Create the Apex class which the decomposed OAS doc will be generated from
     const caseManagerText = [
