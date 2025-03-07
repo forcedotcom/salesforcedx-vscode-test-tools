@@ -35,6 +35,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     // Install A4D extension
     const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
+    await utilities.pause(utilities.Duration.seconds(5));
     const extensionsList = (await extensionsView?.getContent().getSection('Installed')) as ExtensionsViewSection;
     const a4dExtension = await extensionsList?.findItem('Agentforce for Developers');
     await a4dExtension?.install();
