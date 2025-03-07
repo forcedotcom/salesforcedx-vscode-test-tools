@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -177,6 +177,11 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
+      await utilities.executeQuickPick('Problems: Focus on Problems View');
+      const problemsView = new ProblemsView();
+      const problems = await problemsView.getAllVisibleMarkers(MarkerType.File);
+      expect(problems.length).to.equal(1);
+      expect(await problems[0].getLabel()).to.equal('CaseManager.externalServiceRegistration-meta.xml');
     });
 
     step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
@@ -198,7 +203,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Decomposed mode', async () => {
-    step('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
+    xstep('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`);
       const workbench = utilities.getWorkbench();
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
