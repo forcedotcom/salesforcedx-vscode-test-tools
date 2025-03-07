@@ -144,6 +144,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   step('Try to generate OAS doc from an ineligible Apex class', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
+    await utilities.pause(utilities.Duration.seconds(5));
     await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
     const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       'Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation.',
@@ -156,6 +157,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
+      await utilities.pause(utilities.Duration.seconds(5));
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
       await prompt.confirm();
 
