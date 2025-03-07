@@ -7,10 +7,9 @@
 import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -33,6 +32,12 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
     await logLevelSetting?.setValue('debug');
     await utilities.reloadWindow();
+
+    // Install A4D extension
+    const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
+    const extensionsList = (await extensionsView?.getContent().getSection('Installed')) as ExtensionsViewSection;
+    const a4dExtension = await extensionsList?.findItem('Agentforce for Developers');
+    await a4dExtension?.install();
 
     // Create the Apex class which the decomposed OAS doc will be generated from
     const caseManagerText = [
