@@ -10,6 +10,7 @@ export * from './authorization';
 export * from './cliCommands';
 export * from './commandPrompt';
 export * from './constants';
+export * from './deployAndRetrieve';
 export * from './extensionUtils';
 export * from './fileSystem';
 export * from './gitCommands';

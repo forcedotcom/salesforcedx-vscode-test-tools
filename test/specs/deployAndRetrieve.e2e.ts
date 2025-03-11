@@ -85,7 +85,7 @@ describe('Deploy and Retrieve', async () => {
     // Clear the Output view first.
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
-    await runAndValidateCommand('Deploy', 'to', 'ST');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ApexClass', 'MyClass');
   });
 
   step('Deploy again (with no changes) - ST enabled', async () => {
@@ -95,7 +95,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
 
-    await runAndValidateCommand('Deploy', 'to', 'ST', 'Unchanged  ');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ApexClass', 'MyClass', 'Unchanged  ');
   });
 
   step('Modify the file and deploy again - ST enabled', async () => {
@@ -110,7 +110,7 @@ describe('Deploy and Retrieve', async () => {
     await textEditor.save();
 
     // Deploy running SFDX: Deploy This Source to Org
-    await runAndValidateCommand('Deploy', 'to', 'ST', 'Changed  ');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
   step('Retrieve with SFDX: Retrieve This Source from Org', async () => {
@@ -120,7 +120,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
 
-    await runAndValidateCommand('Retrieve', 'from', 'ST');
+    await utilities.runAndValidateCommand('Retrieve', 'from', 'ST', 'ApexClass', 'MyClass');
   });
 
   step('Modify the file and retrieve again', async () => {
@@ -136,7 +136,7 @@ describe('Deploy and Retrieve', async () => {
 
     // Retrieve running SFDX: Retrieve This Source from Org
 
-    await runAndValidateCommand('Retrieve', 'from', 'ST');
+    await utilities.runAndValidateCommand('Retrieve', 'from', 'ST', 'ApexClass', 'MyClass');
     // Retrieve operation will overwrite the file, hence the the comment will remain as before the modification
     const textAfterRetrieve = await textEditor.getText();
     expect(textAfterRetrieve).to.not.contain('modified comment');
@@ -165,7 +165,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.pause(utilities.Duration.seconds(5));
 
     // At this point there should be no conflicts since this is a new class.
-    await validateCommand('Deploy', 'to', 'on save');
+    await utilities.validateCommand('Deploy', 'to', 'on save', 'ApexClass', 'MyClass');
   });
 
   step('Disable Source Tracking Setting', async () => {
@@ -191,7 +191,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
 
-    await runAndValidateCommand('Deploy', 'to', 'no-ST');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'MyClass');
   });
 
   step('Deploy again (with no changes) - ST disabled', async () => {
@@ -201,7 +201,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.clearOutputView(utilities.Duration.seconds(2));
     await utilities.getTextEditor(workbench, 'MyClass.cls');
 
-    await runAndValidateCommand('Deploy', 'to', 'no-ST', 'Unchanged  ');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'MyClass', 'Unchanged  ');
   });
 
   step('Modify the file and deploy again - ST disabled', async () => {
@@ -216,7 +216,7 @@ describe('Deploy and Retrieve', async () => {
     await textEditor.save();
 
     // Deploy running SFDX: Deploy This Source to Org
-    await runAndValidateCommand('Deploy', 'to', 'no-ST', 'Changed  ');
+    await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
   step('SFDX: Delete This from Project and Org', async () => {
@@ -285,46 +285,4 @@ describe('Deploy and Retrieve', async () => {
     utilities.log(`Deploy and Retrieve - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
-
-  const runAndValidateCommand = async (
-    operation: string,
-    fromTo: string,
-    type: string,
-    prefix?: string
-  ): Promise<void> => {
-    utilities.log(`runAndValidateCommand()`);
-    await utilities.executeQuickPick(`SFDX: ${operation} This Source ${fromTo} Org`, utilities.Duration.seconds(5));
-
-    await validateCommand(operation, fromTo, type, prefix);
-  };
-  const validateCommand = async (
-    operation: string,
-    fromTo: string,
-    type: string, // Text to identify operation type (if it has source tracking enabled, disabled or if it was a deploy on save)
-    prefix: string = ''
-  ): Promise<void> => {
-    utilities.log(`validateCommand()`);
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      `SFDX: ${operation} This Source ${fromTo} Org successfully ran`,
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
-
-    // Verify Output tab
-    const outputPanelText = await utilities.attemptToFindOutputPanelText(
-      'Salesforce CLI',
-      `Starting SFDX: ${operation} This Source ${fromTo}`,
-      10
-    );
-    utilities.log(`${operation} time ${type}: ` + (await utilities.getOperationTime(outputPanelText!)));
-    const expectedTexts = [
-      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `${prefix}MyClass    ApexClass  ${pathToClass}.cls`,
-      `${prefix}MyClass    ApexClass  ${pathToClass}.cls-meta.xml`,
-      `ended SFDX: ${operation} This Source ${fromTo} Org`
-    ];
-
-    expect(outputPanelText).to.not.be.undefined;
-    await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
-  };
 });
