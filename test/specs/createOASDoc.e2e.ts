@@ -31,6 +31,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const settingsEditor = new SettingsEditor();
     const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
     await logLevelSetting?.setValue('debug');
+    await utilities.executeQuickPick('View: Close Editor');
     await utilities.reloadWindow();
 
     // Install A4D extension
@@ -39,6 +40,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const extensionsList = (await extensionsView?.getContent().getSection('Installed')) as ExtensionsViewSection;
     const a4dExtension = await extensionsList?.findItem('Agentforce for Developers');
     await a4dExtension?.install();
+    await utilities.executeQuickPick('View: Close Editor');
 
     // Create the Apex class which the decomposed OAS doc will be generated from
     const caseManagerText = [
