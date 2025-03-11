@@ -112,9 +112,9 @@ export async function getOperationTime(outputText: string): Promise<string> {
 }
 
 export async function clearOutputView(wait = Duration.seconds(1)) {
+  const outputView = await new BottomBarPanel().openOutputView();
   if (process.platform === 'linux') {
     // In Linux, clear the output by clicking the "Clear Output" button in the Output Tab
-    const outputView = await new BottomBarPanel().openOutputView();
     const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
     await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
   } else {
