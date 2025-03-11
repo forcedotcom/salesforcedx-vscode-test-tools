@@ -179,18 +179,98 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
       await utilities.executeQuickPick('Problems: Focus on Problems View');
       const problemsView = new ProblemsView();
-      const problems = await problemsView.getAllVisibleMarkers(MarkerType.File);
-      expect(problems.length).to.equal(1);
-      expect(await problems[0].getLabel()).to.equal('CaseManager.externalServiceRegistration-meta.xml');
+      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
+      expect(problems.length).to.equal(0);
     });
 
     step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
-      // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
+      // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
+
+      const idealCaseManagerOASDoc = [
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        `<ExternalServiceRegistration xmlns="http://soap.sforce.com/2006/04/metadata">`,
+        `  <description>This is the ideal OpenAPI v3 specification for CaseManager.cls.</description>`,
+        `  <label>CaseManager</label>`,
+        `  <schema>openapi: 3.0.0`,
+        `info:`,
+        `  title: CaseManager`,
+        `  version: &apos;1.0.0&apos;`,
+        `  description: This is the ideal OpenAPI v3 specification for CaseManager.cls.`,
+        `servers:`,
+        `  - url: /services/apexrest`,
+        `    description: Apex rest`,
+        `paths:`,
+        `  /apex-rest-examples/v1/Cases:`,
+        `    description: The endpoint that contains the POST method.`,
+        `    post:`,
+        `      summary: Create a new case`,
+        `      description: Creates a new case with the provided information.`,
+        `      operationId: createCase`,
+        `      requestBody:`,
+        `        description: The properties of the case to create.`,
+        `        content:`,
+        `          application/json:`,
+        `            schema:`,
+        `              type: object`,
+        `              properties:`,
+        `                subject:`,
+        `                  type: string`,
+        `                  description: The subject of the case`,
+        `                status:`,
+        `                  type: string`,
+        `                  description: The status of the case`,
+        `                origin:`,
+        `                  type: string`,
+        `                  description: The origin of the case`,
+        `                priority:`,
+        `                  type: string`,
+        `                  description: The priority of the case`,
+        `      responses:`,
+        `        &apos;200&apos;:`,
+        `          description: The ID of the newly created case.`,
+        `          content:`,
+        `            text/plain:`,
+        `              schema:`,
+        `                type: string`,
+        `</schema>`,
+        `  <schemaType>OpenApi3</schemaType>`,
+        `  <schemaUploadFileExtension>yaml</schemaUploadFileExtension>`,
+        `  <schemaUploadFileName>casemanager_openapi</schemaUploadFileName>`,
+        `  <status>Complete</status>`,
+        `  <systemVersion>3</systemVersion>`,
+        `  <operations>`,
+        `    <name>createCase</name>`,
+        `    <active>true</active>`,
+        `  </operations>`,
+        `  <registrationProvider>CaseManager</registrationProvider>`,
+        `  <registrationProviderType>ApexRest</registrationProviderType>`,
+        `  <namedCredential>null</namedCredential>`,
+        `</ExternalServiceRegistration>`
+      ].join('\n');
+
+      const workbench = utilities.getWorkbench();
+      const textEditor = await utilities.getTextEditor(workbench, 'CaseManager.externalServiceRegistration-meta.xml');
+      await textEditor.setText(idealCaseManagerOASDoc);
+      await textEditor.save();
+      await utilities.pause(utilities.Duration.seconds(1));
     });
 
     step('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
+      await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        'Validated OpenAPI Document CaseManager.externalServiceRegistration-meta.xml successfully',
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      await utilities.executeQuickPick('Problems: Focus on Problems View');
+      const problemsView = new ProblemsView();
+      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
+      expect(problems.length).to.equal(2);
+      expect(await problems[0].getLabel()).to.equal('CaseManager.externalServiceRegistration-meta.xml');
+      expect(await problems[1].getLabel()).to.equal('operations.responses.content should be application/json');
     });
 
     step('Deploy the composed ESR to the org', async () => {
