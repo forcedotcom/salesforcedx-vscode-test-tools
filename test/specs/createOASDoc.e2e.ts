@@ -44,17 +44,17 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const caseManagerText = [
       `@RestResource(urlMapping='/apex-rest-examples/v1/Cases/*')`,
       `global with sharing class CaseManager {`,
-      `\t@HttpPost`,
-      `\tglobal static ID createCase(String subject, String status,`,
-      `\t\tString origin, String priority) {`,
-      `\t\tCase thisCase = new Case(`,
-      `\t\t\tSubject=subject,`,
-      `\t\t\tStatus=status,`,
-      `\t\t\tOrigin=origin,`,
-      `\t\t\tPriority=priority);`,
-      `\t\tinsert thisCase;`,
-      `\t\treturn thisCase.Id;`,
-      `\t}`,
+      `  @HttpPost`,
+      `  global static ID createCase(String subject, String status,`,
+      `    String origin, String priority) {`,
+      `    Case thisCase = new Case(`,
+      `      Subject=subject,`,
+      `      Status=status,`,
+      `      Origin=origin,`,
+      `      Priority=priority);`,
+      `    insert thisCase;`,
+      `    return thisCase.Id;`,
+      `  }`,
       `}`
     ].join('\n');
 
@@ -68,14 +68,14 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const simpleAccountResourceText = [
       `@RestResource(urlMapping='/apex-rest-examples/v1/*')`,
       `global with sharing class SimpleAccountResource {`,
-      `\t@HttpGet`,
-      `\tglobal static Account getAccount() {`,
-      `\t\tRestRequest req = RestContext.request;`,
-      `\t\tRestResponse res = RestContext.response;`,
-      `\t\tString accountId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);`,
-      `\t\tAccount result = [SELECT Id, Name, Phone, Website FROM Account WHERE Id = :accountId];`,
-      `\t\treturn result;`,
-      `\t}`,
+      `  @HttpGet`,
+      `  global static Account getAccount() {`,
+      `    RestRequest req = RestContext.request;`,
+      `    RestResponse res = RestContext.response;`,
+      `    String accountId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);`,
+      `    Account result = [SELECT Id, Name, Phone, Website FROM Account WHERE Id = :accountId];`,
+      `    return result;`,
+      `  }`,
       `}`
     ].join('\n');
 
