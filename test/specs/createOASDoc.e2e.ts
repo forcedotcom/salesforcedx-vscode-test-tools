@@ -31,6 +31,11 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const settingsEditor = new SettingsEditor();
     const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
     await logLevelSetting?.setValue('debug');
+
+    // Use VSCode's modal dialog style instead of Mac's native dialog style
+    await utilities.inUserSettings();
+    const dialogStyleSetting = await settingsEditor.findSettingByID('window.dialogStyle');
+    await dialogStyleSetting?.setValue('custom');
     await utilities.executeQuickPick('View: Close Editor');
     await utilities.reloadWindow();
 
