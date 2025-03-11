@@ -277,6 +277,11 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Deploy the composed ESR to the org', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the composed ESR to the org`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+      await utilities.getTextEditor(workbench, 'CaseManager.externalServiceRegistration-meta.xml');
+      await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ', false);
     });
 
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
