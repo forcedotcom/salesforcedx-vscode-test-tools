@@ -327,11 +327,32 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Decomposed mode', async () => {
-    xstep('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
+    step('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`);
       const workbench = utilities.getWorkbench();
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
       const textEditor = await utilities.getTextEditor(workbench, 'sfdx-project.json');
+      const newSfdxProjectJsonContents = [
+        `{`,
+        `  "packageDirectories": [`,
+        `    {`,
+        `      "path": "force-app",`,
+        `      "default": true`,
+        `    }`,
+        `  ],`,
+        `  "name": "TempProject-CreateOASDoc",`,
+        `  "namespace": "",`,
+        `  "sfdcLoginUrl": "https://login.salesforce.com",`,
+        `  "sourceApiVersion": "63.0",`,
+        `  "sourceBehaviorOptions": [`,
+        `    "decomposeExternalServiceRegistrationBeta"`,
+        `  ]`,
+        `}`
+      ].join('\n');
+      await textEditor.setText(newSfdxProjectJsonContents);
+      await textEditor.save();
+      await utilities.executeQuickPick('View: Close All Editors');
+      await utilities.reloadWindow();
     });
 
     step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
