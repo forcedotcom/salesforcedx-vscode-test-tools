@@ -150,7 +150,7 @@ describe('Manifest Builder', async () => {
 
     // Look for the success notification that appears which says, "SFDX: Deploy This Source to Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Deploy This Source to Org successfully ran',
+      /SFDX: Deploy This Source to Org successfully ran/,
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
@@ -242,7 +242,7 @@ describe('Manifest Builder', async () => {
 
     // Look for the success notification that appears which says, "SFDX: Retrieve This Source from Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Retrieve This Source from Org successfully ran',
+      /SFDX: Retrieve This Source from Org successfully ran/,
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);

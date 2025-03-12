@@ -41,7 +41,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.createApexClass('MyClass', classText);
     const workbench = utilities.getWorkbench();
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Create Apex Class successfully ran',
+      /SFDX: Create Apex Class successfully ran/,
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
@@ -239,7 +239,7 @@ describe('Deploy and Retrieve', async () => {
 
       // Make sure we get a notification for the source delete
       const notificationFound = await utilities.notificationIsPresentWithTimeout(
-        'Deleting source files deletes the files from your computer and removes the corresponding metadata from your default org. Are you sure you want to delete this source from your project and your org?',
+        /Deleting source files deletes the files from your computer and removes the corresponding metadata from your default org\. Are you sure you want to delete this source from your project and your org\?/,
         utilities.Duration.ONE_MINUTE
       );
 
@@ -253,7 +253,7 @@ describe('Deploy and Retrieve', async () => {
       );
       expect(accepted).to.equal(true);
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Delete from Project and Org successfully ran',
+        /SFDX: Delete from Project and Org successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);

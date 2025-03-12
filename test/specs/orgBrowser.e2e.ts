@@ -82,7 +82,7 @@ describe('Org Browser', async () => {
 
     // Verify the deploy was successful
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Deploy This Source to Org successfully ran',
+      /SFDX: Deploy This Source to Org successfully ran/,
       utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
@@ -119,7 +119,7 @@ describe('Org Browser', async () => {
     await modalDialog.pushButton('Overwrite');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Retrieve This Source from Org successfully ran',
+      /SFDX: Retrieve This Source from Org successfully ran/,
       utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
@@ -143,7 +143,7 @@ describe('Org Browser', async () => {
     await modalDialog.pushButton('Overwrite');
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'SFDX: Retrieve This Source from Org successfully ran',
+      /SFDX: Retrieve This Source from Org successfully ran/,
       utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);

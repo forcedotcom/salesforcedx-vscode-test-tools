@@ -48,14 +48,14 @@ describe('Debug Apex Tests', async () => {
     let successPushNotificationWasFound;
     try {
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
@@ -88,14 +88,14 @@ describe('Debug Apex Tests', async () => {
     let successNotificationWasFound;
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
       await workbench.openNotificationsCenter();
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.ONE_MINUTE
       );
       expect(successNotificationWasFound).to.equal(true);
@@ -122,14 +122,14 @@ describe('Debug Apex Tests', async () => {
     let successNotificationWasFound;
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
       await workbench.openNotificationsCenter();
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.ONE_MINUTE
       );
       expect(successNotificationWasFound).to.equal(true);
@@ -163,14 +163,14 @@ describe('Debug Apex Tests', async () => {
     let successNotificationWasFound;
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
       await workbench.openNotificationsCenter();
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.ONE_MINUTE
       );
       expect(successNotificationWasFound).to.equal(true);
@@ -201,14 +201,14 @@ describe('Debug Apex Tests', async () => {
     let successNotificationWasFound;
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
       await workbench.openNotificationsCenter();
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Debug Test(s) successfully ran',
+        /Debug Test(s) successfully ran/,
         utilities.Duration.ONE_MINUTE
       );
       expect(successNotificationWasFound).to.equal(true);

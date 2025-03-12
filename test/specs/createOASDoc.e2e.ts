@@ -109,14 +109,14 @@ describe('Create OpenAPI v3 Specifications', async () => {
     let successPushNotificationWasFound;
     try {
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran',
+        /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
@@ -154,7 +154,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     await utilities.pause(utilities.Duration.seconds(5));
     await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
     const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      'Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation.',
+      /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./,
       utilities.Duration.TEN_MINUTES
     );
     expect(failureNotificationWasFound).to.equal(true);
@@ -169,7 +169,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await prompt.confirm();
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'OpenAPI Document created for class: CaseManager.',
+        /OpenAPI Document created for class: CaseManager\./,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
@@ -267,7 +267,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-        'Validated OpenAPI Document CaseManager.externalServiceRegistration-meta.xml successfully',
+        /Validated OpenAPI Document CaseManager.externalServiceRegistration-meta.xml successfully/,
         utilities.Duration.TEN_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);

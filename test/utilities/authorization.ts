@@ -137,7 +137,7 @@ async function createDefaultScratchOrg(
 
   // Look for the success notification.
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    'SFDX: Set a Default Org successfully ran',
+    /SFDX: Set a Default Org successfully ran/,
     utilities.Duration.TEN_MINUTES
   );
   if (!successNotificationWasFound) {

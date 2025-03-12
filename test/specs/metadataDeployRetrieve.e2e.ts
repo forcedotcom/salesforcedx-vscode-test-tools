@@ -84,7 +84,7 @@ describe('metadata mdDeployRetrieve', async () => {
   ): Promise<void> => {
     utilities.log(`validateCommand()`);
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      `SFDX: ${operation} This Source ${fromTo} Org successfully ran`,
+      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
