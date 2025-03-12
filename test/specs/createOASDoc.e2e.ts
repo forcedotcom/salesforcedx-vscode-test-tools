@@ -383,19 +383,115 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
+      await utilities.executeQuickPick('Problems: Focus on Problems View');
+      const problemsView = new ProblemsView();
+      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
+      expect(problems.length).to.equal(0);
     });
 
     step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
       // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
+
+      const idealSimpleAccountResourceYAML = [
+        `openapi: 3.0.0`,
+        `servers:`,
+        `  - url: /services/apexrest`,
+        `info:`,
+        `  title: SimpleAccountResource`,
+        `  version: '1.0.0'`,
+        `  description: This is the ideal OpenAPI v3 specification for SimpleAccountResource.cls.`,
+        `paths:`,
+        `  /apex-rest-examples/v1/{accountId}:`,
+        `    description: The endpoint that contains the GET method.`,
+        `    get:`,
+        `      summary: Get Account`,
+        `      operationId: getAccount`,
+        `      description: Returns the Account that matches the ID specified in the URL`,
+        `      parameters:`,
+        `        - name: accountId`,
+        `          in: path`,
+        `          required: true`,
+        `          description: The ID of the Account to retrieve`,
+        `          schema:`,
+        `            type: string`,
+        `      responses:`,
+        `        '200':`,
+        `          description: The Account with the provided ID`,
+        `          content:`,
+        `            application/json:`,
+        `              schema:`,
+        `                type: object`,
+        `                properties:`,
+        `                  Id:`,
+        `                    type: string`,
+        `                    description: The ID of the Account`,
+        `                  Name:`,
+        `                    type: string`,
+        `                    description: The name of the Account`,
+        `                  Phone:`,
+        `                    type: string`,
+        `                    description: The phone number of the Account`,
+        `                  Website:`,
+        `                    type: string`,
+        `                    description: The website of the Account`
+      ].join('\n');
+
+      const workbench = utilities.getWorkbench();
+      let textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
+      await textEditor.setText(idealSimpleAccountResourceYAML);
+      await textEditor.save();
+
+      const idealSimpleAccountResourceXML = [
+        `<?xml version="1.0" encoding="UTF-8"?>`,
+        `<ExternalServiceRegistration xmlns="http://soap.sforce.com/2006/04/metadata">`,
+        `  <description>This is the ideal OpenAPI v3 specification for SimpleAccountResource.cls.</description>`,
+        `  <label>SimpleAccountResource</label>`,
+        `  <schemaType>OpenApi3</schemaType>`,
+        `  <schemaUploadFileExtension>yaml</schemaUploadFileExtension>`,
+        `  <schemaUploadFileName>simpleaccountresource_openapi</schemaUploadFileName>`,
+        `  <status>Complete</status>`,
+        `  <systemVersion>3</systemVersion>`,
+        `  <operations>`,
+        `    <name>getAccount</name>`,
+        `    <active>true</active>`,
+        `  </operations>`,
+        `  <registrationProvider>SimpleAccountResource</registrationProvider>`,
+        `  <registrationProviderType>ApexRest</registrationProviderType>`,
+        `  <namedCredential>null</namedCredential>`,
+        `</ExternalServiceRegistration>`
+      ].join('\n');
+
+      textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.externalServiceRegistration-meta.xml');
+      await textEditor.setText(idealSimpleAccountResourceXML);
+      await textEditor.save();
+      await utilities.pause(utilities.Duration.seconds(1));
     });
 
     step('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
+      const workbench = utilities.getWorkbench();
+      await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
+      await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /Validated OpenAPI Document SimpleAccountResource.yaml successfully/,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      await utilities.executeQuickPick('Problems: Focus on Problems View');
+      const problemsView = new ProblemsView();
+      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
+      expect(problems.length).to.equal(0);
     });
 
     step('Deploy the decomposed ESR to the org', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the decomposed ESR to the org`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+      await utilities.getTextEditor(workbench, 'SimpleAccountResource.externalServiceRegistration-meta.xml');
+      await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
     step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
