@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -178,7 +178,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       );
       expect(successNotificationWasFound).to.equal(true);
 
-      // Verify the generated OAS doc is open in the editor
+      // Verify the generated OAS doc is open in the Editor View
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       const activeTab = await editorView.getActiveTab();
@@ -295,6 +295,34 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      await utilities.executeQuickPick('View: Close All Editors');
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
+      await utilities.pause(utilities.Duration.seconds(5));
+      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      await prompt.confirm();
+
+      // Click the Manual Merge button on the popup
+      const modalDialog = new ModalDialog();
+      expect(modalDialog).to.not.be.undefined;
+      await modalDialog.pushButton('Manually merge with existing ESR');
+
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /A new OpenAPI Document class CaseManager_\d{8}_\d{6} is created for CaseManager\. Manually merge the two files using the diff editor\./,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      // Verify the generated OAS doc and the diff editor are both open in the Editor View
+      const workbench = utilities.getWorkbench();
+      const editorView = workbench.getEditorView();
+      let activeTab = await editorView.getActiveTab();
+      let title = await activeTab?.getTitle();
+      expect(title).to.equal('Manual Diff of ESR XML Files');
+
+      await utilities.executeQuickPick('View: Open Previous Editor');
+      activeTab = await editorView.getActiveTab();
+      title = await activeTab?.getTitle();
+      expect(title).to.match(/CaseManager_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
     });
   });
 
