@@ -290,7 +290,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       // Clear the Output view first.
       await utilities.clearOutputView(utilities.Duration.seconds(2));
       await utilities.getTextEditor(workbench, 'CaseManager.externalServiceRegistration-meta.xml');
-      await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ', false);
+      await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ');
     });
 
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
