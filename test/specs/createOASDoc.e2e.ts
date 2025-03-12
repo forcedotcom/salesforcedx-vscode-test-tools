@@ -357,6 +357,28 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
+      await utilities.pause(utilities.Duration.seconds(5));
+      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      await prompt.confirm();
+
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /OpenAPI Document created for class: SimpleAccountResource\./,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
+      const workbench = utilities.getWorkbench();
+      const editorView = workbench.getEditorView();
+      let activeTab = await editorView.getActiveTab();
+      let title = await activeTab?.getTitle();
+      expect(title).to.equal('SimpleAccountResource.yaml');
+
+      await utilities.executeQuickPick('View: Open Previous Editor');
+      activeTab = await editorView.getActiveTab();
+      title = await activeTab?.getTitle();
+      expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
     step('Check for warnings and errors in the Problems Tab', async () => {
