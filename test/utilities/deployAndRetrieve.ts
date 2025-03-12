@@ -14,13 +14,12 @@ export const runAndValidateCommand = async (
   operationType: string,
   metadataType: string,
   fullName: string,
-  prefix?: string,
-  decomposed?: boolean
+  prefix?: string
 ): Promise<void> => {
   utilities.log(`runAndValidateCommand()`);
   await utilities.executeQuickPick(`SFDX: ${operation} This Source ${fromTo} Org`, utilities.Duration.seconds(5));
 
-  await validateCommand(operation, fromTo, operationType, metadataType, fullName, prefix, decomposed);
+  await validateCommand(operation, fromTo, operationType, metadataType, fullName, prefix);
 };
 
 export const validateCommand = async (
@@ -29,8 +28,7 @@ export const validateCommand = async (
   operationType: string, // Text to identify operation operationType (if it has source tracking enabled, disabled or if it was a deploy on save),
   metadataType: string,
   fullName: string,
-  prefix: string = '',
-  decomposed: boolean = false
+  prefix: string = ''
 ): Promise<void> => {
   utilities.log(`validateCommand()`);
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -60,9 +58,6 @@ export const validateCommand = async (
       `${prefix}${fullName}  ${metadataType}  force-app/main/default/externalServiceRegistrations/${fullName}.externalServiceRegistration-meta.xml`,
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
-    if (decomposed) {
-      expectedTexts.push(`${prefix}${fullName}  ${metadataType}  force-app/main/default/externalServiceRegistrations/${fullName}.yaml`);
-    }
   } else {
     expectedTexts = [];
   }
