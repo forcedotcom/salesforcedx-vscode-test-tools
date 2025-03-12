@@ -36,6 +36,10 @@ describe('Create OpenAPI v3 Specifications', async () => {
     await utilities.inUserSettings();
     const dialogStyleSetting = await settingsEditor.findSettingByID('window.dialogStyle');
     await dialogStyleSetting?.setValue('custom');
+
+    // Disable preview mode for opening editors
+    const previewModeSetting = await settingsEditor.findSettingByID('workbench.editor.enablePreview');
+    await previewModeSetting?.setValue(false);
     await utilities.executeQuickPick('View: Close Editor');
     await utilities.reloadWindow();
 
