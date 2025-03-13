@@ -530,6 +530,34 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
       // NOTE: Windows and Ubuntu only
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      await utilities.executeQuickPick('View: Close All Editors');
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
+      await utilities.pause(utilities.Duration.seconds(5));
+      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      await prompt.confirm();
+
+      // Click the Manual Merge button on the popup
+      const modalDialog = new ModalDialog();
+      expect(modalDialog).to.not.be.undefined;
+      await modalDialog.pushButton('Manually merge with existing ESR');
+
+      const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /A new OpenAPI Document class SimpleAccountResource_\d{8}_\d{6} is created for SimpleAccountResource\. Manually merge the two files using the diff editor\./,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(successNotificationWasFound).to.equal(true);
+
+      // Verify the generated OAS doc and the diff editor are both open in the Editor View
+      const workbench = utilities.getWorkbench();
+      const editorView = workbench.getEditorView();
+      await utilities.executeQuickPick('View: Open First Editor in Group');
+      const openTabs = await editorView.getOpenTabs();
+      expect(openTabs.length).to.equal(5);
+      expect(await openTabs[0].getTitle()).to.equal('SimpleAccountResource.cls');
+      expect(await openTabs[1].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
+      expect(await openTabs[2].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.yaml/);
+      expect(await openTabs[3].getTitle()).to.equal('Manual Diff of ESR XML Files');
+      expect(await openTabs[4].getTitle()).to.equal('Manual Diff of ESR YAML Files');
     });
   });
 
