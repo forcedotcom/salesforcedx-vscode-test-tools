@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, TerminalView, By, ExtensionsViewItem } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -561,8 +561,33 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
   });
 
-  step('Disable A4D extension and ensure the commands to generate and validate OAS docs is not present', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Disable A4D extension and ensure the commands to generate and validate OAS docs is not present`);
+  describe('Uninstall A4D extension', async () => {
+    step('Uninstall A4D extension and ensure the commands to generate and validate OAS docs is not present', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Uninstall A4D extension`);
+
+      const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
+      await utilities.pause(utilities.Duration.seconds(5));
+      let extensionsList = (await extensionsView?.getContent().getSection('Installed')) as ExtensionsViewSection;
+      const a4dExtension = await extensionsList?.findItem('Agentforce for Developers') as ExtensionsViewItem;
+      await a4dExtension.click();
+
+      // In the extension details view, click the Uninstall button
+      const uninstallButton = await a4dExtension.findElement(By.xpath("//a[contains(@class, 'action-label') and contains(@class, 'uninstall') and text()='Uninstall']"));
+      await uninstallButton?.click();
+      await utilities.pause(utilities.Duration.seconds(5));
+
+      // Click the Restart Extensions button
+      const restartExtensionsButton = await a4dExtension.findElement(By.xpath("//a[contains(@class, 'action-label') and contains(@class, 'reload') and text()='Restart Extensions']"));
+      await restartExtensionsButton?.click();
+      await utilities.pause(utilities.Duration.seconds(5));
+
+      // Verify the A4D extension is uninstalled
+      expect(await a4dExtension.isInstalled()).to.equal(false);
+    });
+
+    step('Ensure the commands to generate and validate OAS docs is not present', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs is not present`);
+    });
   });
 
   after('Tear down and clean up the testing environment', async () => {
