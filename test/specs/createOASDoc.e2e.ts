@@ -23,7 +23,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   };
 
   step('Set up the testing environment', async () => {
-    utilities.log(`CreateOASDoc - Set up the testing environment`);
+    utilities.log(`${testSetup.testSuiteSuffixName} - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Set SF_LOG_LEVEL to 'debug' to get the logs in the 'llm_logs' folder when the OAS doc is generated
@@ -166,7 +166,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
   describe('Composed mode', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
-      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
@@ -294,7 +294,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
 
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
-      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
@@ -356,7 +356,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
 
     step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
-      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation`);
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
@@ -495,8 +495,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
 
     step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
-      // NOTE: Windows and Ubuntu only
-      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      // NOTE: Windows and Ubuntu only, Mac uses command palette
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
@@ -528,8 +528,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
 
     step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
-      // NOTE: Windows and Ubuntu only
-      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class`);
+      // NOTE: Windows and Ubuntu only, Mac uses command palette
+      utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
@@ -561,8 +561,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
   });
 
-  describe('Uninstall A4D extension', async () => {
-    step('Uninstall A4D extension and ensure the commands to generate and validate OAS docs is not present', async () => {
+  describe('Uninstall A4D extension and ensure the commands to generate and validate OAS docs are not present', async () => {
+    step('Uninstall A4D extension', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Uninstall A4D extension`);
 
       const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
@@ -585,13 +585,13 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(await a4dExtension.isInstalled()).to.equal(false);
     });
 
-    step('Ensure the commands to generate and validate OAS docs is not present', async () => {
-      utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs is not present`);
+    step('Ensure the commands to generate and validate OAS docs are not present', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs are not present`);
     });
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(`CreateOASDoc - Tear down and clean up the testing environment`);
+    utilities.log(`${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 });
