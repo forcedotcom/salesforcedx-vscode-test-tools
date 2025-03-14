@@ -71,6 +71,17 @@ export const validateCommand = async (
         `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullNames[x]}.externalServiceRegistration-meta.xml`
       );
     }
+  } else if (metadataType === 'CustomObject') {
+    expectedTexts = [
+      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
+      `ended SFDX: ${operation} This Source ${fromTo} Org`
+    ];
+    for (let x = 0; x < fullNames.length; x++) {
+      const spacer = calculateSpacer(longestFullName, fullNames[x]);
+      expectedTexts.push(
+        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects${pathSeparator}${fullNames[x]}${pathSeparator}${fullNames[x]}.object-meta.xml`
+      );
+    }
   } else {
     expectedTexts = [];
   }
