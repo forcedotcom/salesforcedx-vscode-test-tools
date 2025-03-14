@@ -7,7 +7,6 @@
 
 import { expect } from 'chai';
 import * as utilities from './index';
-import { platform } from 'os';
 
 export const runAndValidateCommand = async (
   operation: string,
@@ -46,41 +45,22 @@ export const validateCommand = async (
   );
   utilities.log(`${operation} time ${operationType}: ` + (await utilities.getOperationTime(outputPanelText!)));
   let expectedTexts: string[];
-  if (process.platform === 'win32') {
-    if (metadataType === 'ApexClass') {
-      expectedTexts = [
-        `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-        `${prefix}${fullName}    ${metadataType}  force-app\\main\\default\\classes\\${fullName}.cls`,
-        `${prefix}${fullName}    ${metadataType}  force-app\\main\\default\\classes\\${fullName}.cls-meta.xml`,
-        `ended SFDX: ${operation} This Source ${fromTo} Org`
-      ];
-    } else if (metadataType === 'ExternalServiceRegistration') {
-      expectedTexts = [
-        `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-        `${prefix}${fullName}  ${metadataType}  force-app\\main\\default\\externalServiceRegistrations\\${fullName}.externalServiceRegistration-meta.xml`,
-        `ended SFDX: ${operation} This Source ${fromTo} Org`
-      ];
-    } else {
-      expectedTexts = [];
-    }
-  }
-  else {
-    if (metadataType === 'ApexClass') {
-      expectedTexts = [
-        `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-        `${prefix}${fullName}    ${metadataType}  force-app/main/default/classes/${fullName}.cls`,
-        `${prefix}${fullName}    ${metadataType}  force-app/main/default/classes/${fullName}.cls-meta.xml`,
-        `ended SFDX: ${operation} This Source ${fromTo} Org`
-      ];
-    } else if (metadataType === 'ExternalServiceRegistration') {
-      expectedTexts = [
-        `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-        `${prefix}${fullName}  ${metadataType}  force-app/main/default/externalServiceRegistrations/${fullName}.externalServiceRegistration-meta.xml`,
-        `ended SFDX: ${operation} This Source ${fromTo} Org`
-      ];
-    } else {
-      expectedTexts = [];
-    }
+  const pathSeparator = process.platform === 'win32' ? '\\' : '/';
+  if (metadataType === 'ApexClass') {
+    expectedTexts = [
+      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
+      `${prefix}${fullName}    ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls`,
+      `${prefix}${fullName}    ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls-meta.xml`,
+      `ended SFDX: ${operation} This Source ${fromTo} Org`
+    ];
+  } else if (metadataType === 'ExternalServiceRegistration') {
+    expectedTexts = [
+      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
+      `${prefix}${fullName}  ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullName}.externalServiceRegistration-meta.xml`,
+      `ended SFDX: ${operation} This Source ${fromTo} Org`
+    ];
+  } else {
+    expectedTexts = [];
   }
 
   expect(outputPanelText).to.not.be.undefined;
