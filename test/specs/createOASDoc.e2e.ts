@@ -588,6 +588,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Ensure the commands to generate and validate OAS docs are not present', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs are not present`);
       await utilities.executeQuickPick('View: Close All Editors');
+      await utilities.reloadWindow(utilities.Duration.seconds(5));
 
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
