@@ -600,7 +600,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   after('Tear down and clean up the testing environment', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`);
+    utilities.log(`CreateOASDoc - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
 });
