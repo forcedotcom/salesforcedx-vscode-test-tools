@@ -46,17 +46,24 @@ export const validateCommand = async (
   utilities.log(`${operation} time ${operationType}: ` + (await utilities.getOperationTime(outputPanelText!)));
   let expectedTexts: string[];
   const pathSeparator = process.platform === 'win32' ? '\\' : '/';
+
+  let numberOfSpaces = 2;
+  if (fullName.length < 'FULL NAME'.length) {
+    numberOfSpaces += ('FULL NAME'.length - fullName.length);
+  }
+  const spacer = ' '.repeat(numberOfSpaces);
+
   if (metadataType === 'ApexClass') {
     expectedTexts = [
       `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `${prefix}${fullName}    ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls`,
-      `${prefix}${fullName}    ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls-meta.xml`,
+      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls`,
+      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls-meta.xml`,
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
   } else if (metadataType === 'ExternalServiceRegistration') {
     expectedTexts = [
       `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `${prefix}${fullName}  ${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullName}.externalServiceRegistration-meta.xml`,
+      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullName}.externalServiceRegistration-meta.xml`,
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
   } else {
