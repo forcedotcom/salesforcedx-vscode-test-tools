@@ -23,7 +23,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   };
 
   step('Set up the testing environment', async () => {
-    utilities.log(`${testSetup.testSuiteSuffixName} - Set up the testing environment`);
+    utilities.log(`CreateOASDoc - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Set SF_LOG_LEVEL to 'debug' to get the logs in the 'llm_logs' folder when the OAS doc is generated
