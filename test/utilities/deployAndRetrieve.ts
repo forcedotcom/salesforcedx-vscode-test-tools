@@ -54,15 +54,7 @@ export const validateCommand = async (
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
     for (let x = 0; x < fullNames.length; x++) {
-      // Determine the number of spaces needed to align the output text
-      let numberOfSpaces = 2;
-      if (longestFullName.length < 'FULL_NAME'.length) {
-        numberOfSpaces += ('FULL_NAME'.length - fullNames[x].length);
-      } else {
-        numberOfSpaces += (longestFullName.length - fullNames[x].length);
-      }
-      const spacer = ' '.repeat(numberOfSpaces);
-
+      const spacer = calculateSpacer(longestFullName, fullNames[x]);
       expectedTexts.push(
         `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls`,
         `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls-meta.xml`
@@ -74,15 +66,7 @@ export const validateCommand = async (
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
     for (let x = 0; x < fullNames.length; x++) {
-      // Determine the number of spaces needed to align the output text
-      let numberOfSpaces = 2;
-      if (longestFullName.length < 'FULL_NAME'.length) {
-        numberOfSpaces += ('FULL_NAME'.length - fullNames[x].length);
-      } else {
-        numberOfSpaces += (longestFullName.length - fullNames[x].length);
-      }
-      const spacer = ' '.repeat(numberOfSpaces);
-
+      const spacer = calculateSpacer(longestFullName, fullNames[x]);
       expectedTexts.push(
         `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullNames[x]}.externalServiceRegistration-meta.xml`
       );
@@ -93,4 +77,20 @@ export const validateCommand = async (
 
   expect(outputPanelText).to.not.be.undefined;
   await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
+};
+
+/**
+ * Determines the number of spaces needed to align the output text
+ * @param longestFullName - The longest full name in the list of full names
+ * @param currentFileName - The full name of the current file that is used to calculate the size of the spacer
+ * @returns - A string of spaces to align the output text
+ */
+export const calculateSpacer = (longestFullName: string, currentFileName: string): string => {
+  let numberOfSpaces = 2;
+  if (longestFullName.length < 'FULL_NAME'.length) {
+    numberOfSpaces += ('FULL_NAME'.length - currentFileName.length);
+  } else {
+    numberOfSpaces += (longestFullName.length - currentFileName.length);
+  }
+  return ' '.repeat(numberOfSpaces);
 };
