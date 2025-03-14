@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, TerminalView, By, ExtensionsViewItem } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, By, ExtensionsViewItem } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -587,6 +587,15 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Ensure the commands to generate and validate OAS docs are not present', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs are not present`);
+      await utilities.executeQuickPick('View: Close All Editors');
+
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
+      await utilities.pause(utilities.Duration.seconds(5));
+      expect(await utilities.isCommandAvailable('SFDX: Create OpenAPI Document from This Class (Beta)')).to.equal(false);
+
+      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'externalServiceRegistrations', 'SimpleAccountResource.yaml'));
+      await utilities.pause(utilities.Duration.seconds(5));
+      expect(await utilities.isCommandAvailable('SFDX: Validate OpenAPI Document (Beta)')).to.equal(false);
     });
   });
 
