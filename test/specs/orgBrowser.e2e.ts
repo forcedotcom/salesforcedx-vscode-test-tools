@@ -111,7 +111,7 @@ describe('Org Browser', async () => {
     expect(modalDialog).to.not.be.undefined;
     await modalDialog.pushButton('Overwrite');
 
-    await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', 'MyClass');
+    await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', ['MyClass']);
   });
 
   step('Retrieve and Open Source', async () => {
@@ -131,7 +131,7 @@ describe('Org Browser', async () => {
     expect(modalDialog).to.not.be.undefined;
     await modalDialog.pushButton('Overwrite');
 
-    await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', 'MyClass');
+    await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', ['MyClass']);
 
     // Verify 'Retrieve and Open Source' took us to MyClass.cls
     const workbench = utilities.getWorkbench();

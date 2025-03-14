@@ -165,7 +165,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.pause(utilities.Duration.seconds(5));
 
     // At this point there should be no conflicts since this is a new class.
-    await utilities.validateCommand('Deploy', 'to', 'on save', 'ApexClass', 'MyClass');
+    await utilities.validateCommand('Deploy', 'to', 'on save', 'ApexClass', ['MyClass']);
   });
 
   step('Disable Source Tracking Setting', async () => {

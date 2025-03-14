@@ -19,7 +19,7 @@ export const runAndValidateCommand = async (
   utilities.log(`runAndValidateCommand()`);
   await utilities.executeQuickPick(`SFDX: ${operation} This Source ${fromTo} Org`, utilities.Duration.seconds(5));
 
-  await validateCommand(operation, fromTo, operationType, metadataType, fullName, prefix);
+  await validateCommand(operation, fromTo, operationType, metadataType, [fullName], prefix);
 };
 
 export const validateCommand = async (
@@ -27,7 +27,7 @@ export const validateCommand = async (
   fromTo: string,
   operationType: string, // Text to identify operation operationType (if it has source tracking enabled, disabled or if it was a deploy on save),
   metadataType: string,
-  fullName: string,
+  fullNames: string[],
   prefix: string = ''
 ): Promise<void> => {
   utilities.log(`validateCommand()`);
@@ -46,26 +46,47 @@ export const validateCommand = async (
   utilities.log(`${operation} time ${operationType}: ` + (await utilities.getOperationTime(outputPanelText!)));
   let expectedTexts: string[];
   const pathSeparator = process.platform === 'win32' ? '\\' : '/';
-
-  let numberOfSpaces = 2;
-  if (fullName.length < 'FULL NAME'.length) {
-    numberOfSpaces += ('FULL NAME'.length - fullName.length);
-  }
-  const spacer = ' '.repeat(numberOfSpaces);
+  const longestFullName = fullNames.reduce((a, b) => (a.length > b.length ? a : b), '');
 
   if (metadataType === 'ApexClass') {
     expectedTexts = [
       `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls`,
-      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullName}.cls-meta.xml`,
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
+    for (let x = 0; x < fullNames.length; x++) {
+      // Determine the number of spaces needed to align the output text
+      let numberOfSpaces = 2;
+      if (longestFullName.length < 'FULL_NAME'.length) {
+        numberOfSpaces += ('FULL_NAME'.length - fullNames[x].length);
+      } else {
+        numberOfSpaces += (longestFullName.length - fullNames[x].length);
+      }
+      const spacer = ' '.repeat(numberOfSpaces);
+
+      expectedTexts.push(
+        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls`,
+        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls-meta.xml`
+      );
+    }
   } else if (metadataType === 'ExternalServiceRegistration') {
     expectedTexts = [
       `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `${prefix}${fullName}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullName}.externalServiceRegistration-meta.xml`,
       `ended SFDX: ${operation} This Source ${fromTo} Org`
     ];
+    for (let x = 0; x < fullNames.length; x++) {
+      // Determine the number of spaces needed to align the output text
+      let numberOfSpaces = 2;
+      if (longestFullName.length < 'FULL_NAME'.length) {
+        numberOfSpaces += ('FULL_NAME'.length - fullNames[x].length);
+      } else {
+        numberOfSpaces += (longestFullName.length - fullNames[x].length);
+      }
+      const spacer = ' '.repeat(numberOfSpaces);
+
+      expectedTexts.push(
+        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullNames[x]}.externalServiceRegistration-meta.xml`
+      );
+    }
   } else {
     expectedTexts = [];
   }
