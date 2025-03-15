@@ -100,10 +100,11 @@ describe('Manifest Builder', async () => {
 
     // Clear output before running the command
     await utilities.clearOutputView();
+    const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, 'manifest.xml');
 
     if (process.platform === 'linux') {
       // Dismiss all notifications using the button in the status bar
-      const workbench = utilities.getWorkbench();
       const statusBar = workbench.getStatusBar();
       const notificationsButton = await statusBar.getItem('Notifications');
       if (notificationsButton) {
@@ -153,15 +154,14 @@ describe('Manifest Builder', async () => {
 
   step('SFDX: Retrieve Source in Manifest from Org', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - SFDX: Retrieve Source in Manifest from Org`);
-    const workbench = utilities.getWorkbench();
-    await utilities.getTextEditor(workbench, 'manifest.xml');
 
     // Clear output before running the command
     await utilities.clearOutputView();
+    const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, 'manifest.xml');
 
     if (process.platform === 'linux') {
       // Dismiss all notifications using the button in the status bar
-      const workbench = utilities.getWorkbench();
       const statusBar = workbench.getStatusBar();
       const notificationsButton = await statusBar.getItem('Notifications');
       if (notificationsButton) {
