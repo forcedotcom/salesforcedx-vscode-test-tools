@@ -245,6 +245,7 @@ describe('Apex Replay Debugger', async () => {
       utilities.Duration.seconds(3)
     );
 
+    utilities.pause(utilities.Duration.seconds(5));
     // Continue with the debug session
     await utilities.continueDebugging(2, 30);
 
