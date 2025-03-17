@@ -32,6 +32,10 @@ describe('Create OpenAPI v3 Specifications', async () => {
     const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
     await logLevelSetting?.setValue('debug');
 
+    // Set a telemetry tag to distinguish it as an E2E test run
+    const telemetryTagSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.telemetry-tag');
+    await telemetryTagSetting?.setValue('e2e-test');
+
     // Use VSCode's modal dialog style instead of Mac's native dialog style
     await utilities.inUserSettings();
     const dialogStyleSetting = await settingsEditor.findSettingByID('window.dialogStyle');
