@@ -238,11 +238,8 @@ describe('Apex Replay Debugger', async () => {
   step('SFDX: Launch Apex Replay Debugger with Current File - test class', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - test class`);
 
-    utilities.pause(utilities.Duration.seconds(2));
-
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    const workbench = utilities.getWorkbench();
-    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
+    await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'ExampleApexClassTest.cls'));
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
