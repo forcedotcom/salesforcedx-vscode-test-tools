@@ -329,6 +329,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(successNotificationWasFound).to.equal(true);
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
+      await utilities.executeQuickPick('View: Open Last Editor in Group');
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       let activeTab = await editorView.getActiveTab();
@@ -373,6 +374,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation`);
+      await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
@@ -385,6 +387,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(successNotificationWasFound).to.equal(true);
 
       // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
+      await utilities.executeQuickPick('View: Open Last Editor in Group');
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       let activeTab = await editorView.getActiveTab();
@@ -531,6 +534,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(successNotificationWasFound).to.equal(true);
 
       // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
+      await utilities.executeQuickPick('View: Open Last Editor in Group');
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       let activeTab = await editorView.getActiveTab();
@@ -564,6 +568,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(successNotificationWasFound).to.equal(true);
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
+      await utilities.executeQuickPick('View: Open Last Editor in Group');
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       await utilities.executeQuickPick('View: Open First Editor in Group');
