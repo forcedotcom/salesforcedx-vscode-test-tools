@@ -171,6 +171,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   describe('Composed mode', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
+      await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       utilities.log('A');
       await utilities.pause(utilities.Duration.seconds(5));
