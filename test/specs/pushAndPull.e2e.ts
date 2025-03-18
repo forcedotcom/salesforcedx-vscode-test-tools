@@ -10,8 +10,7 @@ import { step } from 'mocha-steps';
 import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { after } from 'vscode-extension-tester';
-import { expect } from 'chai';
+import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
 
 describe('Push and Pull', async () => {
   let projectName = '';
@@ -227,6 +226,21 @@ describe('Push and Pull', async () => {
     isOrgRequired: false,
     testSuiteSuffixName: 'ViewChanges'
   };
+
+  step('Disable Source Tracking Setting', async () => {
+    utilities.log(`Deploy and Retrieve - Disable Source Tracking Setting`);
+    await utilities.executeQuickPick('Notifications: Clear All Notifications', utilities.Duration.seconds(1));
+
+    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE)).to.equal(false);
+
+    // Reload window to update cache and get the setting behavior to work
+    await utilities.reloadWindow();
+    await utilities.verifyExtensionsAreRunning(
+      utilities.getExtensionsToVerifyActive(),
+      utilities.Duration.seconds(100)
+    );
+  });
+
   step('SFDX: View Changes in Default Org', async () => {
     utilities.log(`Push And Pull - SFDX: View Changes in Default Org`);
     // Create second Project to then view Remote Changes
