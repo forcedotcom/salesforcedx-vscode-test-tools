@@ -560,34 +560,52 @@ describe('Create OpenAPI v3 Specifications', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
+      utilities.log('A');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
+      utilities.log('B');
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      utilities.log('C');
       await prompt.confirm();
+      utilities.log('D');
 
       // Click the Manual Merge button on the popup
       const modalDialog = new ModalDialog();
+      utilities.log('E');
       expect(modalDialog).to.not.be.undefined;
+      utilities.log('F');
       await modalDialog.pushButton('Manually merge with existing ESR');
+      utilities.log('G');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class SimpleAccountResource_\d{8}_\d{6} is created for SimpleAccountResource\. Manually merge the two files using the diff editor\./,
         utilities.Duration.TEN_MINUTES
       );
+      utilities.log('H');
       expect(successNotificationWasFound).to.equal(true);
+      utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
-      await utilities.executeQuickPick('View: Open Last Editor in Group');
       const workbench = utilities.getWorkbench();
+      utilities.log('J');
       const editorView = workbench.getEditorView();
+      utilities.log('K');
       await utilities.executeQuickPick('View: Open First Editor in Group');
+      utilities.log('L');
       const openTabs = await editorView.getOpenTabs();
+      utilities.log('M');
       expect(openTabs.length).to.equal(5);
+      utilities.log('N');
       expect(await openTabs[0].getTitle()).to.equal('SimpleAccountResource.cls');
+      utilities.log('O');
       expect(await openTabs[1].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
+      utilities.log('P');
       expect(await openTabs[2].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.yaml/);
+      utilities.log('Q');
       expect(await openTabs[3].getTitle()).to.equal('Manual Diff of ESR XML Files');
+      utilities.log('R');
       expect(await openTabs[4].getTitle()).to.equal('Manual Diff of ESR YAML Files');
+      utilities.log('S');
     });
   });
 
