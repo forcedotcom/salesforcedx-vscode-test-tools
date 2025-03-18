@@ -302,34 +302,53 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
+      utilities.log('A');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
+      utilities.log('B');
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      utilities.log('C');
       await prompt.confirm();
+      utilities.log('D');
 
       // Click the Manual Merge button on the popup
       const modalDialog = new ModalDialog();
+      utilities.log('E');
       expect(modalDialog).to.not.be.undefined;
+      utilities.log('F');
       await modalDialog.pushButton('Manually merge with existing ESR');
+      utilities.log('G');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class CaseManager_\d{8}_\d{6} is created for CaseManager\. Manually merge the two files using the diff editor\./,
         utilities.Duration.TEN_MINUTES
       );
+      utilities.log('H');
       expect(successNotificationWasFound).to.equal(true);
+      utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
       await utilities.executeQuickPick('View: Open Last Editor in Group');
+      utilities.log('J');
       const workbench = utilities.getWorkbench();
+      utilities.log('K');
       const editorView = workbench.getEditorView();
+      utilities.log('L');
       let activeTab = await editorView.getActiveTab();
+      utilities.log('M');
       let title = await activeTab?.getTitle();
+      utilities.log('N');
       expect(title).to.equal('Manual Diff of ESR XML Files');
+      utilities.log('O');
 
       await utilities.executeQuickPick('View: Open Previous Editor');
+      utilities.log('P');
       activeTab = await editorView.getActiveTab();
+      utilities.log('Q');
       title = await activeTab?.getTitle();
+      utilities.log('R');
       expect(title).to.match(/CaseManager_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
+      utilities.log('S');
     });
   });
 
