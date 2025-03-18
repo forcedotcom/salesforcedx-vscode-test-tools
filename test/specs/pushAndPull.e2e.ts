@@ -241,6 +241,7 @@ describe('Push and Pull', async () => {
     expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE, 'user')).to.equal(
       false
     );
+    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE)).to.equal(false);
 
     // Reload window to update cache and get the setting behavior to work
     await utilities.reloadWindow(utilities.Duration.seconds(20));
