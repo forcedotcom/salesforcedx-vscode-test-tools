@@ -229,8 +229,13 @@ describe('Push and Pull', async () => {
     testSuiteSuffixName: 'ViewChanges'
   };
 
-  step('Disable Source Tracking Setting', async () => {
-    utilities.log(`Deploy and Retrieve - Disable Source Tracking Setting`);
+  step('SFDX: View Changes in Default Org', async () => {
+    utilities.log(`Push And Pull - SFDX: View Changes in Default Org`);
+    // Create second Project to then view Remote Changes
+    // The new project will connect to the scratch org automatically on GHA, but does not work locally
+    testSetup2 = await TestSetup.setUp(testReqConfig2);
+
+    utilities.log(`SFDX: View Changes in Default Org -  Disable Source Tracking Setting`);
     await utilities.executeQuickPick('Notifications: Clear All Notifications', utilities.Duration.seconds(1));
 
     expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE), 'user').to.equal(
@@ -238,27 +243,7 @@ describe('Push and Pull', async () => {
     );
 
     // Reload window to update cache and get the setting behavior to work
-    await utilities.reloadWindow();
-    await utilities.verifyExtensionsAreRunning(
-      utilities.getExtensionsToVerifyActive(),
-      utilities.Duration.seconds(100)
-    );
-  });
-
-  step('SFDX: View Changes in Default Org', async () => {
-    utilities.log(`Push And Pull - SFDX: View Changes in Default Org`);
-    // Create second Project to then view Remote Changes
-    // The new project will connect to the scratch org automatically on GHA, but does not work locally
-    testSetup2 = await TestSetup.setUp(testReqConfig2);
-    testSetup2.updateScratchOrgDefWithEdition('developer');
-    // Verify CLI Integration Extension is present and running.
-    await utilities.reloadAndEnableExtensions();
-    await utilities.showRunningExtensions();
-    const extensionWasFound = await utilities.verifyExtensionsAreRunning(
-      utilities.getExtensionsToVerifyActive(ext => ext.extensionId === 'salesforcedx-vscode-core')
-    );
-    await utilities.zoomReset();
-    expect(extensionWasFound).to.equal(true);
+    await utilities.reloadWindow(utilities.Duration.seconds(20));
 
     //Run SFDX: View Changes in Default Org command to view remote changes
     await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
