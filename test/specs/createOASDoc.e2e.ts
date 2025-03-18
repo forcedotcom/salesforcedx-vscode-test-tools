@@ -188,6 +188,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log('E');
 
       // Verify the generated OAS doc is open in the Editor View
+      await utilities.executeQuickPick('View: Open Last Editor in Group');
+      utilities.log('E1');
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
       utilities.log('F');
