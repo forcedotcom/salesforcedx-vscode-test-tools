@@ -172,22 +172,31 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
+      utilities.log('A');
       await utilities.pause(utilities.Duration.seconds(5));
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      utilities.log('B');
       await prompt.confirm();
+      utilities.log('C');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /OpenAPI Document created for class: CaseManager\./,
         utilities.Duration.TEN_MINUTES
       );
+      utilities.log('D');
       expect(successNotificationWasFound).to.equal(true);
+      utilities.log('E');
 
       // Verify the generated OAS doc is open in the Editor View
       const workbench = utilities.getWorkbench();
       const editorView = workbench.getEditorView();
+      utilities.log('F');
       const activeTab = await editorView.getActiveTab();
+      utilities.log('G');
       const title = await activeTab?.getTitle();
+      utilities.log('H');
       expect(title).to.equal('CaseManager.externalServiceRegistration-meta.xml');
+      utilities.log('I');
     });
 
     step('Check for warnings and errors in the Problems Tab', async () => {
