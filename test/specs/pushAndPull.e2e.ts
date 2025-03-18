@@ -5,9 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import { expect } from 'chai';
 import fs from 'fs';
 import { step } from 'mocha-steps';
 import path from 'path';
+import { after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
