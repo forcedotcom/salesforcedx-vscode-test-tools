@@ -107,9 +107,6 @@ describe('Apex Replay Debugger', async () => {
   step('Run the Anonymous Apex Debugger with Currently Selected Text', async () => {
     utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger with Currently Selected Text`);
 
-    // Clear output before running the command
-    await utilities.clearOutputView();
-
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
@@ -121,6 +118,9 @@ describe('Apex Replay Debugger', async () => {
     // Close finder tool
     await findWidget.close();
     await utilities.pause(utilities.Duration.seconds(1));
+
+    // Clear output before running the command
+    await utilities.clearOutputView();
 
     // Run SFDX: Launch Apex Replay Debugger with Currently Selected Text.
     await utilities.executeQuickPick(
@@ -239,13 +239,13 @@ describe('Apex Replay Debugger', async () => {
     utilities.log(`ApexReplayDebugger - SFDX: Launch Apex Replay Debugger with Current File - test class`);
 
     // Run SFDX: Launch Apex Replay Debugger with Current File
-    await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'ExampleApexClassTest.cls'));
+    const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
     await utilities.executeQuickPick(
       'SFDX: Launch Apex Replay Debugger with Current File',
       utilities.Duration.seconds(3)
     );
 
-    utilities.pause(utilities.Duration.seconds(5));
     // Continue with the debug session
     await utilities.continueDebugging(2, 30);
 
@@ -266,8 +266,6 @@ describe('Apex Replay Debugger', async () => {
     await utilities.clearOutputView();
 
     // Run SFDX: Launch Apex Replay Debugger with Editor Contents", using the Command Palette.
-    const workbench = utilities.getWorkbench();
-    await utilities.getTextEditor(workbench, 'Anonymous.apex');
     await utilities.executeQuickPick(
       'SFDX: Execute Anonymous Apex with Editor Contents',
       utilities.Duration.seconds(10)
