@@ -233,7 +233,9 @@ describe('Push and Pull', async () => {
     utilities.log(`Deploy and Retrieve - Disable Source Tracking Setting`);
     await utilities.executeQuickPick('Notifications: Clear All Notifications', utilities.Duration.seconds(1));
 
-    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE)).to.equal(false);
+    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE), 'user').to.equal(
+      false
+    );
 
     // Reload window to update cache and get the setting behavior to work
     await utilities.reloadWindow();
