@@ -250,7 +250,7 @@ describe('Apex Replay Debugger', async () => {
     await utilities.continueDebugging(2, 30);
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      /Debug Test(s) successfully ran/,
+      /Debug Test\(s\) successfully ran/,
       utilities.Duration.TEN_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
