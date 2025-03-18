@@ -107,6 +107,9 @@ describe('Apex Replay Debugger', async () => {
   step('Run the Anonymous Apex Debugger with Currently Selected Text', async () => {
     utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger with Currently Selected Text`);
 
+    // Clear output before running the command
+    await utilities.clearOutputView();
+
     // Get open text editor
     const workbench = utilities.getWorkbench();
     const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClassTest.cls');
@@ -118,9 +121,6 @@ describe('Apex Replay Debugger', async () => {
     // Close finder tool
     await findWidget.close();
     await utilities.pause(utilities.Duration.seconds(1));
-
-    // Clear output before running the command
-    await utilities.clearOutputView();
 
     // Run SFDX: Launch Apex Replay Debugger with Currently Selected Text.
     await utilities.executeQuickPick(
@@ -259,11 +259,11 @@ describe('Apex Replay Debugger', async () => {
   step('Run the Anonymous Apex Debugger using the Command Palette', async () => {
     utilities.log(`ApexReplayDebugger - Run the Anonymous Apex Debugger using the Command Palette`);
 
-    // Create anonymous apex file
-    await utilities.createAnonymousApexFile();
-
     // Clear output before running the command
     await utilities.clearOutputView();
+
+    // Create anonymous apex file
+    await utilities.createAnonymousApexFile();
 
     // Run SFDX: Launch Apex Replay Debugger with Editor Contents", using the Command Palette.
     await utilities.executeQuickPick(
