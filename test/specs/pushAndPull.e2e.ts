@@ -235,18 +235,13 @@ describe('Push and Pull', async () => {
     // The new project will connect to the scratch org automatically on GHA, but does not work locally
     testSetup2 = await TestSetup.setUp(testReqConfig2);
 
-    utilities.log(`SFDX: View Changes in Default Org -  Disable Source Tracking Setting`);
-    await utilities.executeQuickPick('Notifications: Clear All Notifications', utilities.Duration.seconds(1));
-
-    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE, 'user')).to.equal(
-      false
-    );
-    expect(await utilities.disableBooleanSetting(WSK.ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE)).to.equal(false);
+    // Run SFDX: View Changes in Default Org command to view remote changes
+    await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
 
     // Reload window to update cache and get the setting behavior to work
     await utilities.reloadWindow(utilities.Duration.seconds(20));
 
-    //Run SFDX: View Changes in Default Org command to view remote changes
+    // Run SFDX: View Changes in Default Org command to view remote changes
     await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
 
     // Check the output.
@@ -321,7 +316,7 @@ describe('Push and Pull', async () => {
 
   after('Tear down and clean up the testing environment', async () => {
     utilities.log('Push and Pull - Tear down and clean up the testing environment');
-    await testSetup1?.tearDown();
+    await testSetup1?.tearDown(false);
     await testSetup2?.tearDown();
   });
 
