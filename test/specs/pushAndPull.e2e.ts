@@ -12,7 +12,6 @@ import path from 'path';
 import { after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
 
 describe('Push and Pull', async () => {
   let projectName = '';
@@ -238,7 +237,7 @@ describe('Push and Pull', async () => {
     // Run SFDX: View Changes in Default Org command to view remote changes
     await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
 
-    // Reload window to update cache and get the setting behavior to work
+    // Reload window to update cache
     await utilities.reloadWindow(utilities.Duration.seconds(20));
 
     // Run SFDX: View Changes in Default Org command to view remote changes
