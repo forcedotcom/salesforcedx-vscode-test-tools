@@ -156,7 +156,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     expect(await statusBar.getAttribute('aria-label')).to.contain('Indexing complete');
   });
 
-  step('Try to generate OAS doc from an ineligible Apex class', async () => {
+  xstep('Try to generate OAS doc from an ineligible Apex class', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
     await utilities.pause(utilities.Duration.seconds(5));
@@ -169,7 +169,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Composed mode', async () => {
-    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
+    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
@@ -192,7 +192,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('CaseManager.externalServiceRegistration-meta.xml');
     });
 
-    step('Check for warnings and errors in the Problems Tab', async () => {
+    xstep('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
       await utilities.executeQuickPick('Problems: Focus on Problems View');
       const problemsView = new ProblemsView();
@@ -200,7 +200,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(problems.length).to.equal(0);
     });
 
-    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+    xstep('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
       // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
 
@@ -273,7 +273,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.pause(utilities.Duration.seconds(1));
     });
 
-    step('Revalidate the OAS doc', async () => {
+    xstep('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
@@ -290,7 +290,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(await problems[1].getLabel()).to.equal('operations.responses.content should be application/json');
     });
 
-    step('Deploy the composed ESR to the org', async () => {
+    xstep('Deploy the composed ESR to the org', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the composed ESR to the org`);
       const workbench = utilities.getWorkbench();
       // Clear the Output view first.
@@ -299,7 +299,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ');
     });
 
-    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
+    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       utilities.log('A');
@@ -409,7 +409,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    step('Check for warnings and errors in the Problems Tab', async () => {
+    xstep('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
       await utilities.executeQuickPick('Problems: Focus on Problems View');
       const problemsView = new ProblemsView();
@@ -417,7 +417,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(problems.length).to.equal(0);
     });
 
-    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+    xstep('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
       // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
 
@@ -496,7 +496,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.pause(utilities.Duration.seconds(1));
     });
 
-    step('Revalidate the OAS doc', async () => {
+    xstep('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       const workbench = utilities.getWorkbench();
       await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
@@ -513,7 +513,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(problems.length).to.equal(0);
     });
 
-    step('Deploy the decomposed ESR to the org', async () => {
+    xstep('Deploy the decomposed ESR to the org', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Deploy the decomposed ESR to the org`);
       const workbench = utilities.getWorkbench();
       // Clear the Output view first.
@@ -522,7 +522,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
@@ -586,11 +586,11 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
-      const workbench = utilities.getWorkbench();
-      utilities.log('J');
-      const editorView = workbench.getEditorView();
-      utilities.log('K');
       await utilities.executeQuickPick('View: Open First Editor in Group');
+      utilities.log('J');
+      const workbench = utilities.getWorkbench();
+      utilities.log('K');
+      const editorView = workbench.getEditorView();
       utilities.log('L');
       const openTabs = await editorView.getOpenTabs();
       utilities.log('M');
@@ -610,7 +610,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Uninstall A4D extension and ensure the commands to generate and validate OAS docs are not present', async () => {
-    step('Uninstall A4D extension', async () => {
+    xstep('Uninstall A4D extension', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Uninstall A4D extension`);
 
       const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
@@ -633,7 +633,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(await a4dExtension.isInstalled()).to.equal(false);
     });
 
-    step('Ensure the commands to generate and validate OAS docs are not present', async () => {
+    xstep('Ensure the commands to generate and validate OAS docs are not present', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Ensure the commands to generate and validate OAS docs are not present`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.reloadWindow(utilities.Duration.seconds(5));
