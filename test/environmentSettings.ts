@@ -16,23 +16,23 @@ export class EnvironmentSettings {
   private _specFiles = [
     './lib/specs/**/*.e2e.js'
     // OR
-    // './specs/**/anInitialSuite.e2e.js',
-    // './specs/**/apexLsp.e2e.js',
-    // './specs/**/apexReplayDebugger.e2e.js',
-    // './specs/**/auraLsp.e2e.js',
-    // './specs/**/authentication.e2e.js',
-    // './specs/**/debugApexTests.e2e.js',
-    // './specs/**/deployAndRetrieve.e2e.js',
-    // './specs/**/lwcLsp.e2e.js',
-    // './specs/**/manifestBuilder.e2e.js',
-    // './specs/**/orgBrowser.e2e.js',
-    // './specs/**/pushAndPull.e2e.js',
-    // './specs/**/runApexTests.e2e.js',
-    // './specs/**/sObjectsDefinitions.e2e.js',
-    // './specs/**/templates.e2e.js',
-    // './specs/**/trailApexReplayDebugger.e2e.js',
-    // './specs/**/visualforceLsp.e2e.js',
-    // './specs/**/sfdxProjectJson.e2e.js'
+    // './lib/specs/**/anInitialSuite.e2e.js',
+    // './lib/specs/**/apexLsp.e2e.js',
+    // './lib/specs/**/apexReplayDebugger.e2e.js',
+    // './lib/specs/**/auraLsp.e2e.js',
+    // './lib/specs/**/authentication.e2e.js',
+    // './lib/specs/**/debugApexTests.e2e.js',
+    // './lib/specs/**/deployAndRetrieve.e2e.js',
+    // './lib/specs/**/lwcLsp.e2e.js',
+    // './lib/specs/**/manifestBuilder.e2e.js',
+    // './lib/specs/**/orgBrowser.e2e.js',
+    // './lib/specs/**/pushAndPull.e2e.js'
+    // './lib/specs/**/runApexTests.e2e.js',
+    // './lib/specs/**/sObjectsDefinitions.e2e.js',
+    // './lib/specs/**/templates.e2e.js',
+    // './lib/specs/**/trailApexReplayDebugger.e2e.js',
+    // './lib/specs/**/visualforceLsp.e2e.js',
+    // './lib/specs/**/sfdxProjectJson.e2e.js'
   ];
   private _devHubAliasName = 'vscodeOrg';
   private _devHubUserName = 'svcideebot@salesforce.com';
@@ -60,7 +60,7 @@ export class EnvironmentSettings {
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
     this._orgId = process.env.ORG_ID || this._orgId;
     this._extensionPath = process.env.SALESFORCEDX_VSCODE_EXTENSIONS_PATH || this._extensionPath;
-    this._logLevel = LOG_LEVELS.some((l) => l === process.env.E2E_LOG_LEVEL)
+    this._logLevel = LOG_LEVELS.some(l => l === process.env.E2E_LOG_LEVEL)
       ? (process.env.E2E_LOG_LEVEL as LogLevel)
       : this._logLevel;
     this._javaHome = process.env.JAVA_HOME || this._javaHome;
