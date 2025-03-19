@@ -5,13 +5,13 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import { expect } from 'chai';
 import fs from 'fs';
 import { step } from 'mocha-steps';
 import path from 'path';
+import { after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { after } from 'vscode-extension-tester';
-import { expect } from 'chai';
 
 describe('Push and Pull', async () => {
   let projectName = '';
@@ -227,22 +227,20 @@ describe('Push and Pull', async () => {
     isOrgRequired: false,
     testSuiteSuffixName: 'ViewChanges'
   };
+
   step('SFDX: View Changes in Default Org', async () => {
     utilities.log(`Push And Pull - SFDX: View Changes in Default Org`);
     // Create second Project to then view Remote Changes
     // The new project will connect to the scratch org automatically on GHA, but does not work locally
     testSetup2 = await TestSetup.setUp(testReqConfig2);
-    testSetup2.updateScratchOrgDefWithEdition('developer');
-    // Verify CLI Integration Extension is present and running.
-    await utilities.reloadAndEnableExtensions();
-    await utilities.showRunningExtensions();
-    const extensionWasFound = await utilities.verifyExtensionsAreRunning(
-      utilities.getExtensionsToVerifyActive(ext => ext.extensionId === 'salesforcedx-vscode-core')
-    );
-    await utilities.zoomReset();
-    expect(extensionWasFound).to.equal(true);
 
-    //Run SFDX: View Changes in Default Org command to view remote changes
+    // Run SFDX: View Changes in Default Org command to view remote changes
+    await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
+
+    // Reload window to update cache
+    await utilities.reloadWindow(utilities.Duration.seconds(20));
+
+    // Run SFDX: View Changes in Default Org command to view remote changes
     await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
 
     // Check the output.
@@ -317,7 +315,7 @@ describe('Push and Pull', async () => {
 
   after('Tear down and clean up the testing environment', async () => {
     utilities.log('Push and Pull - Tear down and clean up the testing environment');
-    await testSetup1?.tearDown();
+    await testSetup1?.tearDown(false);
     await testSetup2?.tearDown();
   });
 

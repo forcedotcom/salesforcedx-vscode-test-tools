@@ -36,8 +36,7 @@ export class TestSetup {
       const scratchOrgEdition = testReqConfig.scratchOrgEdition || 'developer';
       testSetup.updateScratchOrgDefWithEdition(scratchOrgEdition);
       if (process.platform === 'darwin') testSetup.setJavaHomeConfigEntry(); // Extra config needed for Apex LSP on GHA
-      if (testReqConfig.isOrgRequired)
-        await utilities.setUpScratchOrg(testSetup, scratchOrgEdition);
+      if (testReqConfig.isOrgRequired) await utilities.setUpScratchOrg(testSetup, scratchOrgEdition);
       await utilities.reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
     testSetup.setWorkbenchHoverDelay();
@@ -45,8 +44,8 @@ export class TestSetup {
     return testSetup;
   }
 
-  public async tearDown(): Promise<void> {
-    await utilities.checkForUncaughtErrors();
+  public async tearDown(checkForUncaughtErrors: boolean = true): Promise<void> {
+    if (checkForUncaughtErrors) await utilities.checkForUncaughtErrors();
     try {
       await utilities.deleteScratchOrg(this.scratchOrgAliasName);
       await utilities.deleteScratchOrgInfo(this);
