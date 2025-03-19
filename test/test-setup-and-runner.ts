@@ -23,7 +23,7 @@ class TestSetupAndRunner extends ExTester {
     await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
     await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
     await this.installExtensions();
-    // await this.setupAndAuthorizeOrg();
+    await this.setupAndAuthorizeOrg();
   }
 
   public async runTests(): Promise<number> {

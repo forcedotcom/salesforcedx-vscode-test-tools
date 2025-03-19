@@ -16,16 +16,16 @@ export class EnvironmentSettings {
   private _specFiles = [
     './lib/specs/**/*.e2e.js'
     // OR
-    // '/lib./specs/**/anInitialSuite.e2e.js',
-    // '/lib./specs/**/apexLsp.e2e.js',
-    // '/lib./specs/**/apexReplayDebugger.e2e.js',
-    // '/lib./specs/**/auraLsp.e2e.js',
-    // '/lib./specs/**/authentication.e2e.js',
-    // '/lib./specs/**/debugApexTests.e2e.js',
-    // '/lib./specs/**/deployAndRetrieve.e2e.js',
-    // '/lib./specs/**/lwcLsp.e2e.js',
-    // '/lib./specs/**/manifestBuilder.e2e.js',
-    // '/lib./specs/**/orgBrowser.e2e.js',
+    // './lib/specs/**/anInitialSuite.e2e.js',
+    // './lib/specs/**/apexLsp.e2e.js',
+    // './lib/specs/**/apexReplayDebugger.e2e.js',
+    // './lib/specs/**/auraLsp.e2e.js',
+    // './lib/specs/**/authentication.e2e.js',
+    // './lib/specs/**/debugApexTests.e2e.js',
+    // './lib/specs/**/deployAndRetrieve.e2e.js',
+    // './lib/specs/**/lwcLsp.e2e.js',
+    // './lib/specs/**/manifestBuilder.e2e.js',
+    // './lib/specs/**/orgBrowser.e2e.js',
     // './lib/specs/**/pushAndPull.e2e.js'
     // './lib/specs/**/runApexTests.e2e.js',
     // './lib/specs/**/sObjectsDefinitions.e2e.js',
