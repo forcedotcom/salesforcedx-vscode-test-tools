@@ -38,14 +38,11 @@ class TestSetupAndRunner extends ExTester {
 
   public async installExtensions(excludeExtensions: utilities.ExtensionId[] = []): Promise<void> {
     const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
-    const extensionPattern =
-      /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map((entry) =>
-      path.resolve(extensionsDir, entry)
-    );
+    const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
+    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
     const foundInstalledExtensions = await Promise.all(
       extensionsDirEntries
-        .filter(async (entry) => {
+        .filter(async entry => {
           try {
             const stats = await fs.stat(entry);
             return stats.isDirectory();
@@ -54,7 +51,7 @@ class TestSetupAndRunner extends ExTester {
             return false;
           }
         })
-        .map((entry) => {
+        .map(entry => {
           const match = path.basename(entry).match(extensionPattern);
           if (match?.groups) {
             return {
@@ -67,8 +64,8 @@ class TestSetupAndRunner extends ExTester {
           return null;
         })
         .filter(Boolean)
-        .filter((ext) =>
-          extensions.find((refExt) => {
+        .filter(ext =>
+          extensions.find(refExt => {
             return refExt.extensionId === ext?.extensionId;
           })
         )
@@ -76,14 +73,12 @@ class TestSetupAndRunner extends ExTester {
 
     if (
       foundInstalledExtensions.length > 0 &&
-      foundInstalledExtensions.every((ext) =>
-        extensions.find((refExt) => refExt.extensionId === ext?.extensionId)
-      )
+      foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
     ) {
       utilities.log(
         `Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`
       );
-      foundInstalledExtensions.forEach((ext) => {
+      foundInstalledExtensions.forEach(ext => {
         utilities.log(`Extension ${ext?.extensionId} version ${ext?.version}`);
       });
       return;
@@ -97,29 +92,23 @@ class TestSetupAndRunner extends ExTester {
     const mergeExcluded = Array.from(
       new Set([
         ...excludeExtensions,
-        ...extensions.filter((ext) => ext.shouldInstall === 'never').map((ext) => ext.extensionId)
+        ...extensions.filter(ext => ext.shouldInstall === 'never').map(ext => ext.extensionId)
       ])
     );
 
     // Refactored part to use the extensions array
-    extensionsVsixs.forEach((vsix) => {
-      const match = path
-        .basename(vsix)
-        .match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+    extensionsVsixs.forEach(vsix => {
+      const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
       if (match?.groups) {
         const { extension, version } = match.groups;
-        const foundExtension = extensions.find((e) => e.extensionId === extension);
+        const foundExtension = extensions.find(e => e.extensionId === extension);
         if (foundExtension) {
           foundExtension.vsixPath = vsix;
           // assign 'never' to this extension if its id is included in excluedExtensions
-          foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId)
-            ? 'never'
-            : 'always';
+          foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId) ? 'never' : 'always';
           // if not installing, don't verify, otherwise use default value
           foundExtension.shouldVerifyActivation =
-            foundExtension.shouldInstall === 'never'
-              ? false
-              : foundExtension.shouldVerifyActivation;
+            foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
           utilities.log(
             `SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`
           );
@@ -128,9 +117,7 @@ class TestSetupAndRunner extends ExTester {
     });
 
     // Iterate over the extensions array to install extensions
-    for (const extensionObj of extensions.filter(
-      (ext) => ext.vsixPath !== '' && ext.shouldInstall !== 'never'
-    )) {
+    for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
       await this.installExtension(extensionObj.vsixPath);
     }
   }
@@ -149,9 +136,7 @@ class TestSetupAndRunner extends ExTester {
 
     // Step 1: Authorize to Testing Org
     const authorizeOrg = await utilities.orgLoginSfdxUrl(authFilePath);
-    expect(authorizeOrg.stdout).to.contain(
-      `Successfully authorized ${devHubUserName} with org ID ${orgId}`
-    );
+    expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName} with org ID ${orgId}`);
 
     // Step 2: Set Alias for the Org
     const setAlias = await utilities.setAlias(devHubAliasName, devHubUserName);
@@ -179,10 +164,7 @@ const argv = yargs(hideBin(process.argv))
   })
   .help().argv as { spec: string | undefined };
 
-const testSetupAnRunner = new TestSetupAndRunner(
-  EnvironmentSettings.getInstance().extensionPath,
-  argv.spec
-);
+const testSetupAnRunner = new TestSetupAndRunner(EnvironmentSettings.getInstance().extensionPath, argv.spec);
 async function run() {
   try {
     await testSetupAnRunner.setup();
