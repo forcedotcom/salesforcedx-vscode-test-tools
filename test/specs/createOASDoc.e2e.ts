@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, By, ExtensionsViewItem } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, By, ExtensionsViewItem, DefaultTreeItem } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -521,7 +521,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
@@ -572,13 +572,47 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    xstep('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
+    step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
-      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+
+      // Use context menu for Windows and Ubuntu, command palette for Mac
+      if (process.platform !== 'darwin') {
+        const workbench = utilities.getWorkbench();
+        const sidebar = await workbench.getSideBar().wait();
+        const content = await sidebar.getContent().wait();
+        const treeViewSection = await content.getSection(testSetup.tempProjectName);
+        if (!treeViewSection) {
+          throw new Error(
+            'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
+          );
+        }
+        const forceAppFolder = await treeViewSection.findItem('force-app') as DefaultTreeItem;
+        await forceAppFolder.expand();
+        const mainFolder = await treeViewSection.findItem('main') as DefaultTreeItem;
+        await mainFolder.expand();
+        const defaultFolder = await treeViewSection.findItem('default') as DefaultTreeItem;
+        await defaultFolder.expand();
+        const classesFolder = await treeViewSection.findItem('classes') as DefaultTreeItem;
+        await classesFolder.expand();
+        const simpleAccountResourceFile = await treeViewSection.findItem('SimpleAccountResource.cls') as DefaultTreeItem;
+
+        const contextMenu = await simpleAccountResourceFile.openContextMenu();
+        const menu = await contextMenu.select('SFDX: Create OpenAPI Document from This Class (Beta)');
+        // Wait for the command palette prompt to appear
+        if (menu) {
+          const result = await getQuickOpenBoxOrInputBox();
+          if (!result) {
+            throw new Error('Failed to get QuickOpenBox or InputBox');
+          }
+          prompt = result;
+        }
+      } else {
+        prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      }
       await prompt.confirm();
 
       // Click the Manual Merge button on the popup
