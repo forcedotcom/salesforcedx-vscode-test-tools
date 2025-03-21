@@ -606,12 +606,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
             'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
           );
         }
-        const forceAppFolder = await treeViewSection.findItem('force-app') as DefaultTreeItem;
+        const forceAppFolder = await treeViewSection.findItem('force-app/main/default') as DefaultTreeItem;
         await forceAppFolder.expand();
-        const mainFolder = await treeViewSection.findItem('main') as DefaultTreeItem;
-        await mainFolder.expand();
-        const defaultFolder = await treeViewSection.findItem('default') as DefaultTreeItem;
-        await defaultFolder.expand();
         const classesFolder = await treeViewSection.findItem('classes') as DefaultTreeItem;
         await classesFolder.expand();
         const simpleAccountResourceFile = await treeViewSection.findItem('SimpleAccountResource.cls') as DefaultTreeItem;
