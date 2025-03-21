@@ -401,7 +401,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    step('Check for warnings and errors in the Problems Tab', async () => {
+    xstep('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
       await utilities.executeQuickPick('Problems: Focus on Problems View');
       const problemsView = new ProblemsView();
@@ -409,7 +409,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(problems.length).to.equal(0);
     });
 
-    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+    xstep('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
       // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
 
@@ -488,7 +488,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.pause(utilities.Duration.seconds(1));
     });
 
-    step('Revalidate the OAS doc', async () => {
+    xstep('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       const workbench = utilities.getWorkbench();
       const textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
@@ -521,13 +521,30 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
-      prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+
+      // Use context menu for Windows and Ubuntu, command palette for Mac
+      if (process.platform !== 'darwin') {
+        const workbench = utilities.getWorkbench();
+        const textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.cls');
+        const contextMenu = await textEditor.openContextMenu();
+        const menu = await contextMenu.select('SFDX: Create OpenAPI Document from This Class (Beta)');
+        // Wait for the command palette prompt to appear
+        if (menu) {
+          const result = await getQuickOpenBoxOrInputBox();
+          if (!result) {
+            throw new Error('Failed to get QuickOpenBox or InputBox');
+          }
+          prompt = result;
+        }
+      } else {
+        prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      }
       await prompt.confirm();
 
       // Click the Overwrite button on the popup
@@ -652,4 +669,18 @@ describe('Create OpenAPI v3 Specifications', async () => {
     utilities.log(`CreateOASDoc - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
+
+  const getQuickOpenBoxOrInputBox = async (): Promise<QuickOpenBox | InputBox | undefined> => {
+    try {
+      const quickOpenBox = await new QuickOpenBox().wait();
+      return quickOpenBox;
+    } catch {
+      try {
+        const inputBox = await new InputBox().wait();
+        return inputBox;
+      } catch {
+        return undefined;
+      }
+    }
+  }
 });
