@@ -601,6 +601,37 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log('M');
       expect(openTabs?.length).to.equal(5);
       utilities.log('N');
+      // Locate the first tab in the Open Editors View using the selector because there is a bug in vscode-extension-tester
+      const firstTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(1)'));
+      utilities.log('O');
+      const firstTabLabel = await firstTab.getText();
+      utilities.log(`First Tab Label: ${firstTabLabel}`);
+      expect(firstTabLabel).to.match(/SimpleAccountResource\.cls/);
+      utilities.log('P');
+      const secondTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(2)'));
+      utilities.log('Q');
+      const secondTabLabel = await secondTab.getText();
+      utilities.log(`Second Tab Label: ${secondTabLabel}`);
+      expect(secondTabLabel).to.match(/SimpleAccountResource_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
+      utilities.log('R');
+      const thirdTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(3)'));
+      utilities.log('S');
+      const thirdTabLabel = await thirdTab.getText();
+      utilities.log(`Third Tab Label: ${thirdTabLabel}`);
+      expect(thirdTabLabel).to.match(/SimpleAccountResource_\d{8}_\d{6}\.yaml/);
+      utilities.log('T');
+      const fourthTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(4)'));
+      utilities.log('U');
+      const fourthTabLabel = await fourthTab.getText();
+      utilities.log(`Fourth Tab Label: ${fourthTabLabel}`);
+      expect(fourthTabLabel).to.match(/Manual Diff of ESR XML Files/);
+      utilities.log('V');
+      const fifthTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(5)'));
+      utilities.log('W');
+      const fifthTabLabel = await fifthTab.getText();
+      utilities.log(`Fifth Tab Label: ${fifthTabLabel}`);
+      expect(fifthTabLabel).to.match(/Manual Diff of ESR YAML Files/);
+      utilities.log('X');
     });
   });
 
