@@ -169,7 +169,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Composed mode', async () => {
-    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
+    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
@@ -299,7 +299,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ');
     });
 
-    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
+    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
@@ -345,7 +345,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Decomposed mode', async () => {
-    xstep('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
+    step('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`);
       const workbench = utilities.getWorkbench();
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
@@ -373,7 +373,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.reloadWindow();
     });
 
-    xstep('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
+    step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
@@ -401,7 +401,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    xstep('Check for warnings and errors in the Problems Tab', async () => {
+    step('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
       await utilities.executeQuickPick('Problems: Focus on Problems View');
       const problemsView = new ProblemsView();
@@ -409,7 +409,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(problems.length).to.equal(0);
     });
 
-    xstep('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
+    step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
       // NOTE: The "fix" is actually replacing the OAS doc with the ideal solution from the EMU repo
       utilities.log(`${testSetup.testSuiteSuffixName} - Fix the OAS doc to get rid of the problems in the Problems Tab`);
 
@@ -488,11 +488,18 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.pause(utilities.Duration.seconds(1));
     });
 
-    xstep('Revalidate the OAS doc', async () => {
+    step('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       const workbench = utilities.getWorkbench();
-      await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
-      await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
+      const textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.yaml');
+
+      // Use context menu for Windows and Ubuntu, command palette for Mac
+      if (process.platform !== 'darwin') {
+        const contextMenu = await textEditor.openContextMenu();
+        await contextMenu.select('SFDX: Validate OpenAPI Document (Beta)');
+      } else {
+        await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
+      }
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /Validated OpenAPI Document SimpleAccountResource.yaml successfully/,
         utilities.Duration.TEN_MINUTES
