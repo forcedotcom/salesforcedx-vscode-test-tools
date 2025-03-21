@@ -169,7 +169,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   describe('Composed mode', async () => {
-    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
+    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
@@ -299,7 +299,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'CaseManager', 'Created  ');
     });
 
-    xstep('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
+    step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       utilities.log('A');
@@ -328,32 +328,38 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
-      await utilities.executeQuickPick('View: Open Last Editor in Group');
-      utilities.log('J');
+      await utilities.executeQuickPick('View: Open First Editor in Group');
       const workbench = utilities.getWorkbench();
-      utilities.log('K');
-      const editorView = workbench.getEditorView();
-      utilities.log('L');
-      let activeTab = await editorView.getActiveTab();
-      utilities.log('M');
-      let title = await activeTab?.getTitle();
-      utilities.log('N');
-      expect(title).to.equal('Manual Diff of ESR XML Files');
-      utilities.log('O');
+      await utilities.executeQuickPick('Explorer: Focus on Open Editors View');
+      const sidebar = await workbench.getSideBar().wait();
+      const content = await sidebar.getContent().wait();
+      const openEditorsView = await content.getSection('Open Editors');
+      utilities.log('J');
 
-      await utilities.executeQuickPick('View: Open Previous Editor');
-      utilities.log('P');
-      activeTab = await editorView.getActiveTab();
-      utilities.log('Q');
-      title = await activeTab?.getTitle();
-      utilities.log('R');
-      expect(title).to.match(/CaseManager_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
-      utilities.log('S');
+      const openTabs = await openEditorsView?.getVisibleItems();
+      expect(openTabs?.length).to.equal(3);
+      utilities.log('K');
+
+      // Locate each tab in the Open Editors View using the selector (there is a bug in vscode-extension-tester)
+      const firstTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(1)'));
+      const firstTabLabel = await firstTab.getText();
+      expect(firstTabLabel).to.match(/CaseManager\.cls/);
+      utilities.log('L');
+
+      const secondTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(2)'));
+      const secondTabLabel = await secondTab.getText();
+      expect(secondTabLabel).to.match(/CaseManager_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
+      utilities.log('M');
+
+      const thirdTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(3)'));
+      const thirdTabLabel = await thirdTab.getText();
+      expect(thirdTabLabel).to.match(/Manual Diff of ESR XML Files/);
+      utilities.log('N');
     });
   });
 
   describe('Decomposed mode', async () => {
-    step('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
+    xstep('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`);
       const workbench = utilities.getWorkbench();
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
@@ -381,7 +387,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.reloadWindow();
     });
 
-    step('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
+    xstep('Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Decomposed mode, initial generation`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
@@ -556,7 +562,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
+    xstep('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
