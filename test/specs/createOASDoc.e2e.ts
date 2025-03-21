@@ -606,43 +606,24 @@ describe('Create OpenAPI v3 Specifications', async () => {
             'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
           );
         }
-        utilities.log('A');
-        // const forceAppFolder = await treeViewSection.findItem('force-app/main/default') as DefaultTreeItem;
-        // utilities.pause(utilities.Duration.seconds(2));
-        // utilities.log('B');
-        // await forceAppFolder.expand();
-        // utilities.log('C');
-        // const classesFolder = await treeViewSection.findItem('classes') as DefaultTreeItem;
-        // utilities.pause(utilities.Duration.seconds(2));
-        // utilities.log('D');
-        // await classesFolder.expand();
-        // utilities.log('E');
-        const simpleAccountResourceFile = await treeViewSection.findItem('SimpleAccountResource.cls') as DefaultTreeItem;
-        utilities.log('F');
 
+        // The force-app/main/default and classes folders are already expanded, so we can find the file directly
+        const simpleAccountResourceFile = await treeViewSection.findItem('SimpleAccountResource.cls') as DefaultTreeItem;
         const contextMenu = await simpleAccountResourceFile.openContextMenu();
-        utilities.log('G');
         const menu = await contextMenu.select('SFDX: Create OpenAPI Document from This Class (Beta)');
-        utilities.log('H');
+
         // Wait for the command palette prompt to appear
         if (menu) {
-          utilities.log('I');
           const result = await getQuickOpenBoxOrInputBox();
-          utilities.log('J');
           if (!result) {
-            utilities.log('K');
             throw new Error('Failed to get QuickOpenBox or InputBox');
           }
-          utilities.log('L');
           prompt = result;
-          utilities.log('M');
         }
       } else {
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
       }
-      utilities.log('N');
       await prompt.confirm();
-      utilities.log('CONFIRMED');
 
       // Click the Manual Merge button on the popup
       const modalDialog = new ModalDialog();
