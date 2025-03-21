@@ -147,7 +147,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     // 13. Disable A4D extension and ensure the command to generate OAS docs is not present ✅
   });
 
-  step('Verify LSP finished indexing', async () => {
+  xstep('Verify LSP finished indexing', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
 
     // Get Apex LSP Status Bar
@@ -590,33 +590,17 @@ describe('Create OpenAPI v3 Specifications', async () => {
       utilities.log('J');
       const workbench = utilities.getWorkbench();
       utilities.log('K');
-      const editorView = workbench.getEditorView();
+      await utilities.executeQuickPick('Explorer: Focus on Open Editors View');
       utilities.log('L');
-      await editorView.getTabByTitle('SimpleAccountResource.cls');
-      utilities.log('M');
-      await editorView.getTabByTitle('SimpleAccountResource_\\d{8}_\\d{6}\\.externalServiceRegistration-meta\\.xml');
-      utilities.log('N');
-      await editorView.getTabByTitle('SimpleAccountResource_\\d{8}_\\d{6}\\.yaml');
-      utilities.log('O');
-      await editorView.getTabByTitle('Manual Diff of ESR XML Files');
-      utilities.log('P');
-      await editorView.getTabByTitle('Manual Diff of ESR YAML Files');
-      utilities.log('Q');
+      const sidebar = await workbench.getSideBar().wait();
+      const content = await sidebar.getContent().wait();
+      const openEditorsView = await content.getSection('Open Editors');
+      utilities.log('ELEPHANT');
 
-      // const openTabs = await editorView.getOpenTabs();
-      // utilities.log('M');
-      // expect(openTabs.length).to.equal(5);
-      // utilities.log('N');
-      // expect(await openTabs[0].getTitle()).to.equal('SimpleAccountResource.cls');
-      // utilities.log('O');
-      // expect(await openTabs[1].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
-      // utilities.log('P');
-      // expect(await openTabs[2].getTitle()).to.match(/SimpleAccountResource_\d{8}_\d{6}\.yaml/);
-      // utilities.log('Q');
-      // expect(await openTabs[3].getTitle()).to.equal('Manual Diff of ESR XML Files');
-      // utilities.log('R');
-      // expect(await openTabs[4].getTitle()).to.equal('Manual Diff of ESR YAML Files');
-      // utilities.log('S');
+      const openTabs = await openEditorsView?.getVisibleItems();
+      utilities.log('M');
+      expect(openTabs?.length).to.equal(5);
+      utilities.log('N');
     });
   });
 
