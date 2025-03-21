@@ -302,30 +302,21 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using command palette - Composed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
-      utilities.log('A');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
-      utilities.log('B');
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      utilities.log('C');
       await prompt.confirm();
-      utilities.log('D');
 
       // Click the Manual Merge button on the popup
       const modalDialog = new ModalDialog();
-      utilities.log('E');
       expect(modalDialog).to.not.be.undefined;
-      utilities.log('F');
       await modalDialog.pushButton('Manually merge with existing ESR');
-      utilities.log('G');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class CaseManager_\d{8}_\d{6} is created for CaseManager\. Manually merge the two files using the diff editor\./,
         utilities.Duration.TEN_MINUTES
       );
-      utilities.log('H');
       expect(successNotificationWasFound).to.equal(true);
-      utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
       await utilities.executeQuickPick('View: Open First Editor in Group');
@@ -334,27 +325,22 @@ describe('Create OpenAPI v3 Specifications', async () => {
       const sidebar = await workbench.getSideBar().wait();
       const content = await sidebar.getContent().wait();
       const openEditorsView = await content.getSection('Open Editors');
-      utilities.log('J');
 
       const openTabs = await openEditorsView?.getVisibleItems();
       expect(openTabs?.length).to.equal(3);
-      utilities.log('K');
 
       // Locate each tab in the Open Editors View using the selector (there is a bug in vscode-extension-tester)
       const firstTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(1)'));
       const firstTabLabel = await firstTab.getText();
       expect(firstTabLabel).to.match(/CaseManager\.cls/);
-      utilities.log('L');
 
       const secondTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(2)'));
       const secondTabLabel = await secondTab.getText();
       expect(secondTabLabel).to.match(/CaseManager_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
-      utilities.log('M');
 
       const thirdTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(3)'));
       const thirdTabLabel = await thirdTab.getText();
       expect(thirdTabLabel).to.match(/Manual Diff of ESR XML Files/);
-      utilities.log('N');
     });
   });
 
