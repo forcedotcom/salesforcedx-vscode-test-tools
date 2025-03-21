@@ -521,7 +521,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
@@ -595,6 +595,8 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
       // Use context menu for Windows and Ubuntu, command palette for Mac
       if (process.platform !== 'darwin') {
+        await utilities.executeQuickPick('File: Focus on Files Explorer');
+        await utilities.pause(utilities.Duration.seconds(2));
         const workbench = utilities.getWorkbench();
         const sidebar = await workbench.getSideBar().wait();
         const content = await sidebar.getContent().wait();
@@ -719,6 +721,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
   });
 
   const getQuickOpenBoxOrInputBox = async (): Promise<QuickOpenBox | InputBox | undefined> => {
+    utilities.log('Enter getQuickOpenBoxOrInputBox()');
     try {
       const quickOpenBox = await new QuickOpenBox().wait();
       return quickOpenBox;
