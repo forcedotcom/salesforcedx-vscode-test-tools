@@ -521,31 +521,45 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
+    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
+      utilities.log('A');
 
       // Use context menu for Windows and Ubuntu, command palette for Mac
       if (process.platform !== 'darwin') {
+        utilities.log('Not Mac - can use context menu');
         const workbench = utilities.getWorkbench();
+        utilities.log('B');
         const textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.cls');
+        utilities.log('C');
         const contextMenu = await textEditor.openContextMenu();
+        utilities.log('D');
         const menu = await contextMenu.select('SFDX: Create OpenAPI Document from This Class (Beta)');
+        utilities.log('E');
         // Wait for the command palette prompt to appear
         if (menu) {
+          utilities.log('F');
           const result = await getQuickOpenBoxOrInputBox();
+          utilities.log('G');
           if (!result) {
+            utilities.log('H');
             throw new Error('Failed to get QuickOpenBox or InputBox');
           }
+          utilities.log('I');
           prompt = result;
+          utilities.log('J');
         }
       } else {
+        utilities.log('Mac - must use command palette')
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+        utilities.log('K');
       }
       await prompt.confirm();
+      utilities.log('CONFIRMED');
 
       // Click the Overwrite button on the popup
       const modalDialog = new ModalDialog();
