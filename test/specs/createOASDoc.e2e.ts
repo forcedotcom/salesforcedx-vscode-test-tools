@@ -560,78 +560,53 @@ describe('Create OpenAPI v3 Specifications', async () => {
       // NOTE: Windows and Ubuntu only, Mac uses command palette
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
-      utilities.log('A');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
-      utilities.log('B');
       prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      utilities.log('C');
       await prompt.confirm();
-      utilities.log('D');
 
       // Click the Manual Merge button on the popup
       const modalDialog = new ModalDialog();
-      utilities.log('E');
       expect(modalDialog).to.not.be.undefined;
-      utilities.log('F');
       await modalDialog.pushButton('Manually merge with existing ESR');
-      utilities.log('G');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class SimpleAccountResource_\d{8}_\d{6} is created for SimpleAccountResource\. Manually merge the two files using the diff editor\./,
         utilities.Duration.TEN_MINUTES
       );
-      utilities.log('H');
       expect(successNotificationWasFound).to.equal(true);
-      utilities.log('I');
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
       await utilities.executeQuickPick('View: Open First Editor in Group');
-      utilities.log('J');
       const workbench = utilities.getWorkbench();
-      utilities.log('K');
       await utilities.executeQuickPick('Explorer: Focus on Open Editors View');
-      utilities.log('L');
       const sidebar = await workbench.getSideBar().wait();
       const content = await sidebar.getContent().wait();
       const openEditorsView = await content.getSection('Open Editors');
-      utilities.log('ELEPHANT');
 
       const openTabs = await openEditorsView?.getVisibleItems();
-      utilities.log('M');
       expect(openTabs?.length).to.equal(5);
-      utilities.log('N');
-      // Locate the first tab in the Open Editors View using the selector because there is a bug in vscode-extension-tester
+
+      // Locate each tab in the Open Editors View using the selector (there is a bug in vscode-extension-tester)
       const firstTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(1)'));
-      utilities.log('O');
       const firstTabLabel = await firstTab.getText();
-      utilities.log(`First Tab Label: ${firstTabLabel}`);
       expect(firstTabLabel).to.match(/SimpleAccountResource\.cls/);
-      utilities.log('P');
+
       const secondTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(2)'));
-      utilities.log('Q');
       const secondTabLabel = await secondTab.getText();
-      utilities.log(`Second Tab Label: ${secondTabLabel}`);
       expect(secondTabLabel).to.match(/SimpleAccountResource_\d{8}_\d{6}\.externalServiceRegistration-meta\.xml/);
-      utilities.log('R');
+
       const thirdTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(3)'));
-      utilities.log('S');
       const thirdTabLabel = await thirdTab.getText();
-      utilities.log(`Third Tab Label: ${thirdTabLabel}`);
       expect(thirdTabLabel).to.match(/SimpleAccountResource_\d{8}_\d{6}\.yaml/);
-      utilities.log('T');
+
       const fourthTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(4)'));
-      utilities.log('U');
       const fourthTabLabel = await fourthTab.getText();
-      utilities.log(`Fourth Tab Label: ${fourthTabLabel}`);
       expect(fourthTabLabel).to.match(/Manual Diff of ESR XML Files/);
-      utilities.log('V');
+
       const fifthTab = await openEditorsView.findElement(By.css('.monaco-list-row:nth-child(5)'));
-      utilities.log('W');
       const fifthTabLabel = await fifthTab.getText();
-      utilities.log(`Fifth Tab Label: ${fifthTabLabel}`);
       expect(fifthTabLabel).to.match(/Manual Diff of ESR YAML Files/);
-      utilities.log('X');
     });
   });
 
