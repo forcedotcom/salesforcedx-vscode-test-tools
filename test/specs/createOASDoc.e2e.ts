@@ -607,16 +607,16 @@ describe('Create OpenAPI v3 Specifications', async () => {
           );
         }
         utilities.log('A');
-        const forceAppFolder = await treeViewSection.findItem('force-app/main/default') as DefaultTreeItem;
-        utilities.pause(utilities.Duration.seconds(2));
-        utilities.log('B');
-        await forceAppFolder.expand();
-        utilities.log('C');
-        const classesFolder = await treeViewSection.findItem('classes') as DefaultTreeItem;
-        utilities.pause(utilities.Duration.seconds(2));
-        utilities.log('D');
-        await classesFolder.expand();
-        utilities.log('E');
+        // const forceAppFolder = await treeViewSection.findItem('force-app/main/default') as DefaultTreeItem;
+        // utilities.pause(utilities.Duration.seconds(2));
+        // utilities.log('B');
+        // await forceAppFolder.expand();
+        // utilities.log('C');
+        // const classesFolder = await treeViewSection.findItem('classes') as DefaultTreeItem;
+        // utilities.pause(utilities.Duration.seconds(2));
+        // utilities.log('D');
+        // await classesFolder.expand();
+        // utilities.log('E');
         const simpleAccountResourceFile = await treeViewSection.findItem('SimpleAccountResource.cls') as DefaultTreeItem;
         utilities.log('F');
 
