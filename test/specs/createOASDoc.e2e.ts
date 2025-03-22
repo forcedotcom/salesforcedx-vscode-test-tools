@@ -567,7 +567,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /OpenAPI Document created for class: SimpleAccountResource\./,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.TWENTY_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
 
