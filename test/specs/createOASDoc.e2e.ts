@@ -521,8 +521,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ExternalServiceRegistration', 'SimpleAccountResource', 'Created  ');
     });
 
-    xstep('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
-      // NOTE: Windows and Ubuntu only, Mac uses command palette
+    step('Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Editor View - Decomposed mode, overwrite`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
@@ -586,8 +585,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       expect(title).to.equal('SimpleAccountResource.externalServiceRegistration-meta.xml');
     });
 
-    step('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
-      // NOTE: Windows and Ubuntu only, Mac uses command palette
+    xstep('Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Generate OAS doc from a valid Apex class using context menu in Explorer View - Decomposed mode, manual merge`);
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
