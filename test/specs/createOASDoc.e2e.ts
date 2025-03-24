@@ -156,20 +156,26 @@ describe('Create OpenAPI v3 Specifications', async () => {
     expect(await statusBar.getAttribute('aria-label')).to.contain('Indexing complete');
   });
 
-  xstep('Try to generate OAS doc from an ineligible Apex class', async () => {
+  step('Try to generate OAS doc from an ineligible Apex class', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
-    if (process.platform !== 'win32') {
-      await utilities.pause(utilities.Duration.seconds(5));
-    } else {
-      await utilities.pause(utilities.Duration.seconds(20));
+    await utilities.pause(utilities.Duration.seconds(5));
+    try {
+      await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(failureNotificationWasFound).to.equal(true);
+    } catch (error) {
+      await utilities.pause(utilities.Duration.minutes(1));
+      await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+      const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./,
+        utilities.Duration.TEN_MINUTES
+      );
+      expect(failureNotificationWasFound).to.equal(true);
     }
-    await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-    const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./,
-      utilities.Duration.TEN_MINUTES
-    );
-    expect(failureNotificationWasFound).to.equal(true);
   });
 
   describe('Composed mode', async () => {
