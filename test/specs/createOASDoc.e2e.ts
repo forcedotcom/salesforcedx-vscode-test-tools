@@ -526,39 +526,27 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await utilities.executeQuickPick('View: Close All Editors');
       await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'SimpleAccountResource.cls'));
       await utilities.pause(utilities.Duration.seconds(5));
-      utilities.log('A');
 
       // Use context menu for Windows and Ubuntu, command palette for Mac
       if (process.platform !== 'darwin') {
         utilities.log('Not Mac - can use context menu');
         const workbench = utilities.getWorkbench();
-        utilities.log('B');
         const textEditor = await utilities.getTextEditor(workbench, 'SimpleAccountResource.cls');
-        utilities.log('C');
         const contextMenu = await textEditor.openContextMenu();
-        utilities.log('D');
         const menu = await contextMenu.select('SFDX: Create OpenAPI Document from This Class (Beta)');
-        utilities.log('E');
         // Wait for the command palette prompt to appear
         if (menu) {
-          utilities.log('F');
           const result = await getQuickOpenBoxOrInputBox();
-          utilities.log('G');
           if (!result) {
-            utilities.log('H');
             throw new Error('Failed to get QuickOpenBox or InputBox');
           }
-          utilities.log('I');
           prompt = result;
-          utilities.log('J');
         }
       } else {
         utilities.log('Mac - must use command palette')
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-        utilities.log('K');
       }
       await prompt.confirm();
-      utilities.log('CONFIRMED');
 
       // Click the Overwrite button on the popup
       const modalDialog = new ModalDialog();
@@ -593,6 +581,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
       // Use context menu for Windows and Ubuntu, command palette for Mac
       if (process.platform !== 'darwin') {
+        utilities.log('Not Mac - can use context menu');
         await utilities.executeQuickPick('File: Focus on Files Explorer');
         await utilities.pause(utilities.Duration.seconds(2));
         const workbench = utilities.getWorkbench();
@@ -619,6 +608,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
           prompt = result;
         }
       } else {
+        utilities.log('Mac - must use command palette')
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
       }
       await prompt.confirm();
