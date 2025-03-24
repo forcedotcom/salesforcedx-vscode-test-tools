@@ -198,7 +198,6 @@ export class Duration extends DurationKit.Duration {
   public static ONE_MINUTE = Duration.minutes(1);
   public static FIVE_MINUTES = Duration.minutes(5);
   public static TEN_MINUTES = Duration.minutes(10);
-  public static TWENTY_MINUTES = Duration.minutes(20);
 
   // Static methods for creating new instances without specifying scaleFactor
   public static milliseconds(quantity: number): Duration {
