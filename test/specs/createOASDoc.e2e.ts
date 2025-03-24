@@ -129,6 +129,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       );
       expect(successPushNotificationWasFound).to.equal(true);
     }
+    utilities.reloadWindow(utilities.Duration.seconds(30));
   });
 
   xstep('Listing all the cases that need to be tested', async () => {
