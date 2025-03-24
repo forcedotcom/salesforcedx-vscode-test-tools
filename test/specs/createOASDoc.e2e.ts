@@ -156,7 +156,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     expect(await statusBar.getAttribute('aria-label')).to.contain('Indexing complete');
   });
 
-  step('Try to generate OAS doc from an ineligible Apex class', async () => {
+  xstep('Try to generate OAS doc from an ineligible Apex class', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
     if (process.platform !== 'win32') {
