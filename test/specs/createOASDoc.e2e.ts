@@ -129,7 +129,6 @@ describe('Create OpenAPI v3 Specifications', async () => {
       );
       expect(successPushNotificationWasFound).to.equal(true);
     }
-    utilities.reloadWindow(utilities.Duration.seconds(30));
   });
 
   xstep('Listing all the cases that need to be tested', async () => {
@@ -160,7 +159,11 @@ describe('Create OpenAPI v3 Specifications', async () => {
   step('Try to generate OAS doc from an ineligible Apex class', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
-    await utilities.pause(utilities.Duration.seconds(5));
+    if (process.platform === "win32") {
+      utilities.reloadWindow(utilities.Duration.minutes(2));
+    } else {
+      await utilities.pause(utilities.Duration.seconds(5));
+    }
     try {
       await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
       const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
