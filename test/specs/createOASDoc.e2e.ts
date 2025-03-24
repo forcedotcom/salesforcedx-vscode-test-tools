@@ -160,7 +160,10 @@ describe('Create OpenAPI v3 Specifications', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Try to generate OAS doc from an ineligible Apex class`);
     await utilities.openFile(path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'IneligibleApexClass.cls'));
     if (process.platform === "win32") {
-      utilities.reloadWindow(utilities.Duration.minutes(2));
+      utilities.reloadWindow();
+      await utilities.verifyExtensionsAreRunning(utilities.getExtensionsToVerifyActive());
+      const workbench = utilities.getWorkbench();
+      await utilities.getTextEditor(workbench, 'IneligibleApexClass.cls');
     } else {
       await utilities.pause(utilities.Duration.seconds(5));
     }
