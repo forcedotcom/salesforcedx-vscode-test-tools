@@ -219,7 +219,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
-  xstep('SFDX: Delete This from Project and Org', async () => {
+  step('SFDX: Delete This from Project and Org', async () => {
     if (process.platform !== 'linux') {
       utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org`);
       const workbench = utilities.getWorkbench();
@@ -235,6 +235,8 @@ describe('Deploy and Retrieve', async () => {
       // clear notifications
       await utilities.dismissAllNotifications();
 
+      await utilities.getTextEditor(workbench, 'MyClass.cls');
+      await utilities.pause(utilities.Duration.seconds(1));
       await utilities.executeQuickPick('SFDX: Delete This from Project and Org', utilities.Duration.seconds(2));
 
       // Make sure we get a notification for the source delete
