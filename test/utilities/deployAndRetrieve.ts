@@ -44,47 +44,10 @@ export const validateCommand = async (
     10
   );
   utilities.log(`${operation} time ${operationType}: ` + (await utilities.getOperationTime(outputPanelText!)));
-  let expectedTexts: string[];
+
   const pathSeparator = process.platform === 'win32' ? '\\' : '/';
   const longestFullName = fullNames.reduce((a, b) => (a.length > b.length ? a : b), '');
-
-  if (metadataType === 'ApexClass') {
-    expectedTexts = [
-      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `ended SFDX: ${operation} This Source ${fromTo} Org`
-    ];
-    for (let x = 0; x < fullNames.length; x++) {
-      const spacer = calculateSpacer(longestFullName, fullNames[x]);
-      expectedTexts.push(
-        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls`,
-        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes${pathSeparator}${fullNames[x]}.cls-meta.xml`
-      );
-    }
-  } else if (metadataType === 'ExternalServiceRegistration') {
-    expectedTexts = [
-      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `ended SFDX: ${operation} This Source ${fromTo} Org`
-    ];
-    for (let x = 0; x < fullNames.length; x++) {
-      const spacer = calculateSpacer(longestFullName, fullNames[x]);
-      expectedTexts.push(
-        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations${pathSeparator}${fullNames[x]}.externalServiceRegistration-meta.xml`
-      );
-    }
-  } else if (metadataType === 'CustomObject') {
-    expectedTexts = [
-      `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-      `ended SFDX: ${operation} This Source ${fromTo} Org`
-    ];
-    for (let x = 0; x < fullNames.length; x++) {
-      const spacer = calculateSpacer(longestFullName, fullNames[x]);
-      expectedTexts.push(
-        `${prefix}${fullNames[x]}${spacer}${metadataType}  force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects${pathSeparator}${fullNames[x]}${pathSeparator}${fullNames[x]}.object-meta.xml`
-      );
-    }
-  } else {
-    expectedTexts = [];
-  }
+  const expectedTexts = constructExpectedTexts(operation, fromTo, metadataType, fullNames, prefix, longestFullName, pathSeparator);
 
   expect(outputPanelText).to.not.be.undefined;
   await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
@@ -104,4 +67,62 @@ export const calculateSpacer = (longestFullName: string, currentFileName: string
     numberOfSpaces += (longestFullName.length - currentFileName.length);
   }
   return ' '.repeat(numberOfSpaces);
+};
+
+/**
+ * Constructs the expected texts for validation based on metadata type and file paths.
+ * @param operation - The operation being performed (e.g., Deploy, Retrieve).
+ * @param fromTo - The direction of the operation (e.g., To, From).
+ * @param metadataType - The type of metadata being processed.
+ * @param fullNames - The list of metadata full names.
+ * @param prefix - Optional prefix to check for in the Output Tab.
+ * @param longestFullName - The longest full name in the list of full names.
+ * @param pathSeparator - The platform-specific path separator.
+ * @returns - An array of expected texts for validation.
+ */
+const constructExpectedTexts = (
+  operation: string,
+  fromTo: string,
+  metadataType: string,
+  fullNames: string[],
+  prefix: string,
+  longestFullName: string,
+  pathSeparator: string
+): string[] => {
+  const expectedTexts = [
+    `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
+    `ended SFDX: ${operation} This Source ${fromTo} Org`
+  ];
+
+  const metadataPaths: Record<string, string> = {
+    ApexClass: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes`,
+    ExternalServiceRsegistration: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations`,
+    CustomObject: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`
+  };
+
+  if (!metadataPaths[metadataType]) {
+    return expectedTexts;
+  }
+
+  const metadataPath = metadataPaths[metadataType];
+  const additionalTexts = fullNames.flatMap((fullName) => {
+    const spacer = calculateSpacer(longestFullName, fullName);
+    if (metadataType === 'CustomObject') {
+      return [
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}${pathSeparator}${fullName}.object-meta.xml`
+      ];
+    } else if (metadataType === 'ExternalServiceRegistration') {
+      return [
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}.externalServiceRegistration-meta.xml`
+      ];
+    } else if (metadataType === 'ApexClass') {
+      return [
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}.cls`,
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}.cls-meta.xml`
+      ];
+    }
+  });
+
+  additionalTexts.filter((text): text is string => text !== undefined).forEach((text) => expectedTexts.push(text));
+  return expectedTexts;
 };
