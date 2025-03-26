@@ -123,8 +123,10 @@ const constructExpectedTexts = (
       ];
     } else if (metadataType === 'CustomField') {
       const [objectName, fieldName] = fullName.split('.');
+      const customObjectSpacer = calculateSpacer(fullName, objectName);
       return [
-        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`
+        `${prefix}${fullName}${spacer}${metadataType}    ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`,
+        `${prefix}${objectName}${customObjectSpacer}CustomObject  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}${objectName}.object-meta.xml`
       ];
     }
   });
