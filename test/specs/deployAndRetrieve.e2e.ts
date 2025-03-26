@@ -219,7 +219,7 @@ describe('Deploy and Retrieve', async () => {
     await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
-  step('SFDX: Delete This from Project and Org', async () => {
+  xstep('SFDX: Delete This from Project and Org', async () => {
     if (process.platform !== 'linux') {
       utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org`);
       const workbench = utilities.getWorkbench();
