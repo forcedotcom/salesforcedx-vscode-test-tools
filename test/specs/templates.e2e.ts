@@ -291,11 +291,9 @@ describe('Templates', async () => {
       path.join('lwc', 'lightningWebComponent1'),
       'js'
     );
-    utilities.log('A');
 
     // Check for expected items in the Explorer view.
     const workbench = await utilities.getWorkbench();
-    utilities.log('B');
 
     // Check for the presence of the directory, "lightningWebComponent1".
     const filteredTreeViewItems = await utilities.getFilteredVisibleTreeViewItemLabels(
@@ -303,15 +301,10 @@ describe('Templates', async () => {
       projectName,
       'lightningWebComponent1'
     );
-    utilities.log('C');
     expect(filteredTreeViewItems.includes('lightningWebComponent1')).to.equal(true);
-    utilities.log('D');
     expect(filteredTreeViewItems.includes('lightningWebComponent1.html')).to.equal(true);
-    utilities.log('E');
     expect(filteredTreeViewItems.includes('lightningWebComponent1.js')).to.equal(true);
-    utilities.log('F');
     expect(filteredTreeViewItems.includes('lightningWebComponent1.js-meta.xml')).to.equal(true);
-    utilities.log('G');
   });
 
   step('Verify the contents of the Lightning Web Component', async () => {
