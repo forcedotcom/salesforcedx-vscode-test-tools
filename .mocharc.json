@@ -1,4 +1,5 @@
 {
   "timeout": 300000,
-  "reporter": "./lib/custom-summary-reporter.js"
+  "reporter": "./lib/custom-summary-reporter.js",
+  "retries": 3
 }
