@@ -97,7 +97,8 @@ const constructExpectedTexts = (
   const metadataPaths: Record<string, string> = {
     ApexClass: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes`,
     ExternalServiceRsegistration: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations`,
-    CustomObject: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`
+    CustomObject: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`,
+    CustomField: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`
   };
 
   if (!metadataPaths[metadataType]) {
@@ -119,6 +120,11 @@ const constructExpectedTexts = (
       return [
         `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}.cls`,
         `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${fullName}.cls-meta.xml`
+      ];
+    } else if (metadataType === 'CustomField') {
+      const [objectName, fieldName] = fullName.split('.');
+      return [
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`
       ];
     }
   });
