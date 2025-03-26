@@ -126,7 +126,7 @@ const constructExpectedTexts = (
       const customObjectSpacer = calculateSpacer(fullName, objectName);
       if (operation === 'Retrieve') {
         return [
-          `${prefix}${fullName}${spacer}${metadataType}    ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`,
+          `${prefix}${fullName}${spacer}${metadataType}   ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`,
           `${prefix}${objectName}${customObjectSpacer}CustomObject  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}${objectName}.object-meta.xml`
         ];
       } else {
