@@ -27,18 +27,16 @@ describe('Create OpenAPI v3 Specifications', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
 
     // Set SF_LOG_LEVEL to 'debug' to get the logs in the 'llm_logs' folder when the OAS doc is generated
-    await utilities.inWorkspaceSettings();
-    await utilities.setSettingValue('salesforcedx-vscode-core.SF_LOG_LEVEL', 'debug');
+    await utilities.setSettingValue('salesforcedx-vscode-core.SF_LOG_LEVEL', 'debug', true);
 
     // Set a telemetry tag to distinguish it as an E2E test run
-    await utilities.setSettingValue('salesforcedx-vscode-core.telemetry-tag', 'e2e-test');
+    await utilities.setSettingValue('salesforcedx-vscode-core.telemetry-tag', 'e2e-test', true);
 
     // Use VSCode's modal dialog style instead of Mac's native dialog style
-    await utilities.inUserSettings();
-    await utilities.setSettingValue('window.dialogStyle', 'custom');
+    await utilities.setSettingValue('window.dialogStyle', 'custom', false);
 
     // Disable preview mode for opening editors
-    await utilities.setSettingValue('workbench.editor.enablePreview', false);
+    await utilities.setSettingValue('workbench.editor.enablePreview', false, false);
     await utilities.executeQuickPick('View: Close Editor');
     await utilities.reloadWindow();
 

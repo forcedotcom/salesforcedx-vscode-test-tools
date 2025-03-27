@@ -103,7 +103,8 @@ export async function isBooleanSettingEnabled(
  * @param value - The new value to set for the specified setting.
  * @returns A promise that resolves when the setting value has been updated.
  */
-export const setSettingValue = async (id: string, value: string | boolean): Promise<void> => {
+export const setSettingValue = async (id: string, value: string | boolean, isWorkspace: boolean): Promise<void> => {
+  await (isWorkspace ? inWorkspaceSettings() : inUserSettings());
   const settingsEditor = new SettingsEditor();
   const logLevelSetting = await settingsEditor.findSettingByID(id);
   await logLevelSetting?.setValue(value);
