@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import path from 'path';
-import { InputBox, QuickOpenBox, SettingsEditor, ExtensionsViewSection, ActivityBar, after, ProblemsView, MarkerType, ModalDialog, By, ExtensionsViewItem, DefaultTreeItem } from 'vscode-extension-tester';
+import { InputBox, QuickOpenBox, ExtensionsViewSection, ActivityBar, after, By, ExtensionsViewItem, DefaultTreeItem } from 'vscode-extension-tester';
 
 describe('Create OpenAPI v3 Specifications', async () => {
   let prompt: QuickOpenBox | InputBox;
@@ -28,22 +28,17 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     // Set SF_LOG_LEVEL to 'debug' to get the logs in the 'llm_logs' folder when the OAS doc is generated
     await utilities.inWorkspaceSettings();
-    const settingsEditor = new SettingsEditor();
-    const logLevelSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.SF_LOG_LEVEL');
-    await logLevelSetting?.setValue('debug');
+    await utilities.setSettingValue('salesforcedx-vscode-core.SF_LOG_LEVEL', 'debug');
 
     // Set a telemetry tag to distinguish it as an E2E test run
-    const telemetryTagSetting = await settingsEditor.findSettingByID('salesforcedx-vscode-core.telemetry-tag');
-    await telemetryTagSetting?.setValue('e2e-test');
+    await utilities.setSettingValue('salesforcedx-vscode-core.telemetry-tag', 'e2e-test');
 
     // Use VSCode's modal dialog style instead of Mac's native dialog style
     await utilities.inUserSettings();
-    const dialogStyleSetting = await settingsEditor.findSettingByID('window.dialogStyle');
-    await dialogStyleSetting?.setValue('custom');
+    await utilities.setSettingValue('window.dialogStyle', 'custom');
 
     // Disable preview mode for opening editors
-    const previewModeSetting = await settingsEditor.findSettingByID('workbench.editor.enablePreview');
-    await previewModeSetting?.setValue(false);
+    await utilities.setSettingValue('workbench.editor.enablePreview', false);
     await utilities.executeQuickPick('View: Close Editor');
     await utilities.reloadWindow();
 
@@ -131,22 +126,6 @@ describe('Create OpenAPI v3 Specifications', async () => {
     }
   });
 
-  xstep('Listing all the cases that need to be tested', async () => {
-    // 1. Generate OAS doc from an invalid Apex class ✅
-    // 2. Generate OAS doc from a valid Apex class using command palette ✅
-    // 3. Generate OAS doc from a valid Apex class using context menu in Editor View (Windows and Ubuntu only) ✅
-    // 4. Generate OAS doc from a valid Apex class using context menu in Explorer View (Windows and Ubuntu only) ✅
-    // 5. Manual merge ✅
-    // 6. Overwrite ✅
-    // 7. Check for warnings and errors in the Problems Tab ✅
-    // 8. Revalidate the OAS doc in decomposed mode ✅
-    // 9. Revalidate the OAS doc in composed mode ✅
-    // 10. Turn on decomposed ESR in sfdx-project.json ✅
-    // 11. Turn off decomposed ESR in sfdx-project.json ✅
-    // 12. Deploy the OAS doc to the org ✅
-    // 13. Disable A4D extension and ensure the command to generate OAS docs is not present ✅
-  });
-
   step('Verify LSP finished indexing', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
 
@@ -211,10 +190,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
-      await utilities.executeQuickPick('Problems: Focus on Problems View');
-      const problemsView = new ProblemsView();
-      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
-      expect(problems.length).to.equal(0);
+      await utilities.countProblemsInProblemsTab(0);
     });
 
     step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
@@ -299,10 +275,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       );
       expect(successNotificationWasFound).to.equal(true);
 
-      await utilities.executeQuickPick('Problems: Focus on Problems View');
-      const problemsView = new ProblemsView();
-      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
-      expect(problems.length).to.equal(2);
+      const problems = await utilities.countProblemsInProblemsTab(2);
       expect(await problems[0].getLabel()).to.equal('CaseManager.externalServiceRegistration-meta.xml');
       expect(await problems[1].getLabel()).to.equal('operations.responses.content should be application/json');
     });
@@ -325,9 +298,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await prompt.confirm();
 
       // Click the Manual Merge button on the popup
-      const modalDialog = new ModalDialog();
-      expect(modalDialog).to.not.be.undefined;
-      await modalDialog.pushButton('Manually merge with existing ESR');
+      await utilities.clickButtonOnModalDialog('Manually merge with existing ESR');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class CaseManager_\d{8}_\d{6} is created for CaseManager\. Manually merge the two files using the diff editor\./,
@@ -420,10 +391,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
 
     step('Check for warnings and errors in the Problems Tab', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Check for warnings and errors in the Problems Tab`);
-      await utilities.executeQuickPick('Problems: Focus on Problems View');
-      const problemsView = new ProblemsView();
-      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
-      expect(problems.length).to.equal(0);
+      await utilities.countProblemsInProblemsTab(0);
     });
 
     step('Fix the OAS doc to get rid of the problems in the Problems Tab', async () => {
@@ -523,10 +491,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       );
       expect(successNotificationWasFound).to.equal(true);
 
-      await utilities.executeQuickPick('Problems: Focus on Problems View');
-      const problemsView = new ProblemsView();
-      const problems = await problemsView.getAllVisibleMarkers(MarkerType.Any);
-      expect(problems.length).to.equal(0);
+      await utilities.countProblemsInProblemsTab(0);
     });
 
     step('Deploy the decomposed ESR to the org', async () => {
@@ -566,9 +531,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await prompt.confirm();
 
       // Click the Overwrite button on the popup
-      const modalDialog = new ModalDialog();
-      expect(modalDialog).to.not.be.undefined;
-      await modalDialog.pushButton('Overwrite');
+      await utilities.clickButtonOnModalDialog('Overwrite');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /OpenAPI Document created for class: SimpleAccountResource\./,
@@ -631,9 +594,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await prompt.confirm();
 
       // Click the Manual Merge button on the popup
-      const modalDialog = new ModalDialog();
-      expect(modalDialog).to.not.be.undefined;
-      await modalDialog.pushButton('Manually merge with existing ESR');
+      await utilities.clickButtonOnModalDialog('Manually merge with existing ESR');
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /A new OpenAPI Document class SimpleAccountResource_\d{8}_\d{6} is created for SimpleAccountResource\. Manually merge the two files using the diff editor\./,
