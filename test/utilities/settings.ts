@@ -101,6 +101,7 @@ export async function isBooleanSettingEnabled(
  *
  * @param id - The unique identifier of the setting to be updated.
  * @param value - The new value to set for the specified setting.
+ * @param isWorkspace - True if the setting is a workspace setting; false if it's a user setting.
  * @returns A promise that resolves when the setting value has been updated.
  */
 export const setSettingValue = async (id: string, value: string | boolean, isWorkspace: boolean): Promise<void> => {
