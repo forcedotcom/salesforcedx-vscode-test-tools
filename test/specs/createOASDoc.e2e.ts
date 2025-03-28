@@ -634,9 +634,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
   });
 
-  describe('Uninstall A4D extension and ensure the commands to generate and validate OAS docs are not present', async () => {
-    step('Uninstall A4D extension', async () => {
-      utilities.log(`${testSetup.testSuiteSuffixName} - Uninstall A4D extension`);
+  describe('Disable A4D extension and ensure the commands to generate and validate OAS docs are not present', async () => {
+    step('Disable A4D extension', async () => {
+      utilities.log(`${testSetup.testSuiteSuffixName} - Disable A4D extension`);
 
       const extensionsView = await (await new ActivityBar().getViewControl('Extensions'))?.openView();
       await utilities.pause(utilities.Duration.seconds(5));
@@ -644,9 +644,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
       const a4dExtension = await extensionsList?.findItem('Agentforce for Developers') as ExtensionsViewItem;
       await a4dExtension.click();
 
-      // In the extension details view, click the Uninstall button
-      const uninstallButton = await a4dExtension.findElement(By.xpath("//a[contains(@class, 'action-label') and contains(@class, 'uninstall') and text()='Uninstall']"));
-      await uninstallButton?.click();
+      // In the extension details view, click the Disable button
+      const disableButton = await a4dExtension.findElement(By.xpath("//a[contains(@class, 'action-label') and contains(@class, 'extension-action') and text()='Disable']"));
+      await disableButton?.click();
       await utilities.pause(utilities.Duration.seconds(5));
 
       // Click the Restart Extensions button
@@ -654,8 +654,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
       await restartExtensionsButton?.click();
       await utilities.pause(utilities.Duration.seconds(5));
 
-      // Verify the A4D extension is uninstalled
-      expect(await a4dExtension.isInstalled()).to.equal(false);
+      // Verify the A4D extension is disabled
+      expect(await a4dExtension.isInstalled()).to.equal(true);
+      expect(await a4dExtension.isEnabled()).to.equal(false);
     });
 
     step('Ensure the commands to generate and validate OAS docs are not present', async () => {
