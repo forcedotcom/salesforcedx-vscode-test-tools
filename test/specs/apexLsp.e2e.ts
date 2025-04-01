@@ -77,13 +77,13 @@ const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
   await utilities.acceptNotification(
     'Clean Apex DB and Restart? Or Restart Only?',
     option,
-    utilities.Duration.seconds(5)
+    utilities.Duration.seconds(7)
   );
 
   // Wait for LSP to enter restarting state
   await verifyLspStatus(LSP_STATUS.restarting);
   // Allow time for LSP to fully restart and reindex
-  await utilities.pause(utilities.Duration.seconds(5));
+  await utilities.pause(utilities.Duration.seconds(7));
   await verifyLspStatus(LSP_STATUS.indexingComplete);
 
   const outputViewText = await utilities.getOutputViewText('Apex Language Server');
@@ -180,12 +180,12 @@ const testStatusBarRestart = async (testSetup: TestSetup, cleanDb: boolean): Pro
   await statusBar.click();
 
   // Allow time for status bar menu to appear and be clickable
-  await utilities.pause(utilities.Duration.seconds(2));
+  await utilities.pause(utilities.Duration.seconds(3));
   const restartButton = utilities.getWorkbench().findElement(By.linkText('Restart Apex Language Server'));
   await restartButton.click();
 
   // Allow time for restart process to begin
-  await utilities.pause(utilities.Duration.seconds(3));
+  await utilities.pause(utilities.Duration.seconds(5));
   await verifyLspRestart(cleanDb);
 
   if (cleanDb) {
