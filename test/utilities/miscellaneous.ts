@@ -15,7 +15,7 @@ import path from 'path';
 import { PredicateWithTimeout } from './predicates';
 import { By, WebElement } from 'vscode-extension-tester';
 import { getBrowser, getWorkbench } from './workbench';
-import { expect, util } from 'chai';
+import { expect } from 'chai';
 
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {
   await sleep(duration.milliseconds);

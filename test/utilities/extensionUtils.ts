@@ -261,7 +261,7 @@ export async function findExtensionsInRunningExtensionsList(
     const isActivationComplete = /\:\s*?[0-9]{1,}ms/.test(activationTime);
     let hasBug;
     try {
-      const bugError = await parent.findElement(By.css('span.codicon-bug error'));
+      await parent.findElement(By.css('span.codicon-bug error'));
     } catch (error: any) {
       hasBug = error.message.startsWith('no such element') ? false : true;
     }
