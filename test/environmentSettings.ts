@@ -14,10 +14,11 @@ export class EnvironmentSettings {
 
   private _vscodeVersion = 'latest';
   private _specFiles = [
-    './lib/specs/**/*.e2e.js'
+    //'./lib/specs/**/*.e2e.js'
     // OR
     // './lib/specs/**/anInitialSuite.e2e.js',
-    // './lib/specs/**/apexLsp.e2e.js',
+    //'./lib/specs/**/apexLsp.e2e.js',
+    './lib/specs/**/apexLspRestart.e2e.js',
     // './lib/specs/**/apexReplayDebugger.e2e.js',
     // './lib/specs/**/auraLsp.e2e.js',
     // './lib/specs/**/authentication.e2e.js',

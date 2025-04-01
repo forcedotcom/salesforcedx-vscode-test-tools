@@ -31,3 +31,7 @@ export * from './textEditorView';
 export * from './types';
 export * from './visualforceUtils';
 export * from './workbench';
+
+export function deleteFile(arg0: string) {
+  throw new Error('Function not implemented.');
+}
