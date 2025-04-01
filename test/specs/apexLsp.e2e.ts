@@ -7,9 +7,43 @@
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { EnvironmentSettings } from '../environmentSettings';
-import { By, after } from 'vscode-extension-tester';
+import { By, WebElement, after } from 'vscode-extension-tester';
+import path from 'path';
+import fs from 'fs';
 import { step } from 'mocha-steps';
 import { expect } from 'chai';
+
+// Constants
+const projectPath = path.join(__dirname, '..', '..', 'e2e-temp', 'TempProject-ApexLsp');
+const apexClassPath = path.join(projectPath, 'force-app', 'main', 'default', 'classes');
+const INDEXING_COMPLETE = 'Indexing complete';
+const LSP_RESTARTING = 'Apex Language Server is restarting';
+const PRELUDE_STARTING = 'Apex Prelude Service STARTING';
+
+// Helper Functions
+const findReleaseDir = (): string => {
+  const toolsPath = path.join(projectPath, '.sfdx', 'tools');
+  const entries = fs.readdirSync(toolsPath);
+  const match = entries.find(entry => /^\d{3}$/.test(entry));
+  return match || '254';
+};
+
+const verifyLspStatus = async (expectedStatus: string): Promise<WebElement> => {
+  const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
+  await statusBar.click();
+  expect(await statusBar.getAttribute('aria-label')).to.include(expectedStatus);
+  return statusBar;
+};
+
+const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
+  const option = cleanDb ? 'Clean Apex DB and Restart' : 'Restart Only';
+  await utilities.acceptNotification('Clean Apex DB and Restart? Or Restart Only?', option, utilities.Duration.seconds(5));
+  await verifyLspStatus(LSP_RESTARTING);
+  await utilities.pause(utilities.Duration.seconds(5));
+  await verifyLspStatus(INDEXING_COMPLETE);
+  const outputViewText = await utilities.getOutputViewText('Apex Language Server');
+  expect(outputViewText).to.contain(PRELUDE_STARTING);
+};
 
 describe('Apex LSP', async () => {
   let testSetup: TestSetup;
@@ -89,8 +123,53 @@ describe('Apex LSP', async () => {
     expect(line7Text).to.include(`ExampleClass.SayHello('Jack');`);
   });
 
+  // Command Palette Restart Tests
+  step('Restart LSP alone via Command Palette', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Cmd Palette: LSP Restart Only`);
+    await utilities.executeQuickPick('Restart Apex Language Server');
+    await verifyLspRestart(false);
+  });
+
+  step('Restart LSP with cleaned db via Command Palette', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Cmd Palette: LSP Restart with cleaned db`);
+    const releaseDir = findReleaseDir();
+    await utilities.removeFolder(path.join(projectPath, '.sfdx/tools', releaseDir, 'StandardApexLibrary'));
+    expect(await utilities.getFolderName(path.join(projectPath, '.sfdx/tools', releaseDir, 'StandardApexLibrary'))).to.equal(null);
+    await utilities.executeQuickPick('Restart Apex Language Server');
+    await verifyLspRestart(true);
+    expect(await utilities.getFolderName(path.join(projectPath, '.sfdx/tools', releaseDir, 'StandardApexLibrary'))).to.equal('StandardApexLibrary');
+  });
+
+  // Status Bar Restart Tests
+  step('Verify LSP can restart alone via Status Bar', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Apex Status Bar: LSP Restart Only`);
+    await utilities.dismissAllNotifications();
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
+    await statusBar.click();
+    await utilities.pause(utilities.Duration.seconds(1));
+    const restartButton = utilities.getWorkbench().findElement(By.linkText('Restart Apex Language Server'));
+    await restartButton.click();
+    await utilities.pause(utilities.Duration.seconds(2));
+    await verifyLspRestart(false);
+  });
+
+  step('Verify LSP can restart with cleaned db via Status Bar', async () => {
+    utilities.log(`${testSetup.testSuiteSuffixName} - Apex Status Bar: LSP Restart with cleaned db`);
+    await utilities.dismissAllNotifications();
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
+    await statusBar.click();
+    await utilities.pause(utilities.Duration.seconds(1));
+    const restartButton = utilities.getWorkbench().findElement(By.linkText('Restart Apex Language Server'));
+    await restartButton.click();
+    await utilities.pause(utilities.Duration.seconds(2));
+    await verifyLspRestart(true);
+    const releaseDir = findReleaseDir();
+    expect(await utilities.getFolderName(path.join(projectPath, '.sfdx/tools', releaseDir, 'StandardApexLibrary'))).to.equal('StandardApexLibrary');
+  });
+
   after('Tear down and clean up the testing environment', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Tear down and clean up the testing environment`);
+    await utilities.removeFolder(apexClassPath);
     await testSetup?.tearDown();
   });
 });
