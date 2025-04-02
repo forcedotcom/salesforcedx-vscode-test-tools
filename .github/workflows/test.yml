@@ -1,0 +1,175 @@
+name: tests
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  # Check package-lock.json for inconsistencies
+  package-lock-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Check package-lock.json
+        run: |
+          if grep -q "localhost" package-lock.json; then
+            echo "ERROR: package-lock.json contains localhost references"
+            exit 1
+          fi
+
+  # Since the Windows unit tests take much longer, we run the linux unit tests first and then run the windows unit tests in parallel with NUTs
+  linux-unit-tests:
+    needs: package-lock-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: npm run test
+
+  windows-unit-tests:
+    needs: linux-unit-tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: npm run test
+
+  nuts:
+    needs: linux-unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run NUTs
+        run: npm run test:nuts
+
+  xNuts:
+    needs: linux-unit-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest']
+        externalProjectGitUrl:
+          - https://github.com/salesforcecli/plugin-apex
+          - https://github.com/salesforcecli/plugin-auth
+          - https://github.com/salesforcecli/plugin-community
+          - https://github.com/salesforcecli/plugin-custom-metadata
+          - https://github.com/salesforcecli/plugin-data
+          - https://github.com/salesforcecli/plugin-limits
+          - https://github.com/salesforcecli/plugin-org
+          - https://github.com/salesforcecli/plugin-schema
+          - https://github.com/salesforcecli/plugin-settings
+          - https://github.com/salesforcecli/plugin-signups
+          - https://github.com/salesforcecli/plugin-templates
+          - https://github.com/salesforcecli/plugin-user
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Prepare test environment
+        run: |
+          shx rm -rf test
+          npm update @jsforce/jsforce-node@latest
+          npm install
+      - name: Clone external project
+        run: |
+          git clone ${{ matrix.externalProjectGitUrl }} external-project
+          cd external-project
+          npm ci
+          npm run build
+          shx rm -rf node_modules/@salesforce/core/node_modules/@jsforce/jsforce-node node_modules/@salesforce/sf-plugins-core/node_modules/@salesforce/core node_modules/@salesforce/cli-plugins-testkit/node_modules/@salesforce/core node_modules/@salesforce/source-tracking/node_modules/@salesforce/core node_modules/@salesforce/source-deploy-retrieve/node_modules/@salesforce/core node_modules/@salesforce/apex-node/node_modules/@salesforce/core
+          npm link ../
+          npm run test:nuts
+
+  # PDR plugin tests
+  pdrNuts:
+    needs: linux-unit-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest']
+        command:
+          - 'npm run test:nuts:convert'
+          - 'npm run test:nuts:deb'
+          - 'npm run test:nuts:delete'
+          - 'npm run test:nuts:deploy:metadata:manifest'
+          - 'npm run test:nuts:deploy:metadata:metadata'
+          - 'npm run test:nuts:deploy:metadata:metadata-dir'
+          - 'npm run test:nuts:deploy:metadata:source-dir'
+          - 'npm run test:nuts:deploy:metadata:test-level'
+          - 'npm run test:nuts:destructive'
+          - 'npm run test:nuts:manifest'
+          - 'npm run test:nuts:retrieve'
+          - 'npm run test:nuts:specialTypes'
+          - 'npm run test:nuts:static'
+          - 'npm run test:nuts:tracking'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Prepare test environment
+        run: |
+          npm update @jsforce/jsforce-node@latest
+          npm install
+      - name: Clone deploy-retrieve plugin
+        run: |
+          git clone https://github.com/salesforcecli/plugin-deploy-retrieve external-project
+          cd external-project
+          npm ci
+          npm run build
+          shx rm -rf node_modules/@salesforce/core/node_modules/@jsforce/jsforce-node node_modules/@salesforce/sf-plugins-core/node_modules/@salesforce/core node_modules/@salesforce/cli-plugins-testkit/node_modules/@salesforce/core node_modules/@salesforce/source-tracking/node_modules/@salesforce/core node_modules/@salesforce/source-deploy-retrieve/node_modules/@salesforce/core
+          npm link ../
+          ${{ matrix.command }}
+        env:
+          TESTKIT_AUTH_URL: ${{ secrets.TESTKIT_AUTH_URL }}

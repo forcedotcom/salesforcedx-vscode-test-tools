@@ -6,11 +6,12 @@
  */
 
 import { expect } from 'chai';
-import * as utilities from '../utilities/index'; // Assuming utilities is a module in your project
+import { Duration, pause } from '../../src/core';
+import { notificationIsPresentWithTimeout, dismissNotification, notificationIsAbsentWithTimeout, acceptNotification } from '../../src/ui-interaction';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function showNotification(message: string) {
-  // await utilities.getBrowser().executeWorkbench(async (vscode, message) => {
+  // await getBrowser().executeWorkbench(async (vscode, message) => {
   //   vscode.window.showInformationMessage(`${message}`);
   // }, message);
 }
@@ -32,37 +33,37 @@ describe('Notifications', async () => {
   // Show a notification
   it('should show an info notification', async () => {
     await showNotification('Modify the file and retrieve again');
-    const isPresent = await utilities.notificationIsPresentWithTimeout(
+    const isPresent = await notificationIsPresentWithTimeout(
       /Modify the file and retrieve again/,
-      utilities.Duration.seconds(2)
+      Duration.seconds(2)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isPresent).to.equal(true);
-    await utilities.dismissNotification(/Modify the file and retrieve again/);
-    await utilities.pause(utilities.Duration.seconds(1));
-    const isNotPresent = await utilities.notificationIsAbsentWithTimeout(
+    await dismissNotification(/Modify the file and retrieve again/);
+    await pause(Duration.seconds(1));
+    const isNotPresent = await notificationIsAbsentWithTimeout(
       /Modify the file and retrieve again/,
-      utilities.Duration.seconds(1)
+      Duration.seconds(1)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isNotPresent).to.equal(true);
-    await utilities.pause(utilities.Duration.seconds(2));
+    await pause(Duration.seconds(2));
   });
   it('should show a notification with two actions', async () => {
     await showNotificationWithActions('Choose an action:', 'A', 'B');
-    const isPresent = await utilities.notificationIsPresentWithTimeout(
+    const isPresent = await notificationIsPresentWithTimeout(
       /Choose an action:/,
-      utilities.Duration.seconds(1)
+      Duration.seconds(1)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isPresent).to.equal(true);
-    await utilities.pause(utilities.Duration.seconds(1));
+    await pause(Duration.seconds(1));
 
-    await utilities.acceptNotification('Choose an action:', 'A', utilities.Duration.seconds(1));
+    await acceptNotification('Choose an action:', 'A', Duration.seconds(1));
 
-    const isNotPresent = await utilities.notificationIsAbsentWithTimeout(
+    const isNotPresent = await notificationIsAbsentWithTimeout(
       /Choose an action:/,
-      utilities.Duration.seconds(5)
+      Duration.seconds(5)
     );
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     expect(isNotPresent).to.equal(true);
