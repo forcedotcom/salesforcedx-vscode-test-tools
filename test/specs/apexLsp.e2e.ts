@@ -83,7 +83,7 @@ const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
   // Wait for LSP to enter restarting state
   await verifyLspStatus(LSP_STATUS.restarting);
   // Allow time for LSP to fully restart and reindex
-  await utilities.pause(utilities.Duration.seconds(7));
+  await utilities.pause(utilities.Duration.seconds(12));
   await verifyLspStatus(LSP_STATUS.indexingComplete);
 
   const outputViewText = await utilities.getOutputViewText('Apex Language Server');
