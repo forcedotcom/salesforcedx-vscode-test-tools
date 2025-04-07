@@ -11,7 +11,7 @@ import { log } from 'console';
 import { orgLoginSfdxUrl, setAlias } from './system-operations/cliCommands';
 import { getVsixFilesFromDir } from './system-operations';
 import { TestConfig } from './core/types';
-import { createDefaultTestConfig, validateTestConfig } from './core/helpers';
+import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
 
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
@@ -29,7 +29,7 @@ class TestSetupAndRunner extends ExTester {
 
     // Pass the workspace path to ExTester as the VS Code download location
     const vscodeDownloadDir = path.join(config.workspacePath, 'extensions');
-    super(config.extensionsPath, ReleaseQuality.Stable, vscodeDownloadDir);
+    super(config.extensionsPath, ReleaseQuality.Stable, normalizePath(vscodeDownloadDir));
     this.testConfig = config;
   }
 
@@ -56,9 +56,11 @@ class TestSetupAndRunner extends ExTester {
   }
 
   public async installExtensions(excludeExtensions: ExtensionId[] = []): Promise<void> {
-    const extensionsDir = path.resolve(this.testConfig.extensionsPath);
+    const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsPath));
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
+    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry =>
+      path.resolve(normalizePath(path.join(extensionsDir, entry)))
+    );
     const foundInstalledExtensions = await Promise.all(
       extensionsDirEntries
         .filter(async entry => {
@@ -214,8 +216,8 @@ const argv = yargs(hideBin(process.argv))
 const testConfig: Partial<TestConfig> = {};
 
 if (argv.workspacePath) {
-  testConfig.workspacePath = argv.workspacePath;
-  testConfig.extensionsPath = path.join(argv.workspacePath, 'extensions');
+  testConfig.workspacePath = normalizePath(argv.workspacePath);
+  testConfig.extensionsPath = normalizePath(path.join(argv.workspacePath, 'extensions'));
 }
 
 const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);

@@ -3,6 +3,16 @@ import { TestConfig } from './types';
 import { EnvironmentSettings } from '../environmentSettings';
 
 /**
+ * Normalizes a file path to use forward slashes consistently across platforms
+ *
+ * @param path - The file path to normalize
+ * @returns A path with forward slashes
+ */
+export function normalizePath(path: string): string {
+  return path.replace(/\\/g, '/');
+}
+
+/**
  * Creates a default test configuration based on environment settings
  *
  * @param overrides - Optional partial TestConfig to override default values
@@ -13,10 +23,18 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
 
   // Create default config
   const defaultConfig: TestConfig = {
-    workspacePath: env.workspacePath,
-    extensionsPath: env.extensionPath,
+    workspacePath: normalizePath(env.workspacePath),
+    extensionsPath: normalizePath(env.extensionPath),
     vscodeVersion: env.vscodeVersion
   };
+
+  // Normalize any path overrides
+  if (overrides?.workspacePath) {
+    overrides.workspacePath = normalizePath(overrides.workspacePath);
+  }
+  if (overrides?.extensionsPath) {
+    overrides.extensionsPath = normalizePath(overrides.extensionsPath);
+  }
 
   // Merge with overrides
   return { ...defaultConfig, ...overrides };
@@ -40,4 +58,8 @@ export function validateTestConfig(config: TestConfig): void {
   if (!config.vscodeVersion) {
     config.vscodeVersion = 'stable';
   }
+
+  // Ensure paths use forward slashes
+  config.workspacePath = normalizePath(config.workspacePath);
+  config.extensionsPath = normalizePath(config.extensionsPath);
 }

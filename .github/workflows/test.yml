@@ -60,8 +60,9 @@ jobs:
         run: npm ci
       - name: Compile and test
         env:
-          WORKSPACE_PATH: ${{ github.workspace }}\temp-workspace
+          WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
         run: |
           npm run compile
-          New-Item -Path $env:WORKSPACE_PATH -Force -ItemType Directory
-          npm test -- --workspace-path $env:WORKSPACE_PATH
+          $workspacePath = "${{ github.workspace }}/temp-workspace" -replace "\\", "/"
+          New-Item -Path $workspacePath -Force -ItemType Directory
+          npm test -- --workspace-path $workspacePath
