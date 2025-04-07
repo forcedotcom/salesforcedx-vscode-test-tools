@@ -167,3 +167,50 @@ After the dependencies have been installed, the vsixes downloaded and stored in 
 Note: At this point you should already have authorized `vscodeOrg` which will be used as your target DevHub, so don't forget to comment out `await this.setupAndAuthorizeOrg();` in setup() method from [test-setup-and-runner](test/test-setup-and-runner.ts) so you don't run into errors during setup while running E2E Tests locally.
 
 Note: if no changes are made to `_specFiles` property in [environmentSettings](test/environmentSettings.ts) class, then all tests will be run. If you want to run only some, comment out `'./test/specs/**/*.e2e.ts'` line in that file and uncomment the tests you want to run.
+
+## Test Configuration
+
+This framework allows customizing the test environment through the `TestConfig` interface. You can specify the following options:
+
+### Workspace Path
+
+By default, the framework creates a `salesforcedx-vscode` folder in your project directory to store VS Code and test artifacts. You can customize this location through:
+
+1. Environment variable: `WORKSPACE_PATH`
+2. Command line argument: `--workspace-path` or `-w`
+3. Programmatically through the `TestConfig` interface
+
+Example configuration through environment variables:
+
+```bash
+WORKSPACE_PATH=/tmp/my-test-workspace npm test
+```
+
+Example using command line arguments:
+
+```bash
+npm test -- --workspace-path /tmp/my-test-workspace
+```
+
+Example programmatic usage:
+
+```typescript
+import { TestSetupAndRunner, TestConfig } from '@salesforce/salesforcedx-vscode-test-tools';
+
+const testConfig: Partial<TestConfig> = {
+  workspacePath: '/tmp/my-test-workspace'
+};
+
+const testRunner = new TestSetupAndRunner(testConfig);
+await testRunner.setup();
+const result = await testRunner.runTests();
+```
+
+### Extensions Path
+
+By default, extensions are installed in the `extensions` subfolder of the workspace path. You can override this with:
+
+1. Environment variable: `EXTENSION_PATH` or `SALESFORCEDX_VSCODE_EXTENSIONS_PATH`
+2. Programmatically through the `TestConfig` interface
+
+If only `workspacePath` is specified, the `extensionsPath` will automatically be set to `${workspacePath}/extensions`.

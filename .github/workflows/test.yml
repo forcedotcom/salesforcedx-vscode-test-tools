@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Compile and test
+        env:
+          WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
         run: |
           npm run compile
-          npm test
+          mkdir -p $WORKSPACE_PATH
+          npm test -- --workspace-path $WORKSPACE_PATH

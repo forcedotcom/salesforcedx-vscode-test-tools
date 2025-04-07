@@ -10,20 +10,32 @@ import { expect } from 'chai';
 import { log } from 'console';
 import { orgLoginSfdxUrl, setAlias } from './system-operations/cliCommands';
 import { getVsixFilesFromDir } from './system-operations';
+import { TestConfig } from './core/types';
+import { createDefaultTestConfig, validateTestConfig } from './core/helpers';
 
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
+  private testConfig: TestConfig;
 
   constructor(
-    extensionPath?: string | undefined,
+    testConfig?: Partial<TestConfig>,
     private spec?: string | string[] | undefined
   ) {
-    super(extensionPath, ReleaseQuality.Stable, extensionPath);
+    // Create config with defaults and overrides
+    const config = createDefaultTestConfig(testConfig);
+
+    // Validate config and set defaults for missing values
+    validateTestConfig(config);
+
+    // Pass the workspace path to ExTester as the VS Code download location
+    const vscodeDownloadDir = path.join(config.workspacePath, 'extensions');
+    super(config.extensionsPath, ReleaseQuality.Stable, vscodeDownloadDir);
+    this.testConfig = config;
   }
 
   public async setup(): Promise<void> {
-    await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
-    await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
+    await this.downloadCode(this.testConfig.vscodeVersion);
+    await this.downloadChromeDriver(this.testConfig.vscodeVersion);
     try {
       await this.installExtensions();
     } catch (error: unknown) {
@@ -44,7 +56,7 @@ class TestSetupAndRunner extends ExTester {
   }
 
   public async installExtensions(excludeExtensions: ExtensionId[] = []): Promise<void> {
-    const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
+    const extensionsDir = path.resolve(this.testConfig.extensionsPath);
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
     const foundInstalledExtensions = await Promise.all(
@@ -156,6 +168,19 @@ class TestSetupAndRunner extends ExTester {
     expect(setAliasResult.stdout).to.contain('true');
   }
 
+  async downloadCode(version = 'latest'): Promise<string> {
+    // Create the workspace directory if it doesn't exist
+    try {
+      await fs.mkdir(this.testConfig.workspacePath, { recursive: true });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      log(`Warning: Failed to create workspace directory: ${errorMessage}. Using default path.`);
+    }
+
+    // Now call the parent method
+    return super.downloadCode(version);
+  }
+
   static get exTester(): TestSetupAndRunner {
     if (TestSetupAndRunner.exTester) {
       return TestSetupAndRunner._exTestor;
@@ -174,9 +199,26 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false,
     array: true
   })
-  .help().argv as { spec: string | string[] | undefined };
+  .option('workspace-path', {
+    alias: 'w',
+    type: 'string',
+    description: 'Path to workspace directory',
+    demandOption: false
+  })
+  .help().argv as {
+  spec: string | string[] | undefined;
+  workspacePath?: string;
+};
 
-const testSetupAnRunner = new TestSetupAndRunner(EnvironmentSettings.getInstance().extensionPath, argv.spec);
+// Create test config from command line arguments
+const testConfig: Partial<TestConfig> = {};
+
+if (argv.workspacePath) {
+  testConfig.workspacePath = argv.workspacePath;
+  testConfig.extensionsPath = path.join(argv.workspacePath, 'extensions');
+}
+
+const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {
   try {
     await testSetupAnRunner.setup();

@@ -62,3 +62,15 @@ export type TestReqConfig = {
   /** The test suite suffix name */
   testSuiteSuffixName: string;
 };
+
+/**
+ * Configuration options for the test environment
+ */
+export interface TestConfig {
+  /** Path to the workspace directory where VS Code and test artifacts are stored */
+  workspacePath: string;
+  /** Path to extensions directory */
+  extensionsPath: string;
+  /** VS Code version to use for testing */
+  vscodeVersion: string;
+}

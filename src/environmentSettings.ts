@@ -69,6 +69,13 @@ export class EnvironmentSettings {
   private _extensionPath = join(__dirname, '..', '..', 'salesforcedx-vscode', 'extensions');
 
   /**
+   * Path to the workspace folder where VS Code and test artifacts are stored
+   * @env WORKSPACE_PATH - Path to workspace directory
+   * @default '[project_root]/salesforcedx-vscode'
+   */
+  private _workspacePath = join(__dirname, '..', '..', 'salesforcedx-vscode');
+
+  /**
    * Test execution start time
    * @default current time formatted as short time string
    */
@@ -120,6 +127,7 @@ export class EnvironmentSettings {
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
     this._orgId = process.env.ORG_ID || this._orgId;
     this._extensionPath = process.env.SALESFORCEDX_VSCODE_EXTENSIONS_PATH || this._extensionPath;
+    this._workspacePath = process.env.WORKSPACE_PATH || this._workspacePath;
     this._logLevel = LOG_LEVELS.some(l => l === process.env.E2E_LOG_LEVEL)
       ? (process.env.E2E_LOG_LEVEL as LogLevel)
       : this._logLevel;
@@ -209,6 +217,11 @@ export class EnvironmentSettings {
     }
 
     this._useExistingProject = projectPath;
+  }
+
+  /** Gets the workspace path where VS Code and test artifacts are stored */
+  public get workspacePath(): string {
+    return this._workspacePath;
   }
 
   /** Gets the log level for test execution */
