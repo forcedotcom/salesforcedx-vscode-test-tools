@@ -37,10 +37,10 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Run tests
-        run: npm run test
+      - name: Build, link, and run Linux Unit Tests
+        run: |
+          npm run compile
+          npm test
 
   windows-unit-tests:
     needs: linux-unit-tests
@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run compile
       - name: Run tests
         run: npm run test
 
@@ -74,7 +74,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run compile
       - name: Run NUTs
         run: npm run test:nuts
 
@@ -107,22 +107,14 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Prepare test environment
+      - name: Build, link, and test project
         run: |
-          shx rm -rf test
-          npm update @jsforce/jsforce-node@latest
-          npm install
-      - name: Clone external project
-        run: |
-          git clone ${{ matrix.externalProjectGitUrl }} external-project
-          cd external-project
-          npm ci
-          npm run build
-          shx rm -rf node_modules/@salesforce/core/node_modules/@jsforce/jsforce-node node_modules/@salesforce/sf-plugins-core/node_modules/@salesforce/core node_modules/@salesforce/cli-plugins-testkit/node_modules/@salesforce/core node_modules/@salesforce/source-tracking/node_modules/@salesforce/core node_modules/@salesforce/source-deploy-retrieve/node_modules/@salesforce/core node_modules/@salesforce/apex-node/node_modules/@salesforce/core
+          npm run compile
+          shx rm -rf node_modules/@salesforce/core/node_modules/@jsforce/jsforce-node node_modules/@salesforce/sf-plugins-core/node_modules/@salesforce/core node_modules/@salesforce/cli-plugins-testkit/node_modules/@salesforce/core node_modules/@salesforce/source-tracking/node_modules/@salesforce/core node_modules/@salesforce/source-deploy-retrieve/node_modules/@salesforce/core
           npm link ../
-          npm run test:nuts
+          ${{ matrix.command }}
+        env:
+          TESTKIT_AUTH_URL: ${{ secrets.TESTKIT_AUTH_URL }}
 
   # PDR plugin tests
   pdrNuts:
@@ -157,7 +149,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run compile
       - name: Prepare test environment
         run: |
           npm update @jsforce/jsforce-node@latest
@@ -167,7 +159,7 @@ jobs:
           git clone https://github.com/salesforcecli/plugin-deploy-retrieve external-project
           cd external-project
           npm ci
-          npm run build
+          npm run compile
           shx rm -rf node_modules/@salesforce/core/node_modules/@jsforce/jsforce-node node_modules/@salesforce/sf-plugins-core/node_modules/@salesforce/core node_modules/@salesforce/cli-plugins-testkit/node_modules/@salesforce/core node_modules/@salesforce/source-tracking/node_modules/@salesforce/core node_modules/@salesforce/source-deploy-retrieve/node_modules/@salesforce/core
           npm link ../
           ${{ matrix.command }}
