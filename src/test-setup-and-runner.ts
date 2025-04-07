@@ -168,7 +168,7 @@ class TestSetupAndRunner extends ExTester {
     expect(setAliasResult.stdout).to.contain('true');
   }
 
-  async downloadCode(version = 'latest'): Promise<string> {
+  async downloadCode(version = 'latest'): Promise<void> {
     // Create the workspace directory if it doesn't exist
     try {
       await fs.mkdir(this.testConfig.workspacePath, { recursive: true });
@@ -178,7 +178,7 @@ class TestSetupAndRunner extends ExTester {
     }
 
     // Now call the parent method
-    return super.downloadCode(version);
+    await super.downloadCode(version);
   }
 
   static get exTester(): TestSetupAndRunner {
