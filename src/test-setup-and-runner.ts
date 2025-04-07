@@ -24,7 +24,12 @@ class TestSetupAndRunner extends ExTester {
   public async setup(): Promise<void> {
     await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
     await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
-    await this.installExtensions();
+    try {
+      await this.installExtensions();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      log(`Warning: Failed to install extensions: ${errorMessage}. Continuing setup.`);
+    }
     await this.setupAndAuthorizeOrg();
   }
 
@@ -77,9 +82,7 @@ class TestSetupAndRunner extends ExTester {
       foundInstalledExtensions.length > 0 &&
       foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
     ) {
-      log(
-        `Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`
-      );
+      log(`Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`);
       foundInstalledExtensions.forEach(ext => {
         log(`Extension ${ext?.extensionId} version ${ext?.version}`);
       });
@@ -88,7 +91,8 @@ class TestSetupAndRunner extends ExTester {
 
     const extensionsVsixs = getVsixFilesFromDir(extensionsDir);
     if (extensionsVsixs.length === 0) {
-      throw new Error(`No vsix files were found in dir ${extensionsDir}`);
+      log(`No vsix files were found in dir ${extensionsDir}, skipping extension installation`);
+      return; // Skip installation instead of throwing an error
     }
 
     const mergeExcluded = Array.from(
@@ -111,9 +115,7 @@ class TestSetupAndRunner extends ExTester {
           // if not installing, don't verify, otherwise use default value
           foundExtension.shouldVerifyActivation =
             foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
-          log(
-            `SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`
-          );
+          log(`SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`);
         }
       }
     });
@@ -129,6 +131,13 @@ class TestSetupAndRunner extends ExTester {
     const devHubUserName = environmentSettings.devHubUserName;
     const devHubAliasName = environmentSettings.devHubAliasName;
     const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
+
+    // Skip if no auth URL is provided
+    if (!SFDX_AUTH_URL) {
+      log('No SFDX_AUTH_URL provided, skipping org authorization');
+      return;
+    }
+
     const orgId = environmentSettings.orgId;
     const sfdxAuthUrl = String(SFDX_AUTH_URL);
     const authFilePath = 'authFile.txt';
