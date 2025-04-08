@@ -142,6 +142,9 @@ class TestSetupAndRunner extends ExTester {
 
   public async setupAndAuthorizeOrg() {
     const environmentSettings = EnvironmentSettings.getInstance();
+    if (!environmentSettings.devHubUserName) {
+      throw new Error('No DEV_HUB_USER_NAME provided');
+    }
     const devHubUserName = environmentSettings.devHubUserName;
     const devHubAliasName = environmentSettings.devHubAliasName;
     const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
@@ -214,11 +217,6 @@ const argv = yargs(hideBin(process.argv))
 
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
-
-if (argv.workspacePath) {
-  testConfig.workspacePath = normalizePath(argv.workspacePath);
-  testConfig.extensionsPath = normalizePath(path.join(argv.workspacePath, 'extensions'));
-}
 
 const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {

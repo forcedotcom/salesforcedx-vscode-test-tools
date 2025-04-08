@@ -59,7 +59,7 @@
       "output": []
     },
     "test": {
-      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/selfSpecs/anInitialSuite.e2e.js",
+      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/selfSpecs/**.e2e.js",
       "dependencies": [
         "compile"
       ],

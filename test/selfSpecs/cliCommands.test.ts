@@ -9,7 +9,14 @@ import fs from 'fs';
 import { step } from 'mocha-steps';
 import { EnvironmentSettings } from '../../src/environmentSettings';
 import { expect } from 'chai';
-import { orgLoginSfdxUrl, scratchOrgCreate, orgList, orgDisplay, deleteScratchOrg, setAlias } from '../../src/system-operations';
+import {
+  orgLoginSfdxUrl,
+  scratchOrgCreate,
+  orgList,
+  orgDisplay,
+  deleteScratchOrg,
+  setAlias
+} from '../../src/system-operations';
 
 describe('CLI Commands', async () => {
   const environmentSettings = EnvironmentSettings.getInstance();
@@ -23,6 +30,10 @@ describe('CLI Commands', async () => {
   step('Authorize to Testing Org', async () => {
     const sfdxAuthUrl = String(SFDX_AUTH_URL);
     const authFilePath = 'authFile.txt';
+
+    if (!devHubUserName) {
+      throw new Error('No DEV_HUB_USER_NAME provided');
+    }
 
     // create and write in a text file
     fs.writeFileSync(authFilePath, sfdxAuthUrl);

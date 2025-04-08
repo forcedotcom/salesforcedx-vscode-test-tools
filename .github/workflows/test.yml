@@ -36,13 +36,16 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
           WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
         run: |
+          echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
           mkdir -p $WORKSPACE_PATH
-          npm test -- --workspace-path $WORKSPACE_PATH
+          npm test
 
   windows-basic-tests:
     needs: ubuntu-basic-tests
@@ -58,11 +61,15 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
+          # Use forward slashes even on Windows to avoid path interpretation issues
           WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
         run: |
+          echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
-          $workspacePath = "${{ github.workspace }}/temp-workspace" -replace "\\", "/"
-          New-Item -Path $workspacePath -Force -ItemType Directory
-          npm test -- --workspace-path $workspacePath
+          $WORKSPACE_PATH = "${{ github.workspace }}/temp-workspace" -replace "\\", "/"
+          New-Item -Path $WORKSPACE_PATH -Force -ItemType Directory
+          npm test

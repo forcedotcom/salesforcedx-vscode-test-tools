@@ -27,7 +27,7 @@ export class EnvironmentSettings {
 
   /**
    * Specific test spec files to run
-   * @env SPEC_FILES - Test spec filename(s) to run, will be prefixed with 'lib/specs/'
+   * @env SPEC_FILES - Test spec filename(s) to run
    * @default []
    */
   private _specFiles: string[] = [];
@@ -42,9 +42,8 @@ export class EnvironmentSettings {
   /**
    * DevHub username
    * @env DEV_HUB_USER_NAME - Username for the DevHub org
-   * @default 'svcideebot@salesforce.com'
    */
-  private _devHubUserName = 'svcideebot@salesforce.com';
+  private _devHubUserName: string | undefined;
 
   /**
    * SFDX auth URL for authentication
@@ -66,14 +65,14 @@ export class EnvironmentSettings {
    * @env SALESFORCEDX_VSCODE_EXTENSIONS_PATH - Alternative path (takes precedence)
    * @default '[project_root]/salesforcedx-vscode/extensions'
    */
-  private _extensionPath = join(__dirname, '..', '..', 'salesforcedx-vscode', 'extensions');
+  private _extensionPath = join(process.cwd(), 'salesforcedx-vscode', 'extensions');
 
   /**
    * Path to the workspace folder where VS Code and test artifacts are stored
    * @env WORKSPACE_PATH - Path to workspace directory
    * @default '[project_root]/salesforcedx-vscode'
    */
-  private _workspacePath = join(__dirname, '..', '..', 'salesforcedx-vscode');
+  private _workspacePath = join(process.cwd(), 'salesforcedx-vscode');
 
   /**
    * Test execution start time
@@ -116,12 +115,15 @@ export class EnvironmentSettings {
   private constructor() {
     this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
 
-    if (process.env.SPEC_FILES) {
-      this._specFiles = ['lib/specs/' + process.env.SPEC_FILES];
+    const specFiles = process.env.SPEC_FILES;
+    if (!specFiles) {
+      throw new Error('No SPEC_FILES provided');
     }
 
+    this._specFiles = specFiles.split(',');
+
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
-    this._devHubUserName = process.env.DEV_HUB_USER_NAME || this._devHubUserName;
+    this._devHubUserName = process.env.DEV_HUB_USER_NAME;
     this._extensionPath = process.env.EXTENSION_PATH || this._extensionPath;
     this._throttleFactor = parseInt(process.env.THROTTLE_FACTOR ?? '0') || this._throttleFactor;
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
@@ -162,7 +164,7 @@ export class EnvironmentSettings {
   }
 
   /** Gets the DevHub username */
-  public get devHubUserName(): string {
+  public get devHubUserName(): string | undefined {
     return this._devHubUserName;
   }
 

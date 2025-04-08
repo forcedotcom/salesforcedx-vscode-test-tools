@@ -112,7 +112,11 @@ export async function orgLoginSfdxUrl(authFilePath: string): Promise<SfCommandRu
  * @returns Results of the org display command
  * @throws Error if the command fails
  */
-export async function orgDisplay(usernameOrAlias: string): Promise<SfCommandRunResults> {
+export async function orgDisplay(usernameOrAlias: string | undefined): Promise<SfCommandRunResults> {
+  if (!usernameOrAlias) {
+    throw new Error('No usernameOrAlias provided');
+  }
+
   const sfOrgDisplayResult = await runCliCommand('org:display', '--target-org', usernameOrAlias, '--verbose', '--json');
   if (sfOrgDisplayResult.exitCode > 0) {
     const message = `sf org display failed with exit code: ${sfOrgDisplayResult.exitCode}.\n${sfOrgDisplayResult.stderr}`;
