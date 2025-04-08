@@ -1,11 +1,9 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import { ExtensionId } from '../testing/extensionUtils';
 
 /**
  * Type representing the available Salesforce org editions
@@ -48,6 +46,27 @@ export type ProjectConfig = {
 };
 
 /**
+ * Extension installation options for test configuration
+ */
+export type ExtensionInstallOption = 'always' | 'never' | 'optional';
+
+/**
+ * Configuration for a specific extension in tests
+ */
+export type ExtensionConfig = {
+  /** Extension identifier - can be any valid VS Code extension ID */
+  extensionId: string;
+  /** Whether to install the extension */
+  shouldInstall: ExtensionInstallOption;
+  /** Whether to verify the extension is activated */
+  shouldVerifyActivation: boolean;
+  /** Custom VSIX path for the extension if needed */
+  vsixPath?: string;
+  /** Optional display name for the extension */
+  name?: string;
+};
+
+/**
  * Configuration for test requirements
  */
 export type TestReqConfig = {
@@ -57,8 +76,19 @@ export type TestReqConfig = {
   isOrgRequired: boolean;
   /** The edition of the scratch org to be created, only specified when isOrgRequired is true */
   scratchOrgEdition?: OrgEdition;
-  /** The extensions that do not need to be installed */
-  excludedExtensions?: ExtensionId[];
+  /**
+   * Configuration for extensions to use in the test.
+   * Options:
+   * - undefined: use all default extensions with default configuration
+   * - Array of extension configs: override configuration for specific extensions
+   * - Empty array: don't configure any extensions
+   */
+  extensionConfigs?: ExtensionConfig[];
+  /**
+   * The extensions that should not be installed or verified.
+   * @deprecated Use extensionConfigs instead for more granular control
+   */
+  excludedExtensions?: string[];
   /** The test suite suffix name */
   testSuiteSuffixName: string;
 };
@@ -74,3 +104,44 @@ export interface TestConfig {
   /** VS Code version to use for testing */
   vscodeVersion: string;
 }
+
+/**
+ * Extension information returned by VS Code APIs
+ */
+export type Extension = {
+  id: string;
+  extensionPath: string;
+  isActive: boolean;
+  packageJSON: unknown;
+};
+
+/**
+ * Configuration for extension types in tests
+ */
+export type ExtensionType = {
+  extensionId: string;
+  name: string;
+  vsixPath: string;
+  shouldInstall: 'always' | 'never' | 'optional';
+  shouldVerifyActivation: boolean;
+};
+
+/**
+ * Information about extension activation status
+ */
+export type ExtensionActivation = {
+  extensionId: string;
+  isPresent: boolean;
+  version?: string;
+  activationTime?: string;
+  hasBug?: boolean;
+  isActivationComplete?: boolean;
+};
+
+/**
+ * Options for verifying extensions
+ */
+export type VerifyExtensionsOptions = {
+  timeout?: number;
+  interval?: number;
+};

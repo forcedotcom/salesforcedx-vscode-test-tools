@@ -2,7 +2,7 @@ import { ExTester } from 'vscode-extension-tester';
 import { EnvironmentSettings } from './environmentSettings';
 import path from 'path';
 import fs from 'fs/promises';
-import { extensions, ExtensionId } from './testing/extensionUtils';
+import { extensions } from './testing/extensionUtils';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ReleaseQuality } from 'vscode-extension-tester/out/util/codeUtil';
@@ -56,7 +56,7 @@ class TestSetupAndRunner extends ExTester {
     await this.installVsix({ useYarn: false, vsixFile: extension });
   }
 
-  public async installExtensions(excludeExtensions: ExtensionId[] = []): Promise<void> {
+  public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
     const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsPath));
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry =>

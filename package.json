@@ -13,7 +13,6 @@
   "scripts": {
     "test": "wireit",
     "automation-tests": "wireit",
-    "setup": "wireit",
     "lint": "wireit",
     "lint:fix": "eslint ./test ./src --ext .ts --fix",
     "compile": "wireit",
@@ -59,7 +58,7 @@
       "output": []
     },
     "test": {
-      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/**.e2e.js",
+      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/*.test.js",
       "dependencies": [
         "compile"
       ],
@@ -70,16 +69,6 @@
     },
     "automation-tests": {
       "command": "node ./lib/test-setup-and-runner.js",
-      "dependencies": [
-        "compile"
-      ],
-      "files": [
-        "lib/**/*"
-      ],
-      "output": []
-    },
-    "setup": {
-      "command": "node ./lib/test-setup-and-runner.js --spec lib/test/setup/anInitialSetUp.e2e.js",
       "dependencies": [
         "compile"
       ],

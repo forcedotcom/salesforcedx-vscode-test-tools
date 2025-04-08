@@ -13,7 +13,8 @@ import { verifyProjectLoaded } from '../../src/ui-interaction';
 describe('Use existing project', async () => {
   const testReqConfig: TestReqConfig = {
     projectConfig: {
-      projectShape: ProjectShapeOption.NEW
+      projectShape: ProjectShapeOption.NAMED,
+      githubRepoUrl: 'https://github.com/trailheadapps/dreamhouse-lwc.git'
     },
     isOrgRequired: false,
     testSuiteSuffixName: 'UseExistingProject'
@@ -23,6 +24,6 @@ describe('Use existing project', async () => {
   step('verify existing project is open', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
     log(`${testSetup.testSuiteSuffixName} - Verify existing project open`);
-    await verifyProjectLoaded('dreamhouse-lwc-testing');
+    await verifyProjectLoaded('dreamhouse-lwc');
   });
 });

@@ -1,139 +1,20 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import { Duration, log, pause } from '../core/miscellaneous';
+import { ExtensionType, ExtensionActivation, ExtensionConfig } from '../core/types';
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { By, Editor } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { getBrowser, getWorkbench, reloadWindow, enableAllExtensions, zoom, zoomReset } from '../ui-interaction';
 
-export type ExtensionId =
-  | 'salesforcedx-vscode'
-  | 'salesforcedx-vscode-expanded'
-  | 'salesforcedx-vscode-soql'
-  | 'salesforcedx-einstein-gpt'
-  | 'salesforcedx-vscode-core'
-  | 'salesforcedx-vscode-apex'
-  | 'salesforcedx-vscode-apex-debugger'
-  | 'salesforcedx-vscode-apex-replay-debugger'
-  | 'salesforcedx-vscode-lightning'
-  | 'salesforcedx-vscode-lwc'
-  | 'salesforcedx-vscode-visualforce';
-
-export type Extension = {
-  id: string;
-  extensionPath: string;
-  isActive: boolean;
-  packageJSON: unknown;
-};
-
-export type ExtensionType = {
-  extensionId: ExtensionId;
-  name: string;
-  vsixPath: string;
-  shouldInstall: 'always' | 'never' | 'optional';
-  shouldVerifyActivation: boolean;
-};
-
-export type ExtensionActivation = {
-  extensionId: string;
-  isPresent: boolean;
-  version?: string;
-  activationTime?: string;
-  hasBug?: boolean;
-  isActivationComplete?: boolean;
-};
-
-export type VerifyExtensionsOptions = {
-  timeout?: number;
-  interval?: number;
-};
-
 const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(60);
 
-export const extensions: ExtensionType[] = [
-  {
-    extensionId: 'salesforcedx-vscode',
-    name: 'Salesforce Extension Pack',
-    vsixPath: '',
-    shouldInstall: 'never',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-expanded',
-    name: 'Salesforce Extension Pack (Expanded)',
-    vsixPath: '',
-    shouldInstall: 'never',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-soql',
-    name: 'SOQL',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-einstein-gpt',
-    name: 'Einstein for Developers (Beta)',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-core',
-    name: 'Salesforce CLI Integration',
-    vsixPath: '',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex',
-    name: 'Apex',
-    vsixPath: '',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex-debugger',
-    name: 'Apex Interactive Debugger',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex-replay-debugger',
-    name: 'Apex Replay Debugger',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-lightning',
-    name: 'Lightning Web Components',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-lwc',
-    name: 'Lightning Web Components',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-visualforce',
-    name: 'salesforcedx-vscode-visualforce',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  }
-];
+export const extensions: ExtensionType[] = [];
 
 /**
  * Shows the list of running extensions in VS Code
@@ -190,7 +71,7 @@ export function getExtensionsToVerifyActive(
  * @param {Duration} timeout - Optional timeout (defaults to VERIFY_EXTENSIONS_TIMEOUT)
  * @returns {Promise<boolean>} True if all extensions are activated successfully
  */
-export async function verifyExtensionsAreRunning(extensions: ExtensionType[], timeout = VERIFY_EXTENSIONS_TIMEOUT) {
+export async function verifyExtensionsAreRunning(extensions: ExtensionConfig[], timeout = VERIFY_EXTENSIONS_TIMEOUT) {
   log('');
   log(`Starting verifyExtensionsAreRunning()...`);
   if (extensions.length === 0) {

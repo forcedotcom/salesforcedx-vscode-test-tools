@@ -8,20 +8,34 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { EnvironmentSettings as Env } from './environmentSettings';
 import * as core from './core/index';
-import { ProjectConfig, ProjectShapeOption } from './core/types';
-import { deleteScratchOrg, createFolder, generateSfProject, gitRepoExists, getRepoNameFromUrl, getFolderName, gitClone } from './system-operations';
-import { verifyExtensionsAreRunning, getExtensionsToVerifyActive, reloadAndEnableExtensions, checkForUncaughtErrors } from './testing';
+import { ProjectConfig, ProjectShapeOption, ExtensionConfig } from './core/types';
+import {
+  deleteScratchOrg,
+  createFolder,
+  generateSfProject,
+  gitRepoExists,
+  getRepoNameFromUrl,
+  getFolderName,
+  gitClone
+} from './system-operations';
+import {
+  verifyExtensionsAreRunning,
+  reloadAndEnableExtensions,
+  checkForUncaughtErrors,
+  extensions,
+} from './testing';
 import { verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 
 export class TestSetup {
   public testSuiteSuffixName = '';
   // this needs to be defined in EnvironmentSettings with the default being os.tmpDir()
-  public tempFolderPath = path.join(__dirname, '..', 'e2e-temp');
+  public tempFolderPath = path.join(process.cwd(), 'e2e-temp');
   public projectFolderPath: string | undefined;
   public aliasAndUserNameWereVerified = false;
   public scratchOrgAliasName: string | undefined;
   public scratchOrgId: string | undefined;
+  private configuredExtensions: ExtensionConfig[] = [];
 
   private constructor() {}
 
@@ -34,10 +48,14 @@ export class TestSetup {
     testSetup.testSuiteSuffixName = testReqConfig.testSuiteSuffixName;
     core.log('');
     core.log(`${testSetup.testSuiteSuffixName} - Starting TestSetup.setUp()...`);
+
+    // Configure extensions based on test requirements
+    testSetup.configureExtensions(testReqConfig);
+
     /* The expected workspace will be open up after setUpTestingWorkspace */
     await testSetup.setUpTestingWorkspace(testReqConfig.projectConfig);
     if (testReqConfig.projectConfig.projectShape !== ProjectShapeOption.NONE) {
-      await verifyExtensionsAreRunning(getExtensionsToVerifyActive());
+      await verifyExtensionsAreRunning(testSetup.getExtensionsToVerify());
       const scratchOrgEdition = testReqConfig.scratchOrgEdition || 'developer';
       testSetup.updateScratchOrgDefWithEdition(scratchOrgEdition);
       if (process.platform === 'darwin') testSetup.setJavaHomeConfigEntry(); // Extra config needed for Apex LSP on GHA
@@ -47,6 +65,81 @@ export class TestSetup {
     testSetup.setWorkbenchHoverDelay();
     core.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
     return testSetup;
+  }
+
+  /**
+   * Configure extensions based on test requirements
+   * @param testReqConfig Test requirement configuration
+   */
+  private configureExtensions(testReqConfig: core.TestReqConfig): void {
+    // Start with all default extensions from salesforceExtensions
+    this.configuredExtensions = testReqConfig.extensionConfigs || [];
+
+    // If extensionConfigs is provided, configure the specific extensions
+    if (testReqConfig.extensionConfigs) {
+      if (testReqConfig.extensionConfigs.length === 0) {
+        // Empty array means no extensions
+        this.configuredExtensions = [];
+      } else {
+        // For each configured extension, update the corresponding default extension or add a new one
+        for (const extConfig of testReqConfig.extensionConfigs) {
+          const existingExtIndex = this.configuredExtensions.findIndex(
+            ext => ext.extensionId === extConfig.extensionId
+          );
+
+          if (existingExtIndex >= 0) {
+            // Update existing extension configuration
+            this.configuredExtensions[existingExtIndex] = {
+              ...this.configuredExtensions[existingExtIndex],
+              shouldInstall: extConfig.shouldInstall,
+              shouldVerifyActivation: extConfig.shouldVerifyActivation,
+              vsixPath: extConfig.vsixPath || this.configuredExtensions[existingExtIndex].vsixPath
+            };
+          } else {
+            // Add new extension configuration
+            this.configuredExtensions.push({
+              extensionId: extConfig.extensionId,
+              name: extConfig.name || extConfig.extensionId, // Use provided name or extensionId as name
+              vsixPath: extConfig.vsixPath || '',
+              shouldInstall: extConfig.shouldInstall,
+              shouldVerifyActivation: extConfig.shouldVerifyActivation
+            });
+          }
+        }
+      }
+    }
+
+    // For backward compatibility: handle excludedExtensions by setting shouldInstall to 'never'
+    if (testReqConfig.excludedExtensions && testReqConfig.excludedExtensions.length > 0) {
+      for (const excludedExtId of testReqConfig.excludedExtensions) {
+        const extIndex = this.configuredExtensions.findIndex(ext => ext.extensionId === excludedExtId);
+        if (extIndex >= 0) {
+          this.configuredExtensions[extIndex].shouldInstall = 'never';
+          this.configuredExtensions[extIndex].shouldVerifyActivation = false;
+        }
+      }
+    }
+
+    // Update the global extensions variable to use our configured extensions
+    // This ensures compatibility with any code that still uses the global extensions
+    Object.assign(extensions, this.configuredExtensions);
+
+    core.log(`${this.testSuiteSuffixName} - Configured ${this.configuredExtensions.length} extensions for testing`);
+  }
+
+  /**
+   * Get extensions that should be verified during test setup
+   */
+  public getExtensionsToVerify(): ExtensionConfig[] {
+    return this.configuredExtensions.filter(ext => ext.shouldVerifyActivation);
+  }
+
+  /**
+   * Get extensions that should be installed with a specific installation option
+   * @param option Installation option to filter by
+   */
+  public getExtensionsToInstall(option: 'always' | 'never' | 'optional'): ExtensionConfig[] {
+    return this.configuredExtensions.filter(ext => ext.shouldInstall === option);
   }
 
   public async tearDown(shouldCheckForUncaughtErrors = true): Promise<void> {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -116,7 +116,7 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   if (process.platform === 'linux') {
     // In Linux, clear the output by clicking the "Clear Output" button in the Output Tab
     const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
-    await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
+    await outputView.getDriver().executeScript('arguments[0].click();', clearButton);
   } else {
     // In Mac and Windows, clear the output by calling the "View: Clear Output" command in the command palette
     await executeQuickPick('View: Clear Output', wait);
