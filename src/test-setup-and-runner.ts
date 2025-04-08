@@ -12,6 +12,7 @@ import { orgLoginSfdxUrl, setAlias } from './system-operations/cliCommands';
 import { getVsixFilesFromDir } from './system-operations';
 import { TestConfig } from './core/types';
 import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
+import { verifyAliasAndUserName } from './salesforce-components/authorization';
 
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
@@ -142,20 +143,39 @@ class TestSetupAndRunner extends ExTester {
 
   public async setupAndAuthorizeOrg() {
     const environmentSettings = EnvironmentSettings.getInstance();
-    if (!environmentSettings.devHubUserName) {
-      throw new Error('No DEV_HUB_USER_NAME provided');
-    }
     const devHubUserName = environmentSettings.devHubUserName;
     const devHubAliasName = environmentSettings.devHubAliasName;
     const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
 
-    // Skip if no auth URL is provided
-    if (!SFDX_AUTH_URL) {
-      log('No SFDX_AUTH_URL provided, skipping org authorization');
+    try {
+      // First try to verify if the org with alias and username exists
+      log('Checking if org with matching alias and username is already authenticated...');
+      await verifyAliasAndUserName();
+      log(`Org with alias ${devHubAliasName} and username ${devHubUserName} is already authenticated`);
       return;
+    } catch (error) {
+      // If verification fails, continue with SFDX_AUTH_URL
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      log(`No existing authenticated org found: ${errorMessage}`);
+
+      // If no SFDX_AUTH_URL is provided, rethrow the error
+      if (!SFDX_AUTH_URL) {
+        throw new Error('No SFDX_AUTH_URL provided and no existing authentication found. Unable to authorize org.');
+      }
     }
 
-    const orgId = environmentSettings.orgId;
+    // The verifyAliasAndUserName function already checks that both alias and username are set,
+    // so at this point we know they are defined (or we would have thrown earlier).
+    // TypeScript doesn't know this though, so we'll add the non-null assertion
+    if (!devHubUserName || !devHubAliasName) {
+      throw new Error(
+        'DevHub username or alias name is not set. This should not happen as verifyAliasAndUserName should have caught this.'
+      );
+    }
+
+    // At this point, neither alias nor username matched an existing org,
+    // and we have an SFDX_AUTH_URL to use
+    log('Authenticating using SFDX_AUTH_URL...');
     const sfdxAuthUrl = String(SFDX_AUTH_URL);
     const authFilePath = 'authFile.txt';
 
@@ -164,7 +184,7 @@ class TestSetupAndRunner extends ExTester {
 
     // Step 1: Authorize to Testing Org
     const authorizeOrg = await orgLoginSfdxUrl(authFilePath);
-    expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName} with org ID ${orgId}`);
+    expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName}`);
 
     // Step 2: Set Alias for the Org
     const setAliasResult = await setAlias(devHubAliasName, devHubUserName);

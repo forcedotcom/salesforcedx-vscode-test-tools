@@ -118,7 +118,6 @@ The following environment variables can be used to configure the automation test
 | `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                |
 | `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | `'svcideebot@salesforce.com'`                |
 | `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  |
-| `ORG_ID`                              | ID of the Salesforce org                                                                              | `undefined`                                  |
 | `EXTENSION_PATH`                      | Path to extensions directory                                                                          | `{cwd}/../../salesforcedx-vscode/extensions` |
 | `SALESFORCEDX_VSCODE_EXTENSIONS_PATH` | Alternative path to extensions (takes precedence over EXTENSION_PATH)                                 | -                                            |
 | `THROTTLE_FACTOR`                     | Number to multiply timeouts by (used to slow down test execution)                                     | `1`                                          |

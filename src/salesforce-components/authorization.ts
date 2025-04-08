@@ -66,9 +66,8 @@ export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
 /**
  * Verifies that the alias and user name are set and match an org in the org list
  * @throws Error if DevHub alias or username are not set or can't be found in org list
- * @private
  */
-async function verifyAliasAndUserName() {
+export async function verifyAliasAndUserName() {
   const environmentSettings = Env.getInstance();
 
   const devHubAliasName = environmentSettings.devHubAliasName;

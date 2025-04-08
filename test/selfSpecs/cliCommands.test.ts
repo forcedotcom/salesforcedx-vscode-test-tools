@@ -23,7 +23,6 @@ describe('CLI Commands', async () => {
   const devHubUserName = environmentSettings.devHubUserName;
   const devHubAliasName = environmentSettings.devHubAliasName;
   const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
-  const orgId = environmentSettings.orgId;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let scratchOrg: any;
 
@@ -39,7 +38,7 @@ describe('CLI Commands', async () => {
     fs.writeFileSync(authFilePath, sfdxAuthUrl);
 
     const authorizeOrg = await orgLoginSfdxUrl(authFilePath);
-    expect(authorizeOrg.stdout).to.include(`Successfully authorized ${devHubUserName} with org ID ${orgId}`);
+    expect(authorizeOrg.stdout).to.include(`Successfully authorized ${devHubUserName}`);
 
     const setAliasResult = await setAlias(devHubAliasName, devHubUserName);
     expect(setAliasResult.stdout).to.include(devHubAliasName);

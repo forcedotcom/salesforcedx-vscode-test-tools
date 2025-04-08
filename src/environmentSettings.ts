@@ -53,13 +53,6 @@ export class EnvironmentSettings {
   private _sfdxAuthUrl = process.env.SFDX_AUTH_URL;
 
   /**
-   * Salesforce org ID
-   * @env ORG_ID - ID of the Salesforce org
-   * @default undefined
-   */
-  private _orgId = process.env.ORG_ID;
-
-  /**
    * Path to Salesforce DX VSCode extensions
    * @env EXTENSION_PATH - Path to extensions directory
    * @env SALESFORCEDX_VSCODE_EXTENSIONS_PATH - Alternative path (takes precedence)
@@ -119,7 +112,6 @@ export class EnvironmentSettings {
     this._extensionPath = process.env.EXTENSION_PATH || this._extensionPath;
     this._throttleFactor = parseInt(process.env.THROTTLE_FACTOR ?? '0') || this._throttleFactor;
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
-    this._orgId = process.env.ORG_ID || this._orgId;
     this._extensionPath = process.env.SALESFORCEDX_VSCODE_EXTENSIONS_PATH || this._extensionPath;
     this._workspacePath = process.env.WORKSPACE_PATH || this._workspacePath;
     this._logLevel = LOG_LEVELS.some(l => l === process.env.E2E_LOG_LEVEL)
@@ -178,11 +170,6 @@ export class EnvironmentSettings {
   /** Gets the SFDX auth URL for authentication */
   public get sfdxAuthUrl(): string | undefined {
     return this._sfdxAuthUrl;
-  }
-
-  /** Gets the Salesforce org ID */
-  public get orgId(): string | undefined {
-    return this._orgId;
   }
 
   /** Gets the Java home directory path */
