@@ -114,14 +114,6 @@ export class EnvironmentSettings {
    */
   private constructor() {
     this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
-
-    const specFiles = process.env.SPEC_FILES;
-    if (!specFiles) {
-      throw new Error('No SPEC_FILES provided');
-    }
-
-    this._specFiles = specFiles.split(',');
-
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
     this._devHubUserName = process.env.DEV_HUB_USER_NAME;
     this._extensionPath = process.env.EXTENSION_PATH || this._extensionPath;
