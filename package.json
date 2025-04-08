@@ -59,7 +59,7 @@
       "output": []
     },
     "test": {
-      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/selfSpecs/**.e2e.js",
+      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/**.e2e.js",
       "dependencies": [
         "compile"
       ],
@@ -79,7 +79,7 @@
       "output": []
     },
     "setup": {
-      "command": "node ./lib/test-setup-and-runner.js --spec test/setup/anInitialSetUp.e2e.js",
+      "command": "node ./lib/test-setup-and-runner.js --spec lib/test/setup/anInitialSetUp.e2e.js",
       "dependencies": [
         "compile"
       ],

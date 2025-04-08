@@ -44,7 +44,6 @@ jobs:
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
-          echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
           mkdir -p $WORKSPACE_PATH
           npm test
@@ -72,7 +71,6 @@ jobs:
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
-          echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
           $WORKSPACE_PATH = "${{ github.workspace }}/temp-workspace" -replace "\\", "/"
           New-Item -Path $WORKSPACE_PATH -Force -ItemType Directory
