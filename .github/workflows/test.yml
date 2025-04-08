@@ -41,6 +41,8 @@ jobs:
       - name: Compile and test
         env:
           WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
+          DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
@@ -67,6 +69,8 @@ jobs:
         env:
           # Use forward slashes even on Windows to avoid path interpretation issues
           WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
+          DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           echo "WORKSPACE_PATH: $WORKSPACE_PATH"
           npm run compile
