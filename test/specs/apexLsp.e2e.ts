@@ -8,7 +8,7 @@
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { EnvironmentSettings } from '../environmentSettings';
-import { By, WebElement, after } from 'vscode-extension-tester';
+import { By, InputBox, QuickPickItem, WebElement, after } from 'vscode-extension-tester';
 import path from 'path';
 import fs from 'fs';
 import { step } from 'mocha-steps';
@@ -72,14 +72,6 @@ const verifyLspStatus = async (expectedStatus: string): Promise<WebElement> => {
 const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
   const option = LSP_RESTART_OPTIONS.find(opt => opt.cleanDb === cleanDb)?.option;
   if (!option) throw new Error(`Invalid cleanDb option: ${cleanDb}`);
-
-  // Wait for notification to appear and be clickable
-  await utilities.acceptNotification(
-    'Clean Apex DB and Restart? Or Restart Only?',
-    option,
-    utilities.Duration.seconds(7)
-  );
-
   // Wait for LSP to enter restarting state
   await verifyLspStatus(LSP_STATUS.restarting);
   // Allow time for LSP to fully restart and reindex
@@ -160,7 +152,15 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
     expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal(null);
   }
 
-  await utilities.executeQuickPick('Restart Apex Language Server');
+  const restartCommand = await utilities.executeQuickPick('Restart Apex Language Server');
+  const quickPicks = await restartCommand.getQuickPicks();
+  for (const quickPick of quickPicks) {
+    const label = await quickPick.getLabel();
+    if (label === (cleanDb ? 'Clean Apex DB and Restart' : 'Restart Only')) {
+      await quickPick.select();
+      break;
+    }
+  }
   await verifyLspRestart(cleanDb);
 
   if (cleanDb) {
@@ -175,7 +175,6 @@ const testStatusBarRestart = async (testSetup: TestSetup, cleanDb: boolean): Pro
   const action = cleanDb ? 'with cleaned db' : 'alone';
   utilities.log(`${testSetup.testSuiteSuffixName} - Apex Status Bar: LSP Restart ${action}`);
 
-  await utilities.dismissAllNotifications();
   const statusBar = await utilities.getStatusBarItemWhichIncludes('Editor Language Status');
   await statusBar.click();
 
@@ -185,7 +184,8 @@ const testStatusBarRestart = async (testSetup: TestSetup, cleanDb: boolean): Pro
   await restartButton.click();
 
   // Allow time for restart process to begin
-  await utilities.pause(utilities.Duration.seconds(5));
+  const dropdown = await new InputBox().wait();
+  await utilities.selectQuickPickItem(dropdown, cleanDb ? 'Clean Apex DB and Restart' : 'Restart Only');
   await verifyLspRestart(cleanDb);
 
   if (cleanDb) {
