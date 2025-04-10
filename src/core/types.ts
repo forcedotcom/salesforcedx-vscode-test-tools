@@ -97,12 +97,38 @@ export type TestReqConfig = {
  * Configuration options for the test environment
  */
 export interface TestConfig {
-  /** Path to the workspace directory where VS Code and test artifacts are stored */
-  workspacePath: string;
-  /** Path to extensions directory */
-  extensionsPath: string;
-  /** VS Code version to use for testing */
-  vscodeVersion: string;
+  /**
+   * Path to the workspace directory where VS Code and test artifacts are stored
+   * @deprecated Use testResources instead
+   */
+  workspacePath?: string;
+
+  /**
+   * Path to the test resources directory (standard vscode-extension-tester name)
+   */
+  testResources: string;
+
+  /**
+   * Path to extensions directory
+   * @deprecated Use extensionsFolder instead
+   */
+  extensionsPath?: string;
+
+  /**
+   * Path to the extensions folder (standard vscode-extension-tester name)
+   */
+  extensionsFolder: string;
+
+  /**
+   * VS Code version to use for testing
+   * @deprecated Use codeVersion instead
+   */
+  vscodeVersion?: string;
+
+  /**
+   * VS Code version to use for testing (standard vscode-extension-tester name)
+   */
+  codeVersion: string;
 }
 
 /**

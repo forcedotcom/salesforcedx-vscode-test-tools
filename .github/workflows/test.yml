@@ -41,10 +41,11 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          # Standard vscode-extension-tester variables
+          # Standard vscode-extension-tester environment variables
           TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
           EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
           CODE_VERSION: 'latest'
+          VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: '--user-data-dir=${{ github.workspace }}/chrome-data-${{ github.run_id }}'
           # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
@@ -73,10 +74,11 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          # Standard vscode-extension-tester variables (use forward slashes even on Windows)
+          # Standard vscode-extension-tester environment variables (use forward slashes even on Windows)
           TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
           EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
           CODE_VERSION: 'latest'
+          VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: '--user-data-dir=${{ github.workspace }}/chrome-data-${{ github.run_id }}'
           # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}

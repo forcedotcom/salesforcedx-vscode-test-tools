@@ -29,23 +29,34 @@ class TestSetupAndRunner extends ExTester {
     validateTestConfig(config);
 
     // Set up the VS Code download location as a sibling directory to workspace
-    const workspaceDir = path.dirname(config.workspacePath);
+    const workspaceDir = path.dirname(config.testResources);
     const vscodeDownloadDir = path.join(workspaceDir, 'vscode');
-    super(config.extensionsPath, ReleaseQuality.Stable, normalizePath(vscodeDownloadDir));
+    super(config.extensionsFolder, ReleaseQuality.Stable, normalizePath(vscodeDownloadDir));
     this.testConfig = config;
   }
 
-  public async setup(): Promise<void> {
-    await this.downloadCode(this.testConfig.vscodeVersion);
-    await this.downloadChromeDriver(this.testConfig.vscodeVersion);
+  /**
+   * Helper method to log important test information using standard terminology
+   */
+  private logTestEnvironment(): void {
+    log(`Setting up test environment with:`);
+    log(`- Test Resources: ${this.testConfig.testResources}`);
+    log(`- Extensions Folder: ${this.testConfig.extensionsFolder}`);
+    log(`- VS Code Version: ${this.testConfig.codeVersion}`);
 
-    // Set ChromeDriver arguments if provided
+    // Log Chrome driver arguments if available
     const chromeDriverArgs = EnvironmentSettings.getInstance().chromeDriverArgs;
     if (chromeDriverArgs) {
-      log(`Setting ChromeDriver arguments: ${chromeDriverArgs}`);
-      // If we need to set Chrome options, we'd do it here
-      // This would require using the selenium.Options class
+      log(`- ChromeDriver Arguments: ${chromeDriverArgs}`);
     }
+  }
+
+  public async setup(): Promise<void> {
+    // Log the test environment configuration
+    this.logTestEnvironment();
+
+    await this.downloadCode(this.testConfig.codeVersion);
+    await this.downloadChromeDriver(this.testConfig.codeVersion);
 
     try {
       await this.installExtensions();
@@ -67,7 +78,7 @@ class TestSetupAndRunner extends ExTester {
   }
 
   public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
-    const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsPath));
+    const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsFolder));
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry =>
       path.resolve(normalizePath(path.join(extensionsDir, entry)))
@@ -204,12 +215,24 @@ class TestSetupAndRunner extends ExTester {
   }
 
   async downloadCode(version = 'latest'): Promise<void> {
-    // Create the workspace directory if it doesn't exist
+    // Create all necessary directories with standard terminology
     try {
-      await fs.mkdir(this.testConfig.workspacePath, { recursive: true });
+      // Create test resources directory
+      await fs.mkdir(this.testConfig.testResources, { recursive: true });
+      log(`Created test resources directory: ${this.testConfig.testResources}`);
+
+      // Create extensions directory
+      await fs.mkdir(this.testConfig.extensionsFolder, { recursive: true });
+      log(`Created extensions directory: ${this.testConfig.extensionsFolder}`);
+
+      // Create VS Code download directory
+      const workspaceDir = path.dirname(this.testConfig.testResources);
+      const vscodeDir = path.join(workspaceDir, 'vscode');
+      await fs.mkdir(vscodeDir, { recursive: true });
+      log(`Created VS Code directory: ${vscodeDir}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      log(`Warning: Failed to create workspace directory: ${errorMessage}. Using default path.`);
+      log(`Warning: Failed to create directories: ${errorMessage}. Using default paths.`);
     }
 
     // Now call the parent method
@@ -234,13 +257,35 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false,
     array: true
   })
+  .option('test-resources', {
+    alias: 'r',
+    type: 'string',
+    description: 'Path to test resources directory',
+    demandOption: false
+  })
+  .option('extensions-folder', {
+    alias: 'e',
+    type: 'string',
+    description: 'Path to extensions directory',
+    demandOption: false
+  })
   .help().argv as {
   spec: string | string[] | undefined;
-  workspacePath?: string;
+  testResources?: string;
+  extensionsFolder?: string;
 };
 
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
+
+// Use command line args if provided, using standard vscode-extension-tester naming
+if (argv.testResources) {
+  testConfig.testResources = argv.testResources;
+}
+
+if (argv.extensionsFolder) {
+  testConfig.extensionsFolder = argv.extensionsFolder;
+}
 
 const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {

@@ -22,19 +22,45 @@ export function normalizePath(path: string): string {
 export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestConfig {
   const env = EnvironmentSettings.getInstance();
 
-  // Create default config
+  // Create default config with standard property names
   const defaultConfig: TestConfig = {
-    workspacePath: normalizePath(env.testResources),
-    extensionsPath: normalizePath(env.extensionsFolder),
-    vscodeVersion: env.codeVersion
+    testResources: normalizePath(env.testResources),
+    extensionsFolder: normalizePath(env.extensionsFolder),
+    codeVersion: env.codeVersion
   };
 
-  // Normalize any path overrides
-  if (overrides?.workspacePath) {
+  // Set deprecated properties for backward compatibility
+  defaultConfig.workspacePath = defaultConfig.testResources;
+  defaultConfig.extensionsPath = defaultConfig.extensionsFolder;
+  defaultConfig.vscodeVersion = defaultConfig.codeVersion;
+
+  // Normalize any path overrides and handle both new and deprecated property names
+  if (overrides?.testResources) {
+    overrides.testResources = normalizePath(overrides.testResources);
+    // Keep workspacePath in sync for backward compatibility
+    overrides.workspacePath = overrides.testResources;
+  } else if (overrides?.workspacePath) {
     overrides.workspacePath = normalizePath(overrides.workspacePath);
+    // Set testResources from workspacePath for forward compatibility
+    overrides.testResources = overrides.workspacePath;
   }
-  if (overrides?.extensionsPath) {
+
+  if (overrides?.extensionsFolder) {
+    overrides.extensionsFolder = normalizePath(overrides.extensionsFolder);
+    // Keep extensionsPath in sync for backward compatibility
+    overrides.extensionsPath = overrides.extensionsFolder;
+  } else if (overrides?.extensionsPath) {
     overrides.extensionsPath = normalizePath(overrides.extensionsPath);
+    // Set extensionsFolder from extensionsPath for forward compatibility
+    overrides.extensionsFolder = overrides.extensionsPath;
+  }
+
+  if (overrides?.codeVersion) {
+    // Keep vscodeVersion in sync for backward compatibility
+    overrides.vscodeVersion = overrides.codeVersion;
+  } else if (overrides?.vscodeVersion) {
+    // Set codeVersion from vscodeVersion for forward compatibility
+    overrides.codeVersion = overrides.vscodeVersion;
   }
 
   // Merge with overrides
@@ -47,21 +73,44 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
  * @param config - The test configuration to validate
  */
 export function validateTestConfig(config: TestConfig): void {
-  if (!config.workspacePath) {
-    throw new Error('TestConfig.workspacePath is required');
+  // First validate using the standard property names
+  if (!config.testResources) {
+    if (config.workspacePath) {
+      // Use deprecated property if new one is not set
+      config.testResources = config.workspacePath;
+    } else {
+      throw new Error('TestConfig.testResources is required');
+    }
   }
 
-  if (!config.extensionsPath) {
-    // Default to sibling 'extensions' directory instead of a subdirectory of workspace
-    const workspaceDir = path.dirname(config.workspacePath);
-    config.extensionsPath = join(workspaceDir, 'extensions');
+  if (!config.extensionsFolder) {
+    if (config.extensionsPath) {
+      // Use deprecated property if new one is not set
+      config.extensionsFolder = config.extensionsPath;
+    } else {
+      // Default to sibling 'extensions' directory
+      const workspaceDir = path.dirname(config.testResources);
+      config.extensionsFolder = join(workspaceDir, 'extensions');
+    }
   }
 
-  if (!config.vscodeVersion) {
-    config.vscodeVersion = 'stable';
+  if (!config.codeVersion) {
+    if (config.vscodeVersion) {
+      // Use deprecated property if new one is not set
+      config.codeVersion = config.vscodeVersion;
+    } else {
+      config.codeVersion = 'stable';
+    }
   }
+
+  // Keep deprecated properties in sync for backward compatibility
+  config.workspacePath = config.testResources;
+  config.extensionsPath = config.extensionsFolder;
+  config.vscodeVersion = config.codeVersion;
 
   // Ensure paths use forward slashes
-  config.workspacePath = normalizePath(config.workspacePath);
-  config.extensionsPath = normalizePath(config.extensionsPath);
+  config.testResources = normalizePath(config.testResources);
+  config.extensionsFolder = normalizePath(config.extensionsFolder);
+  config.workspacePath = config.testResources;
+  config.extensionsPath = config.extensionsFolder;
 }
