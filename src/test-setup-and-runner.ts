@@ -28,8 +28,9 @@ class TestSetupAndRunner extends ExTester {
     // Validate config and set defaults for missing values
     validateTestConfig(config);
 
-    // Pass the workspace path to ExTester as the VS Code download location
-    const vscodeDownloadDir = path.join(config.workspacePath, 'extensions');
+    // Set up the VS Code download location as a sibling directory to workspace
+    const workspaceDir = path.dirname(config.workspacePath);
+    const vscodeDownloadDir = path.join(workspaceDir, 'vscode');
     super(config.extensionsPath, ReleaseQuality.Stable, normalizePath(vscodeDownloadDir));
     this.testConfig = config;
   }
@@ -37,6 +38,15 @@ class TestSetupAndRunner extends ExTester {
   public async setup(): Promise<void> {
     await this.downloadCode(this.testConfig.vscodeVersion);
     await this.downloadChromeDriver(this.testConfig.vscodeVersion);
+
+    // Set ChromeDriver arguments if provided
+    const chromeDriverArgs = EnvironmentSettings.getInstance().chromeDriverArgs;
+    if (chromeDriverArgs) {
+      log(`Setting ChromeDriver arguments: ${chromeDriverArgs}`);
+      // If we need to set Chrome options, we'd do it here
+      // This would require using the selenium.Options class
+    }
+
     try {
       await this.installExtensions();
     } catch (error: unknown) {

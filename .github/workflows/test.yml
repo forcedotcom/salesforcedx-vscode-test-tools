@@ -1,4 +1,5 @@
 name: tests
+# Testing edit_file access
 on:
   push:
     branches-ignore: [main]
@@ -40,12 +41,18 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          WORKSPACE_PATH: ./temp-workspace-${{ github.run_id }}
+          # Standard vscode-extension-tester variables
+          TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
+          EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
+          CODE_VERSION: 'latest'
+          # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
-          mkdir -p $WORKSPACE_PATH
+          mkdir -p $TEST_RESOURCES
+          mkdir -p $EXTENSIONS_FOLDER
+          mkdir -p ${{ github.workspace }}/chrome-data-${{ github.run_id }}
           npm test
 
   windows-basic-tests:
@@ -66,12 +73,19 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          # Use forward slashes even on Windows to avoid path interpretation issues
-          WORKSPACE_PATH: ./temp-workspace-${{ github.run_id }}
+          # Standard vscode-extension-tester variables (use forward slashes even on Windows)
+          TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
+          EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
+          CODE_VERSION: 'latest'
+          # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
-          $WORKSPACE_PATH = ./temp-workspace-${{ github.run_id }}" -replace "\\", "/"
-          New-Item -Path $WORKSPACE_PATH -Force -ItemType Directory
+          $testResourcesPath = "${{ github.workspace }}/test-resources-${{ github.run_id }}" -replace "\\", "/"
+          $extensionsPath = "${{ github.workspace }}/extensions-${{ github.run_id }}" -replace "\\", "/"
+          $chromeDataPath = "${{ github.workspace }}/chrome-data-${{ github.run_id }}" -replace "\\", "/"
+          New-Item -Path $testResourcesPath -Force -ItemType Directory
+          New-Item -Path $extensionsPath -Force -ItemType Directory
+          New-Item -Path $chromeDataPath -Force -ItemType Directory
           npm test

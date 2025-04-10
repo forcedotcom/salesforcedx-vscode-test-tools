@@ -1,4 +1,5 @@
 import { join } from 'path';
+import path from 'path';
 import { TestConfig } from './types';
 import { EnvironmentSettings } from '../environmentSettings';
 
@@ -23,9 +24,9 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
 
   // Create default config
   const defaultConfig: TestConfig = {
-    workspacePath: normalizePath(env.workspacePath),
-    extensionsPath: normalizePath(env.extensionPath),
-    vscodeVersion: env.vscodeVersion
+    workspacePath: normalizePath(env.testResources),
+    extensionsPath: normalizePath(env.extensionsFolder),
+    vscodeVersion: env.codeVersion
   };
 
   // Normalize any path overrides
@@ -51,8 +52,9 @@ export function validateTestConfig(config: TestConfig): void {
   }
 
   if (!config.extensionsPath) {
-    // Default to 'extensions' subfolder of workspace path
-    config.extensionsPath = join(config.workspacePath, 'extensions');
+    // Default to sibling 'extensions' directory instead of a subdirectory of workspace
+    const workspaceDir = path.dirname(config.workspacePath);
+    config.extensionsPath = join(workspaceDir, 'extensions');
   }
 
   if (!config.vscodeVersion) {

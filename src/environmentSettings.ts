@@ -20,10 +20,10 @@ export class EnvironmentSettings {
 
   /**
    * VSCode version to use in tests
-   * @env CODE_VERSION - VSCode version identifier
+   * @env CODE_VERSION - VSCode version identifier (vscode-extension-tester standard)
    * @default 'latest'
    */
-  private _vscodeVersion = 'latest';
+  private _codeVersion = 'latest';
 
   /**
    * Specific test spec files to run
@@ -54,18 +54,24 @@ export class EnvironmentSettings {
 
   /**
    * Path to Salesforce DX VSCode extensions
-   * @env EXTENSION_PATH - Path to extensions directory
-   * @env SALESFORCEDX_VSCODE_EXTENSIONS_PATH - Alternative path (takes precedence)
-   * @default '[project_root]/salesforcedx-vscode/extensions'
+   * @env EXTENSIONS_FOLDER - Path to extensions directory (vscode-extension-tester standard)
+   * @default '[project_root]/extensions'
    */
-  private _extensionPath: string;
+  private _extensionsFolder = join(process.cwd(), 'extensions');
 
   /**
    * Path to the workspace folder where VS Code and test artifacts are stored
-   * @env WORKSPACE_PATH - Path to workspace directory
-   * @default '[project_root]/salesforcedx-vscode'
+   * @env TEST_RESOURCES - Path to workspace directory (vscode-extension-tester standard)
+   * @default '[project_root]/test-resources'
    */
-  private _workspacePath = join(process.cwd(), 'salesforcedx-vscode');
+  private _testResources = join(process.cwd(), 'test-resources');
+
+  /**
+   * Chrome driver arguments
+   * @env VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS - Arguments for Chrome driver
+   * @default undefined
+   */
+  private _chromeDriverArgs: string | undefined;
 
   /**
    * Test execution start time
@@ -106,14 +112,17 @@ export class EnvironmentSettings {
    * Follows the Singleton pattern - use getInstance() to access
    */
   private constructor() {
-    this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
+    // Use vscode-extension-tester standard environment variables
+    this._codeVersion = process.env.CODE_VERSION || this._codeVersion;
+    this._testResources = process.env.TEST_RESOURCES || this._testResources;
+    this._extensionsFolder = process.env.EXTENSIONS_FOLDER || this._extensionsFolder;
+    this._chromeDriverArgs = process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS;
+
+    // Custom project environment variables
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
     this._devHubUserName = process.env.DEV_HUB_USER_NAME;
-    this._workspacePath = process.env.WORKSPACE_PATH || this._workspacePath;
-    this._extensionPath = process.env.EXTENSION_PATH || join(this._workspacePath, 'extensions');
     this._throttleFactor = parseInt(process.env.THROTTLE_FACTOR ?? '0') || this._throttleFactor;
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
-    this._extensionPath = process.env.SALESFORCEDX_VSCODE_EXTENSIONS_PATH || this._extensionPath;
     this._logLevel = LOG_LEVELS.some(l => l === process.env.E2E_LOG_LEVEL)
       ? (process.env.E2E_LOG_LEVEL as LogLevel)
       : this._logLevel;
@@ -134,7 +143,12 @@ export class EnvironmentSettings {
 
   /** Gets the VSCode version to use in tests */
   public get vscodeVersion(): string {
-    return this._vscodeVersion;
+    return this._codeVersion;
+  }
+
+  /** @deprecated Use vscodeVersion instead */
+  public get codeVersion(): string {
+    return this._codeVersion;
   }
 
   /** Gets the spec files to run */
@@ -154,7 +168,12 @@ export class EnvironmentSettings {
 
   /** Gets the path to Salesforce DX VSCode extensions */
   public get extensionPath(): string {
-    return this._extensionPath;
+    return this._extensionsFolder;
+  }
+
+  /** Gets the path to Salesforce DX VSCode extensions (aligned with env var name) */
+  public get extensionsFolder(): string {
+    return this._extensionsFolder;
   }
 
   /** Gets the throttle factor for slowing down test execution */
@@ -202,11 +221,26 @@ export class EnvironmentSettings {
 
   /** Gets the workspace path where VS Code and test artifacts are stored */
   public get workspacePath(): string {
-    return this._workspacePath;
+    return this._testResources;
+  }
+
+  /** Gets the test resources path (aligned with env var name) */
+  public get testResources(): string {
+    return this._testResources;
   }
 
   /** Gets the log level for test execution */
   public get logLevel(): LogLevel {
     return this._logLevel;
+  }
+
+  /** Gets the Chrome driver arguments */
+  public get chromeDriverArgs(): string | undefined {
+    return this._chromeDriverArgs;
+  }
+
+  /** Gets the Chrome driver arguments (more explicit naming) */
+  public get vscodeExtensionTesterChromeDriverArgs(): string | undefined {
+    return this._chromeDriverArgs;
   }
 }
