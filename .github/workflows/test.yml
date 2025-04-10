@@ -81,4 +81,6 @@ jobs:
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
+          New-Item -Path $TEST_RESOURCES -Force -ItemType Directory
+          New-Item -Path $EXTENSIONS_FOLDER -Force -ItemType Directory
           npm test
