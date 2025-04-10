@@ -40,7 +40,7 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace-${{ github.run_id }}
+          WORKSPACE_PATH: ./temp-workspace-${{ github.run_id }}
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
@@ -67,11 +67,11 @@ jobs:
       - name: Compile and test
         env:
           # Use forward slashes even on Windows to avoid path interpretation issues
-          WORKSPACE_PATH: ${{ github.workspace }}/temp-workspace-${{ github.run_id }}
+          WORKSPACE_PATH: ./temp-workspace-${{ github.run_id }}
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
-          $WORKSPACE_PATH = "${{ github.workspace }}/temp-workspace-${{ github.run_id }}" -replace "\\", "/"
+          $WORKSPACE_PATH = ./temp-workspace-${{ github.run_id }}" -replace "\\", "/"
           New-Item -Path $WORKSPACE_PATH -Force -ItemType Directory
           npm test
