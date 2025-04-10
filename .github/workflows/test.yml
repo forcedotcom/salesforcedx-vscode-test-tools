@@ -42,8 +42,8 @@ jobs:
       - name: Compile and test
         env:
           # Standard vscode-extension-tester environment variables
-          TEST_RESOURCES: test-resources-${{ github.run_id }}
-          EXTENSIONS_FOLDER: extensions-${{ github.run_id }}
+          # TEST_RESOURCES: test-resources-${{ github.run_id }}
+          # EXTENSIONS_FOLDER: extensions-${{ github.run_id }}
           CODE_VERSION: 'latest'
           # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}

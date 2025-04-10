@@ -58,7 +58,7 @@
       "output": []
     },
     "test": {
-      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/cliCommands.test.js",
+      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/*.test.js",
       "dependencies": [
         "compile"
       ],
