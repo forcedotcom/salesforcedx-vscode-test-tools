@@ -219,15 +219,19 @@ class TestSetupAndRunner extends ExTester {
     // Create all necessary directories with standard terminology
     try {
       // Create test resources directory
-      await fs.mkdir(this.testConfig.testResources, { recursive: true });
-      log(`Created test resources directory: ${this.testConfig.testResources}`);
+      if (this.testConfig.testResources) {
+        await fs.mkdir(this.testConfig.testResources, { recursive: true });
+        log(`Created test resources directory: ${this.testConfig.testResources}`);
+      }
 
-      // Create extensions directory
-      await fs.mkdir(this.testConfig.extensionsFolder, { recursive: true });
-      log(`Created extensions directory: ${this.testConfig.extensionsFolder}`);
+      if (this.testConfig.extensionsFolder) {
+        // Create extensions directory
+        await fs.mkdir(this.testConfig.extensionsFolder, { recursive: true });
+        log(`Created extensions directory: ${this.testConfig.extensionsFolder}`);
+      }
 
       // Create VS Code download directory
-      const workspaceDir = path.dirname(this.testConfig.testResources);
+      const workspaceDir = path.dirname(this.testConfig.testResources ?? '');
       const vscodeDir = path.join(workspaceDir, 'vscode');
       await fs.mkdir(vscodeDir, { recursive: true });
       log(`Created VS Code directory: ${vscodeDir}`);
