@@ -72,6 +72,7 @@ class TestSetupAndRunner extends ExTester {
     const resources = useExistingProject ? [useExistingProject] : [];
     return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
   }
+
   public async installExtension(extension: string): Promise<void> {
     log(`SetUp - Started Install extension ${path.basename(extension)}`);
     await this.installVsix({ useYarn: false, vsixFile: extension });
