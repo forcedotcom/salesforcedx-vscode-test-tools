@@ -224,12 +224,6 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false,
     array: true
   })
-  .option('workspace-path', {
-    alias: 'w',
-    type: 'string',
-    description: 'Path to workspace directory',
-    demandOption: false
-  })
   .help().argv as {
   spec: string | string[] | undefined;
   workspacePath?: string;

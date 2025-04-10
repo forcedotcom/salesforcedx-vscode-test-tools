@@ -58,7 +58,7 @@ export class EnvironmentSettings {
    * @env SALESFORCEDX_VSCODE_EXTENSIONS_PATH - Alternative path (takes precedence)
    * @default '[project_root]/salesforcedx-vscode/extensions'
    */
-  private _extensionPath = join(process.cwd(), 'salesforcedx-vscode', 'extensions');
+  private _extensionPath: string;
 
   /**
    * Path to the workspace folder where VS Code and test artifacts are stored
@@ -109,11 +109,11 @@ export class EnvironmentSettings {
     this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
     this._devHubUserName = process.env.DEV_HUB_USER_NAME;
-    this._extensionPath = process.env.EXTENSION_PATH || this._extensionPath;
+    this._workspacePath = process.env.WORKSPACE_PATH || this._workspacePath;
+    this._extensionPath = process.env.EXTENSION_PATH || join(this._workspacePath, 'extensions');
     this._throttleFactor = parseInt(process.env.THROTTLE_FACTOR ?? '0') || this._throttleFactor;
     this._sfdxAuthUrl = process.env.SFDX_AUTH_URL || this._sfdxAuthUrl;
     this._extensionPath = process.env.SALESFORCEDX_VSCODE_EXTENSIONS_PATH || this._extensionPath;
-    this._workspacePath = process.env.WORKSPACE_PATH || this._workspacePath;
     this._logLevel = LOG_LEVELS.some(l => l === process.env.E2E_LOG_LEVEL)
       ? (process.env.E2E_LOG_LEVEL as LogLevel)
       : this._logLevel;
