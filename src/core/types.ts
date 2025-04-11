@@ -106,29 +106,17 @@ export interface TestConfig {
   /**
    * Path to the test resources directory (standard vscode-extension-tester name)
    */
-  testResources: string;
-
-  /**
-   * Path to extensions directory
-   * @deprecated Use extensionsFolder instead
-   */
-  extensionsPath?: string;
+  testResources?: string;
 
   /**
    * Path to the extensions folder (standard vscode-extension-tester name)
    */
-  extensionsFolder: string;
+  extensionsFolder?: string;
 
   /**
    * Path to directory containing VSIX files to install
    */
   vsixToInstallDir?: string;
-
-  /**
-   * VS Code version to use for testing
-   * @deprecated Use codeVersion instead
-   */
-  vscodeVersion?: string;
 
   /**
    * VS Code version to use for testing (standard vscode-extension-tester name)

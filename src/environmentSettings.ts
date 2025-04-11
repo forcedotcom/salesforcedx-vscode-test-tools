@@ -62,16 +62,16 @@ export class EnvironmentSettings {
   /**
    * Path to Salesforce DX VSCode extensions
    * @env EXTENSIONS_FOLDER - Path to extensions directory (vscode-extension-tester standard)
-   * @default '[project_root]/extensions'
+   * @default undefined
    */
-  private _extensionsFolder = join(process.cwd(), 'extensions');
+  private _extensionsFolder: string | undefined;
 
   /**
    * Path to the workspace folder where VS Code and test artifacts are stored
    * @env TEST_RESOURCES - Path to workspace directory (vscode-extension-tester standard)
-   * @default '[project_root]/test-resources'
+   * @default undefined
    */
-  private _testResources = join(process.cwd(), 'test-resources');
+  private _testResources: string | undefined;
 
   /**
    * Chrome driver arguments
@@ -121,8 +121,8 @@ export class EnvironmentSettings {
   private constructor() {
     // Use vscode-extension-tester standard environment variables
     this._codeVersion = process.env.CODE_VERSION || this._codeVersion;
-    this._testResources = process.env.TEST_RESOURCES || this._testResources;
-    this._extensionsFolder = process.env.EXTENSIONS_FOLDER || this._extensionsFolder;
+    this._testResources = process.env.TEST_RESOURCES;
+    this._extensionsFolder = process.env.EXTENSIONS_FOLDER;
     this._chromeDriverArgs = process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS;
 
     // VSIXs to install directory - no default value
@@ -152,11 +152,6 @@ export class EnvironmentSettings {
   }
 
   /** Gets the VSCode version to use in tests */
-  public get vscodeVersion(): string {
-    return this._codeVersion;
-  }
-
-  /** @deprecated Use vscodeVersion instead */
   public get codeVersion(): string {
     return this._codeVersion;
   }
@@ -177,12 +172,12 @@ export class EnvironmentSettings {
   }
 
   /** Gets the path to Salesforce DX VSCode extensions */
-  public get extensionPath(): string {
+  public get extensionPath(): string | undefined {
     return this._extensionsFolder;
   }
 
   /** Gets the path to Salesforce DX VSCode extensions (aligned with env var name) */
-  public get extensionsFolder(): string {
+  public get extensionsFolder(): string | undefined {
     return this._extensionsFolder;
   }
 
@@ -230,12 +225,12 @@ export class EnvironmentSettings {
   }
 
   /** Gets the workspace path where VS Code and test artifacts are stored */
-  public get workspacePath(): string {
+  public get workspacePath(): string | undefined {
     return this._testResources;
   }
 
   /** Gets the test resources path (aligned with env var name) */
-  public get testResources(): string {
+  public get testResources(): string | undefined {
     return this._testResources;
   }
 

@@ -1,4 +1,5 @@
 import { ExTester } from 'vscode-extension-tester';
+import { VSBrowser } from 'vscode-extension-tester';
 import { EnvironmentSettings } from './environmentSettings';
 import path from 'path';
 import fs from 'fs/promises';
@@ -14,8 +15,8 @@ import { TestConfig } from './core/types';
 import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
 import { verifyAliasAndUserName } from './salesforce-components/authorization';
 
-class TestSetupAndRunner extends ExTester {
-  protected static _exTestor: TestSetupAndRunner;
+export class TestSetupAndRunner extends ExTester {
+  protected static _exTester: TestSetupAndRunner;
   private testConfig: TestConfig;
 
   constructor(
@@ -37,8 +38,8 @@ class TestSetupAndRunner extends ExTester {
    */
   private logTestEnvironment(): void {
     log(`Setting up test environment with:`);
-    log(`- Test Resources: ${this.testConfig.testResources}`);
-    log(`- Extensions Folder: ${this.testConfig.extensionsFolder}`);
+    log(`- Test Resources: ${this.testConfig.testResources ?? 'not set'}`);
+    log(`- Extensions Folder: ${this.testConfig.extensionsFolder ?? 'not set'}`);
     log(`- VS Code Version: ${this.testConfig.codeVersion}`);
 
     // Log Chrome driver arguments if available
@@ -92,7 +93,7 @@ class TestSetupAndRunner extends ExTester {
     // Check for already installed extensions
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
-      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
+      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)) ?? '')
     );
     const foundInstalledExtensions = await Promise.all(
       extensionsDirEntries
@@ -229,12 +230,34 @@ class TestSetupAndRunner extends ExTester {
     await super.downloadCode(version);
   }
 
-  static get exTester(): TestSetupAndRunner {
-    if (TestSetupAndRunner.exTester) {
-      return TestSetupAndRunner._exTestor;
+  /**
+   * Gets the active WebDriver browser session if available
+   *
+   * @returns The WebDriver instance for the active browser session or undefined if not available
+   */
+  public async getDriver(): Promise<import('selenium-webdriver').WebDriver | undefined> {
+    try {
+      // Get the VSBrowser instance which gives access to the WebDriver
+      const browser = VSBrowser.instance;
+
+      // Get the WebDriver from VSBrowser
+      if (browser) {
+        // Access the underlying WebDriver
+        return await browser.driver;
+      }
+      return undefined;
+    } catch (error) {
+      console.warn('Failed to get WebDriver instance:', error);
+      return undefined;
     }
-    TestSetupAndRunner._exTestor = new TestSetupAndRunner();
-    return TestSetupAndRunner._exTestor;
+  }
+
+  static get exTester(): TestSetupAndRunner {
+    if (TestSetupAndRunner._exTester) {
+      return TestSetupAndRunner._exTester;
+    }
+    TestSetupAndRunner._exTester = new TestSetupAndRunner();
+    return TestSetupAndRunner._exTester;
   }
 }
 
@@ -254,11 +277,11 @@ const argv = yargs(hideBin(process.argv))
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
 
-const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
+const testSetupAndRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {
   try {
-    await testSetupAnRunner.setup();
-    const result = await testSetupAnRunner.runTests();
+    await testSetupAndRunner.setup();
+    const result = await testSetupAndRunner.runTests();
     console.log(result);
     process.exit(result);
   } catch (error) {

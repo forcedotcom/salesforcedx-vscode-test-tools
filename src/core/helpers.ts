@@ -9,8 +9,8 @@ import { EnvironmentSettings } from '../environmentSettings';
  * @param path - The file path to normalize
  * @returns A path with forward slashes
  */
-export function normalizePath(path: string): string {
-  return path.replace(/\\/g, '/');
+export function normalizePath(path: string | undefined): string | undefined {
+  return path ? path.replace(/\\/g, '/') : undefined;
 }
 
 /**
@@ -34,11 +34,6 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
     defaultConfig.vsixToInstallDir = normalizePath(env.vsixToInstallDir);
   }
 
-  // Set deprecated properties for backward compatibility
-  defaultConfig.workspacePath = defaultConfig.testResources;
-  defaultConfig.extensionsPath = defaultConfig.extensionsFolder;
-  defaultConfig.vscodeVersion = defaultConfig.codeVersion;
-
   // Normalize any path overrides and handle both new and deprecated property names
   if (overrides?.testResources) {
     overrides.testResources = normalizePath(overrides.testResources);
@@ -52,20 +47,6 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
 
   if (overrides?.extensionsFolder) {
     overrides.extensionsFolder = normalizePath(overrides.extensionsFolder);
-    // Keep extensionsPath in sync for backward compatibility
-    overrides.extensionsPath = overrides.extensionsFolder;
-  } else if (overrides?.extensionsPath) {
-    overrides.extensionsPath = normalizePath(overrides.extensionsPath);
-    // Set extensionsFolder from extensionsPath for forward compatibility
-    overrides.extensionsFolder = overrides.extensionsPath;
-  }
-
-  if (overrides?.codeVersion) {
-    // Keep vscodeVersion in sync for backward compatibility
-    overrides.vscodeVersion = overrides.codeVersion;
-  } else if (overrides?.vscodeVersion) {
-    // Set codeVersion from vscodeVersion for forward compatibility
-    overrides.codeVersion = overrides.vscodeVersion;
   }
 
   // Merge with overrides
@@ -89,35 +70,22 @@ export function validateTestConfig(config: TestConfig): void {
   }
 
   if (!config.extensionsFolder) {
-    if (config.extensionsPath) {
-      // Use deprecated property if new one is not set
-      config.extensionsFolder = config.extensionsPath;
-    } else {
-      // Default to sibling 'extensions' directory
-      const workspaceDir = path.dirname(config.testResources);
-      config.extensionsFolder = join(workspaceDir, 'extensions');
-    }
+    // Default to sibling 'extensions' directory
+    const workspaceDir = path.dirname(config.testResources);
+    config.extensionsFolder = join(workspaceDir, 'extensions');
   }
 
   if (!config.codeVersion) {
-    if (config.vscodeVersion) {
-      // Use deprecated property if new one is not set
-      config.codeVersion = config.vscodeVersion;
-    } else {
-      config.codeVersion = 'stable';
-    }
+    config.codeVersion = 'stable';
   }
 
-  // Keep deprecated properties in sync for backward compatibility
+  // Keep workspacePath in sync for backward compatibility
   config.workspacePath = config.testResources;
-  config.extensionsPath = config.extensionsFolder;
-  config.vscodeVersion = config.codeVersion;
 
   // Ensure paths use forward slashes
   config.testResources = normalizePath(config.testResources);
   config.extensionsFolder = normalizePath(config.extensionsFolder);
   config.workspacePath = config.testResources;
-  config.extensionsPath = config.extensionsFolder;
 
   // Normalize vsixToInstallDir if it exists
   if (config.vsixToInstallDir) {
