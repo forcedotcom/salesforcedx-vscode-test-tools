@@ -28,10 +28,7 @@ class TestSetupAndRunner extends ExTester {
     // Validate config and set defaults for missing values
     validateTestConfig(config);
 
-    // Set up the VS Code download location as a sibling directory to workspace
-    const workspaceDir = path.dirname(config.testResources);
-    const vscodeDownloadDir = path.join(workspaceDir, 'vscode');
-    super(config.extensionsFolder, ReleaseQuality.Stable, normalizePath(vscodeDownloadDir));
+    super(undefined, ReleaseQuality.Stable);
     this.testConfig = config;
   }
 
