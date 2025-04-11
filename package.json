@@ -10,9 +10,6 @@
     "README.md",
     "LICENSE"
   ],
-  "bin": {
-    "init-vscode-tests": "lib/setup/init-test-config.js"
-  },
   "scripts": {
     "test": "wireit",
     "test:unit": "wireit",
@@ -29,8 +26,7 @@
     "commitlint": "commitlint --edit",
     "prepublishOnly": "npm run clean && npm run lint && npm run compile",
     "docs": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals",
-    "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch",
-    "init-test-config": "node lib/setup/init-test-config.js"
+    "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch"
   },
   "overrides": {
     "typedoc": {
@@ -133,7 +129,7 @@
     "fast-glob": "^3.3.2",
     "mocha": "^10.8.2",
     "mocha-steps": "^1.3.0",
-    "vscode-extension-tester": "^8.14.0",
+    "vscode-extension-tester": "^8.8.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

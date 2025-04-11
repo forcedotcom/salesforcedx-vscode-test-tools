@@ -111,28 +111,26 @@ To install the test dependencies, run `npm install`. You do not need to compile 
 
 The following environment variables can be used to configure the automation tests. These are managed by the `EnvironmentSettings` class.
 
-| Environment Variable        | Description                                                                                           | Default Value                 |
-| --------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `CODE_VERSION`              | VSCode version to use in tests                                                                        | `'latest'`                    |
-| `SPEC_FILES`                | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                          |
-| `VSIX_TO_INSTALL`           | Path to directory containing VSIX files to install                                                    | `undefined`                   |
-| `DEV_HUB_ALIAS_NAME`        | Alias for the DevHub org                                                                              | `'vscodeOrg'`                 |
-| `DEV_HUB_USER_NAME`         | Username for the DevHub org                                                                           | `'svcideebot@salesforce.com'` |
-| `SFDX_AUTH_URL`             | URL for authenticating with Salesforce DX                                                             | `undefined`                   |
-| `EXTENSIONS_FOLDER`         | Path to extensions directory                                                                          | `undefined`                   |
-| `TEST_RESOURCES`            | Path to workspace directory                                                                           | `undefined`                   |
-| `THROTTLE_FACTOR`           | Number to multiply timeouts by (used to slow down test execution)                                     | `1`                           |
-| `JAVA_HOME`                 | Path to Java installation                                                                             | `undefined`                   |
-| `USE_EXISTING_PROJECT_PATH` | Path to an existing project to use instead of creating a new one                                      | `undefined`                   |
-| `E2E_LOG_LEVEL`             | Log level for test execution (one of the valid log levels: 'error', 'warn', 'info', 'debug', 'trace') | `'info'`                      |
+| Environment Variable                  | Description                                                                                           | Default Value                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `CODE_VERSION`                        | VSCode version to use in tests                                                                        | `'latest'`                                   |
+| `SPEC_FILES`                          | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                                         |
+| `VSIX_TO_INSTALL`                     | Path to directory containing VSIX files to install                                                    | `undefined`                                  |
+| `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                |
+| `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | `'svcideebot@salesforce.com'`                |
+| `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  |
+| `EXTENSION_PATH`                      | Path to extensions directory                                                                          | `{cwd}/../../salesforcedx-vscode/extensions` |
+| `SALESFORCEDX_VSCODE_EXTENSIONS_PATH` | Alternative path to extensions (takes precedence over EXTENSION_PATH)                                 | -                                            |
+| `THROTTLE_FACTOR`                     | Number to multiply timeouts by (used to slow down test execution)                                     | `1`                                          |
+| `JAVA_HOME`                           | Path to Java installation                                                                             | `undefined`                                  |
+| `USE_EXISTING_PROJECT_PATH`           | Path to an existing project to use instead of creating a new one                                      | `undefined`                                  |
+| `E2E_LOG_LEVEL`                       | Log level for test execution (one of the valid log levels: 'error', 'warn', 'info', 'debug', 'trace') | `'info'`                                     |
 
 #### Usage Notes
 
 - **SPEC_FILES**: If specified, only the named test spec files will be run instead of all tests
 
-- **TEST_RESOURCES**: Path to the workspace directory where VS Code and test artifacts are stored
-
-- **EXTENSIONS_FOLDER**: Path to the extensions directory where extensions will be installed
+- **EXTENSION_PATH**: If your folder structure does not match the standard folder structure shown in the Getting Started section, `EXTENSION_PATH` will need to be set to the correct relative path to 'salesforcedx-vscode/extensions'
 
 - **SFDX_AUTH_URL**: To obtain this URL, run `sf org display -o vscodeOrg --verbose --json` in your terminal and extract the value from the `sfdxAuthUrl` property
 
@@ -174,17 +172,24 @@ Note: if no changes are made to `_specFiles` property in [environmentSettings](t
 
 This framework allows customizing the test environment through the `TestConfig` interface. You can specify the following options:
 
-### Test Resources
+### Workspace Path
 
-By default, the framework creates a test resources folder in your project directory to store VS Code and test artifacts. You can customize this location through:
+By default, the framework creates a `salesforcedx-vscode` folder in your project directory to store VS Code and test artifacts. You can customize this location through:
 
-1. Environment variable: `TEST_RESOURCES`
-2. Programmatically through the `TestConfig` interface
+1. Environment variable: `WORKSPACE_PATH`
+2. Command line argument: `--workspace-path` or `-w`
+3. Programmatically through the `TestConfig` interface
 
 Example configuration through environment variables:
 
 ```bash
-TEST_RESOURCES=/tmp/my-test-workspace npm test
+WORKSPACE_PATH=/tmp/my-test-workspace npm test
+```
+
+Example using command line arguments:
+
+```bash
+npm test -- --workspace-path /tmp/my-test-workspace
 ```
 
 Example programmatic usage:
@@ -193,7 +198,7 @@ Example programmatic usage:
 import { TestSetupAndRunner, TestConfig } from '@salesforce/salesforcedx-vscode-test-tools';
 
 const testConfig: Partial<TestConfig> = {
-  testResources: '/tmp/my-test-workspace'
+  workspacePath: '/tmp/my-test-workspace'
 };
 
 const testRunner = new TestSetupAndRunner(testConfig);
@@ -205,10 +210,10 @@ const result = await testRunner.runTests();
 
 By default, extensions are installed in the `extensions` subfolder of the workspace path. You can override this with:
 
-1. Environment variable: `EXTENSIONS_FOLDER`
+1. Environment variable: `EXTENSION_PATH` or `SALESFORCEDX_VSCODE_EXTENSIONS_PATH`
 2. Programmatically through the `TestConfig` interface
 
-If only `testResources` is specified, the `extensionsFolder` will automatically be set to `${testResources}/extensions`.
+If only `workspacePath` is specified, the `extensionsPath` will automatically be set to `${workspacePath}/extensions`.
 
 ### VSIX Installation Directory
 

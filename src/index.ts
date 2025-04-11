@@ -55,20 +55,5 @@ export * from './environmentSettings';
 export * from './test-setup-and-runner';
 export * from './testSetup';
 
-/**
- * Test framework integration utilities
- * @module TestFrameworkIntegration
- */
-export * from './setup/mocha-setup';
-export * from './setup/init-test-config';
-
-import path from 'path';
-
-/**
- * Path to template files for test configuration
- * @constant
- */
-export const TEMPLATE_DIR = path.join(__dirname, 'templates');
-
 export { TestConfig } from './core/types';
 export { EnvironmentSettings } from './environmentSettings';
