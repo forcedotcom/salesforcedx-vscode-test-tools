@@ -115,6 +115,7 @@ The following environment variables can be used to configure the automation test
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `CODE_VERSION`                        | VSCode version to use in tests                                                                        | `'latest'`                                   |
 | `SPEC_FILES`                          | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                                         |
+| `VSIX_TO_INSTALL`                     | Path to directory containing VSIX files to install                                                    | `undefined`                                  |
 | `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                |
 | `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | `'svcideebot@salesforce.com'`                |
 | `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  |
@@ -213,3 +214,33 @@ By default, extensions are installed in the `extensions` subfolder of the worksp
 2. Programmatically through the `TestConfig` interface
 
 If only `workspacePath` is specified, the `extensionsPath` will automatically be set to `${workspacePath}/extensions`.
+
+### VSIX Installation Directory
+
+You can specify a dedicated directory containing VSIX files to be installed during test setup. This separates the source of VSIX files from the extensions folder where they get installed.
+
+This can be configured through:
+
+1. Environment variable: `VSIX_TO_INSTALL`
+2. Programmatically through the `TestConfig` interface
+
+```bash
+# Set a custom VSIX installation directory
+VSIX_TO_INSTALL=/path/to/vsix-directory npm test
+```
+
+Example programmatic usage:
+
+```typescript
+import { TestSetupAndRunner, TestConfig } from '@salesforce/salesforcedx-vscode-test-tools';
+
+const testConfig: Partial<TestConfig> = {
+  vsixToInstallDir: '/path/to/vsix-directory'
+};
+
+const testRunner = new TestSetupAndRunner(testConfig);
+await testRunner.setup();
+const result = await testRunner.runTests();
+```
+
+If both the `TestConfig` and environment variable are set, the `TestConfig` value takes precedence.

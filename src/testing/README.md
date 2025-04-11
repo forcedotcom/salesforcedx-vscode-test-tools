@@ -141,3 +141,33 @@ import { salesforceExtensions } from './testing/salesforceExtensions';
 ## Example Usage
 
 See `src/samples/extensionConfigExample.ts` for complete examples of different extension configuration scenarios.
+
+## VSIX Installation Directory
+
+In addition to configuring individual extensions, you can specify a dedicated directory containing VSIX files to be installed during test setup using the `vsixToInstallDir` property in the `TestConfig` interface. This separates the source of VSIX files from the extensions folder where they get installed.
+
+You can configure this in two ways:
+
+1. Environment variable: `VSIX_TO_INSTALL`
+2. Programmatically through the `TestConfig` interface
+
+Example setting a custom VSIX directory in your test:
+
+```typescript
+import { TestSetupAndRunner, TestConfig } from '@salesforce/salesforcedx-vscode-test-tools';
+
+const testConfig: Partial<TestConfig> = {
+  vsixToInstallDir: '/path/to/vsix-directory'
+};
+
+const testRunner = new TestSetupAndRunner(testConfig);
+await testRunner.setup();
+```
+
+If a VSIX installation directory is specified, the framework will:
+
+1. Look for VSIX files in this directory first
+2. Install all VSIX files found in this directory
+3. Skip looking in the extensions folder if VSIXs are found in the specified directory
+
+If both the `TestConfig` and environment variable are set, the `TestConfig` value takes precedence.

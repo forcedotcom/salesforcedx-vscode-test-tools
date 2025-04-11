@@ -7,6 +7,7 @@
 
 import { TestSetup } from '../testSetup';
 import { TestReqConfig, ProjectShapeOption, ExtensionConfig } from '../core/types';
+import { TestSetupAndRunner, TestConfig } from '..';
 
 /**
  * Example: Configure a test with default Salesforce extensions
@@ -232,6 +233,33 @@ async function runTestWithMixedExtensionSettings() {
   }
 }
 
+/**
+ * Example: Configure a test with a dedicated VSIX installation directory
+ */
+async function runTestWithVsixInstallDirectory() {
+  // Configure test with a custom VSIX installation directory
+  const testConfig: Partial<TestConfig> = {
+    vsixToInstallDir: '/path/to/vsix-directory',
+    // Other standard config options
+    testResources: '/path/to/test-resources',
+    extensionsFolder: '/path/to/extensions-folder',
+    codeVersion: 'latest'
+  };
+
+  // Create and set up the test runner
+  const testRunner = new TestSetupAndRunner(testConfig);
+  await testRunner.setup();
+
+  try {
+    // Run your test here...
+    console.log('Test with custom VSIX installation directory is running');
+    const result = await testRunner.runTests();
+    console.log(`Test completed with result: ${result}`);
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+}
+
 // Export the example functions
 export {
   runTestWithDefaultExtensions,
@@ -239,5 +267,6 @@ export {
   runTestWithThirdPartyExtensions,
   runTestWithCustomVsixExtension,
   runTestWithExcludedExtensions,
-  runTestWithMixedExtensionSettings
+  runTestWithMixedExtensionSettings,
+  runTestWithVsixInstallDirectory
 };
