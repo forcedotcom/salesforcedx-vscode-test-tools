@@ -12,6 +12,8 @@
   ],
   "scripts": {
     "test": "wireit",
+    "test:unit": "wireit",
+    "test:integration": "wireit",
     "automation-tests": "wireit",
     "lint": "wireit",
     "lint:fix": "eslint ./test ./src --ext .ts --fix",
@@ -58,14 +60,35 @@
       "output": []
     },
     "test": {
-      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/cliCommands.test.js",
+      "dependencies": [
+        "test:unit",
+        "test:integration"
+      ]
+    },
+    "test:unit": {
+      "command": "mocha ./lib/test/unit/**/*.test.js",
       "dependencies": [
         "compile"
       ],
       "files": [
-        "lib/**/*"
+        "lib/test/unit/**/*.test.js"
       ],
       "output": []
+    },
+    "test:integration": {
+      "command": "node ./lib/src/test-setup-and-runner.js --spec lib/test/selfSpecs/useExistingProject.test.js",
+      "dependencies": [
+        "compile",
+        "test:unit"
+      ],
+      "files": [
+        "lib/test/selfSpecs/**/*.test.js"
+      ],
+      "service": {
+        "wireitConfig": {
+          "cache": false
+        }
+      }
     },
     "automation-tests": {
       "command": "node ./lib/test-setup-and-runner.js",

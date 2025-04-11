@@ -75,50 +75,24 @@ class TestSetupAndRunner extends ExTester {
   }
 
   public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
-    // Get directories for extensions
-    const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsFolder));
-
-    // Check if we have a specific directory for VSIXs to install
-    // First check TestConfig, then fall back to EnvironmentSettings
     const vsixToInstallDir = this.testConfig.vsixToInstallDir || EnvironmentSettings.getInstance().vsixToInstallDir;
 
-    if (vsixToInstallDir) {
-      log(`Using VSIX installation directory: ${vsixToInstallDir}`);
-
-      // Check if the directory exists
-      try {
-        await fs.access(vsixToInstallDir);
-      } catch (error) {
-        log(`Warning: VSIX_TO_INSTALL directory does not exist or is not accessible: ${vsixToInstallDir}`);
-        log(`Falling back to extensions folder: ${extensionsDir}`);
-      }
-
-      // Get VSIX files from the specified directory
-      const vsixFiles = getVsixFilesFromDir(vsixToInstallDir);
-
-      if (vsixFiles.length === 0) {
-        log(`No VSIX files found in ${vsixToInstallDir}`);
-        return;
-      }
-
-      log(`Found ${vsixFiles.length} VSIX files to install from ${vsixToInstallDir}`);
-
-      // Install each VSIX file
-      for (const vsixFile of vsixFiles) {
-        log(`Installing VSIX: ${path.basename(vsixFile)}`);
-        await this.installExtension(vsixFile);
-      }
-
+    if (!vsixToInstallDir) {
+      log(`No VSIX_TO_INSTALL directory specified, the tests will run without installing any extensions`);
       return;
     }
 
-    // If no VSIX_TO_INSTALL is set, use the traditional method
-    log(`No VSIX installation directory specified, using extensions folder: ${extensionsDir}`);
+    // Check if the directory exists
+    try {
+      await fs.access(vsixToInstallDir);
+    } catch (error) {
+      throw new Error(`VSIX_TO_INSTALL directory does not exist or is not accessible: ${vsixToInstallDir}`);
+    }
 
     // Check for already installed extensions
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry =>
-      path.resolve(normalizePath(path.join(extensionsDir, entry)))
+    const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
+      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
     );
     const foundInstalledExtensions = await Promise.all(
       extensionsDirEntries
@@ -155,16 +129,16 @@ class TestSetupAndRunner extends ExTester {
       foundInstalledExtensions.length > 0 &&
       foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
     ) {
-      log(`Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`);
+      log(`Found the following pre-installed extensions in dir ${vsixToInstallDir}, skipping installation of vsix`);
       foundInstalledExtensions.forEach(ext => {
         log(`Extension ${ext?.extensionId} version ${ext?.version}`);
       });
       return;
     }
 
-    const extensionsVsixs = getVsixFilesFromDir(extensionsDir);
+    const extensionsVsixs = getVsixFilesFromDir(vsixToInstallDir);
     if (extensionsVsixs.length === 0) {
-      log(`No vsix files were found in dir ${extensionsDir}, skipping extension installation`);
+      log(`No vsix files were found in dir ${vsixToInstallDir}, skipping extension installation`);
       return; // Skip installation instead of throwing an error
     }
 

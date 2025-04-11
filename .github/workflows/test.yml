@@ -41,26 +41,12 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          # Standard vscode-extension-tester environment variables
-          TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
-          EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
           CODE_VERSION: 'latest'
-          VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: '--user-data-dir=${{ github.workspace }}/chrome-data-${{ github.run_id }}'
-          # Custom VSIX installation directory
-          VSIX_TO_INSTALL: ${{ github.workspace }}/path/to/vsix-directory
           # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
-          mkdir -p $TEST_RESOURCES
-          mkdir -p $EXTENSIONS_FOLDER
-          mkdir -p ${{ github.workspace }}/chrome-data-${{ github.run_id }}
-          # If VSIX_TO_INSTALL is specified, ensure the directory exists
-          if [ -n "$VSIX_TO_INSTALL" ]; then
-            mkdir -p $VSIX_TO_INSTALL
-            echo "Using VSIX installation directory: $VSIX_TO_INSTALL"
-          fi
           npm test
 
   windows-basic-tests:
@@ -81,30 +67,10 @@ jobs:
         run: npm install -g @salesforce/cli
       - name: Compile and test
         env:
-          # Standard vscode-extension-tester environment variables (use forward slashes even on Windows)
-          TEST_RESOURCES: ${{ github.workspace }}/test-resources-${{ github.run_id }}
-          EXTENSIONS_FOLDER: ${{ github.workspace }}/extensions-${{ github.run_id }}
           CODE_VERSION: 'latest'
-          VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: '--user-data-dir=${{ github.workspace }}/chrome-data-${{ github.run_id }}'
-          # Custom VSIX installation directory - use forward slashes even on Windows
-          VSIX_TO_INSTALL: ${{ github.workspace }}/path/to/vsix-directory
           # Custom project variables
           SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL_E2E }}
           DEV_HUB_USER_NAME: ${{ secrets.DEV_HUB_USER_NAME_E2E }}
         run: |
           npm run compile
-          $testResourcesPath = "${{ github.workspace }}/test-resources-${{ github.run_id }}" -replace "\\", "/"
-          $extensionsPath = "${{ github.workspace }}/extensions-${{ github.run_id }}" -replace "\\", "/"
-          $chromeDataPath = "${{ github.workspace }}/chrome-data-${{ github.run_id }}" -replace "\\", "/"
-          New-Item -Path $testResourcesPath -Force -ItemType Directory
-          New-Item -Path $extensionsPath -Force -ItemType Directory
-          New-Item -Path $chromeDataPath -Force -ItemType Directory
-
-          # If VSIX_TO_INSTALL is specified, ensure the directory exists
-          if ($env:VSIX_TO_INSTALL) {
-            $vsixInstallPath = "$env:VSIX_TO_INSTALL" -replace "\\", "/"
-            New-Item -Path $vsixInstallPath -Force -ItemType Directory
-            Write-Host "Using VSIX installation directory: $vsixInstallPath"
-          }
-
           npm test
