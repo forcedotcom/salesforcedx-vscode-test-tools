@@ -33,6 +33,13 @@ export class EnvironmentSettings {
   private _specFiles: string[] = [];
 
   /**
+   * Path to directory containing VSIX files to install
+   * @env VSIX_TO_INSTALL - Path to directory with VSIX files
+   * @default undefined
+   */
+  private _vsixToInstallDir: string | undefined;
+
+  /**
    * DevHub org alias name
    * @env DEV_HUB_ALIAS_NAME - Alias for the DevHub org
    * @default 'vscodeOrg'
@@ -117,6 +124,9 @@ export class EnvironmentSettings {
     this._testResources = process.env.TEST_RESOURCES || this._testResources;
     this._extensionsFolder = process.env.EXTENSIONS_FOLDER || this._extensionsFolder;
     this._chromeDriverArgs = process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS;
+
+    // VSIXs to install directory - no default value
+    this._vsixToInstallDir = process.env.VSIX_TO_INSTALL;
 
     // Custom project environment variables
     this._devHubAliasName = process.env.DEV_HUB_ALIAS_NAME || this._devHubAliasName;
@@ -242,5 +252,10 @@ export class EnvironmentSettings {
   /** Gets the Chrome driver arguments (more explicit naming) */
   public get vscodeExtensionTesterChromeDriverArgs(): string | undefined {
     return this._chromeDriverArgs;
+  }
+
+  /** Gets the directory containing VSIX files to install */
+  public get vsixToInstallDir(): string | undefined {
+    return this._vsixToInstallDir;
   }
 }

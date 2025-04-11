@@ -120,6 +120,11 @@ export interface TestConfig {
   extensionsFolder: string;
 
   /**
+   * Path to directory containing VSIX files to install
+   */
+  vsixToInstallDir?: string;
+
+  /**
    * VS Code version to use for testing
    * @deprecated Use codeVersion instead
    */

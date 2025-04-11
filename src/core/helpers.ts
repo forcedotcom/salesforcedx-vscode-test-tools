@@ -29,6 +29,11 @@ export function createDefaultTestConfig(overrides?: Partial<TestConfig>): TestCo
     codeVersion: env.codeVersion
   };
 
+  // Add vsixToInstallDir if it's defined in environment settings
+  if (env.vsixToInstallDir) {
+    defaultConfig.vsixToInstallDir = normalizePath(env.vsixToInstallDir);
+  }
+
   // Set deprecated properties for backward compatibility
   defaultConfig.workspacePath = defaultConfig.testResources;
   defaultConfig.extensionsPath = defaultConfig.extensionsFolder;
@@ -113,4 +118,9 @@ export function validateTestConfig(config: TestConfig): void {
   config.extensionsFolder = normalizePath(config.extensionsFolder);
   config.workspacePath = config.testResources;
   config.extensionsPath = config.extensionsFolder;
+
+  // Normalize vsixToInstallDir if it exists
+  if (config.vsixToInstallDir) {
+    config.vsixToInstallDir = normalizePath(config.vsixToInstallDir);
+  }
 }

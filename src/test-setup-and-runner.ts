@@ -75,7 +75,47 @@ class TestSetupAndRunner extends ExTester {
   }
 
   public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
+    // Get directories for extensions
     const extensionsDir = path.resolve(normalizePath(this.testConfig.extensionsFolder));
+
+    // Check if we have a specific directory for VSIXs to install
+    // First check TestConfig, then fall back to EnvironmentSettings
+    const vsixToInstallDir = this.testConfig.vsixToInstallDir || EnvironmentSettings.getInstance().vsixToInstallDir;
+
+    if (vsixToInstallDir) {
+      log(`Using VSIX installation directory: ${vsixToInstallDir}`);
+
+      // Check if the directory exists
+      try {
+        await fs.access(vsixToInstallDir);
+      } catch (error) {
+        log(`Warning: VSIX_TO_INSTALL directory does not exist or is not accessible: ${vsixToInstallDir}`);
+        log(`Falling back to extensions folder: ${extensionsDir}`);
+      }
+
+      // Get VSIX files from the specified directory
+      const vsixFiles = getVsixFilesFromDir(vsixToInstallDir);
+
+      if (vsixFiles.length === 0) {
+        log(`No VSIX files found in ${vsixToInstallDir}`);
+        return;
+      }
+
+      log(`Found ${vsixFiles.length} VSIX files to install from ${vsixToInstallDir}`);
+
+      // Install each VSIX file
+      for (const vsixFile of vsixFiles) {
+        log(`Installing VSIX: ${path.basename(vsixFile)}`);
+        await this.installExtension(vsixFile);
+      }
+
+      return;
+    }
+
+    // If no VSIX_TO_INSTALL is set, use the traditional method
+    log(`No VSIX installation directory specified, using extensions folder: ${extensionsDir}`);
+
+    // Check for already installed extensions
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry =>
       path.resolve(normalizePath(path.join(extensionsDir, entry)))
@@ -212,27 +252,6 @@ class TestSetupAndRunner extends ExTester {
   }
 
   async downloadCode(version = 'latest'): Promise<void> {
-    // Create all necessary directories with standard terminology
-    try {
-      // Create test resources directory
-      await fs.mkdir(this.testConfig.testResources, { recursive: true });
-      log(`Created test resources directory: ${this.testConfig.testResources}`);
-
-      // Create extensions directory
-      await fs.mkdir(this.testConfig.extensionsFolder, { recursive: true });
-      log(`Created extensions directory: ${this.testConfig.extensionsFolder}`);
-
-      // Create VS Code download directory
-      const workspaceDir = path.dirname(this.testConfig.testResources);
-      const vscodeDir = path.join(workspaceDir, 'vscode');
-      await fs.mkdir(vscodeDir, { recursive: true });
-      log(`Created VS Code directory: ${vscodeDir}`);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      log(`Warning: Failed to create directories: ${errorMessage}. Using default paths.`);
-    }
-
-    // Now call the parent method
     await super.downloadCode(version);
   }
 
@@ -254,35 +273,12 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false,
     array: true
   })
-  .option('test-resources', {
-    alias: 'r',
-    type: 'string',
-    description: 'Path to test resources directory',
-    demandOption: false
-  })
-  .option('extensions-folder', {
-    alias: 'e',
-    type: 'string',
-    description: 'Path to extensions directory',
-    demandOption: false
-  })
   .help().argv as {
   spec: string | string[] | undefined;
-  testResources?: string;
-  extensionsFolder?: string;
 };
 
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
-
-// Use command line args if provided, using standard vscode-extension-tester naming
-if (argv.testResources) {
-  testConfig.testResources = argv.testResources;
-}
-
-if (argv.extensionsFolder) {
-  testConfig.extensionsFolder = argv.extensionsFolder;
-}
 
 const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {
