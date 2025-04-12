@@ -113,6 +113,22 @@ describe('Deploy and Retrieve', async () => {
     await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
+  // Use context menu only for Windows and Ubuntu
+  if (process.platform !== 'darwin') {
+    step('Deploy with context menu from editor view', async () => {
+      utilities.log(`Deploy with context menu from editor view`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+
+      const textEditor = await utilities.getTextEditor(workbench, 'MyClass.cls');
+      const contextMenu = await textEditor.openContextMenu();
+      await contextMenu.select('SFDX: Deploy This Source to Org');
+
+      await utilities.validateCommand('Deploy', 'to', 'ST', 'ApexClass', ['MyClass'], 'Unchanged  ');
+    });
+  }
+
   step('Retrieve with SFDX: Retrieve This Source from Org', async () => {
     utilities.log(`Deploy and Retrieve - Retrieve with SFDX: Retrieve This Source from Org`);
     const workbench = utilities.getWorkbench();
@@ -141,6 +157,22 @@ describe('Deploy and Retrieve', async () => {
     const textAfterRetrieve = await textEditor.getText();
     expect(textAfterRetrieve).to.not.contain('modified comment');
   });
+
+  // Use context menu only for Windows and Ubuntu
+  if (process.platform !== 'darwin') {
+    step('Retrieve with context menu from editor view', async () => {
+      utilities.log(`Retrieve with context menu from editor view`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+
+      const textEditor = await utilities.getTextEditor(workbench, 'MyClass.cls');
+      const contextMenu = await textEditor.openContextMenu();
+      await contextMenu.select('SFDX: Retrieve This Source from Org');
+
+      await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', ['MyClass']);
+    });
+  }
 
   step('Prefer Deploy on Save when `Push or deploy on save` is enabled', async () => {
     utilities.log(`Deploy and Retrieve - Prefer Deploy on Save when 'Push or deploy on save' is enabled`);
