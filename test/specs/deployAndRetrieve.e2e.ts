@@ -132,6 +132,8 @@ describe('Deploy and Retrieve', async () => {
   if (process.platform !== 'darwin') {
     step('Deploy with context menu from explorer view', async () => {
       utilities.log(`Deploy with context menu from explorer view`);
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
       await utilities.executeQuickPick('File: Focus on Files Explorer');
       await utilities.pause(utilities.Duration.seconds(2));
       const workbench = utilities.getWorkbench();
@@ -201,6 +203,8 @@ describe('Deploy and Retrieve', async () => {
   if (process.platform !== 'darwin') {
     step('Retrieve with context menu from explorer view', async () => {
       utilities.log(`Retrieve with context menu from explorer view`);
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
       await utilities.executeQuickPick('File: Focus on Files Explorer');
       await utilities.pause(utilities.Duration.seconds(2));
       const workbench = utilities.getWorkbench();
