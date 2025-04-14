@@ -9,7 +9,7 @@ import path from 'path';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
-import { after } from 'vscode-extension-tester';
+import { after, DefaultTreeItem } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
 describe('Deploy and Retrieve', async () => {
@@ -113,6 +113,48 @@ describe('Deploy and Retrieve', async () => {
     await utilities.runAndValidateCommand('Deploy', 'to', 'ST', 'ApexClass', 'MyClass', 'Changed  ');
   });
 
+  // Use context menu only for Windows and Ubuntu
+  if (process.platform !== 'darwin') {
+    step('Deploy with context menu from editor view', async () => {
+      utilities.log(`Deploy with context menu from editor view`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+
+      const textEditor = await utilities.getTextEditor(workbench, 'MyClass.cls');
+      const contextMenu = await textEditor.openContextMenu();
+      await contextMenu.select('SFDX: Deploy This Source to Org');
+
+      await utilities.validateCommand('Deploy', 'to', 'ST', 'ApexClass', ['MyClass'], 'Unchanged  ');
+    });
+  }
+
+  if (process.platform !== 'darwin') {
+    step('Deploy with context menu from explorer view', async () => {
+      utilities.log(`Deploy with context menu from explorer view`);
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+      await utilities.executeQuickPick('File: Focus on Files Explorer');
+      await utilities.pause(utilities.Duration.seconds(2));
+      const workbench = utilities.getWorkbench();
+      const sidebar = await workbench.getSideBar().wait();
+      const content = await sidebar.getContent().wait();
+      const treeViewSection = await content.getSection(testSetup.tempProjectName);
+      if (!treeViewSection) {
+        throw new Error(
+          'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
+        );
+      }
+
+      // The force-app/main/default and classes folders are already expanded, so we can find the file directly
+      const myClassFile = (await treeViewSection.findItem('MyClass.cls')) as DefaultTreeItem;
+      const contextMenu = await myClassFile.openContextMenu();
+      await contextMenu.select('SFDX: Deploy This Source to Org');
+
+      await utilities.validateCommand('Deploy', 'to', 'ST', 'ApexClass', ['MyClass'], 'Unchanged  ');
+    });
+  }
+
   step('Retrieve with SFDX: Retrieve This Source from Org', async () => {
     utilities.log(`Deploy and Retrieve - Retrieve with SFDX: Retrieve This Source from Org`);
     const workbench = utilities.getWorkbench();
@@ -141,6 +183,48 @@ describe('Deploy and Retrieve', async () => {
     const textAfterRetrieve = await textEditor.getText();
     expect(textAfterRetrieve).to.not.contain('modified comment');
   });
+
+  // Use context menu only for Windows and Ubuntu
+  if (process.platform !== 'darwin') {
+    step('Retrieve with context menu from editor view', async () => {
+      utilities.log(`Retrieve with context menu from editor view`);
+      const workbench = utilities.getWorkbench();
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+
+      const textEditor = await utilities.getTextEditor(workbench, 'MyClass.cls');
+      const contextMenu = await textEditor.openContextMenu();
+      await contextMenu.select('SFDX: Retrieve This Source from Org');
+
+      await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', ['MyClass']);
+    });
+  }
+
+  if (process.platform !== 'darwin') {
+    step('Retrieve with context menu from explorer view', async () => {
+      utilities.log(`Retrieve with context menu from explorer view`);
+      // Clear the Output view first.
+      await utilities.clearOutputView(utilities.Duration.seconds(2));
+      await utilities.executeQuickPick('File: Focus on Files Explorer');
+      await utilities.pause(utilities.Duration.seconds(2));
+      const workbench = utilities.getWorkbench();
+      const sidebar = await workbench.getSideBar().wait();
+      const content = await sidebar.getContent().wait();
+      const treeViewSection = await content.getSection(testSetup.tempProjectName);
+      if (!treeViewSection) {
+        throw new Error(
+          'In verifyProjectLoaded(), getSection() returned a treeViewSection with a value of null (or undefined)'
+        );
+      }
+
+      // The force-app/main/default and classes folders are already expanded, so we can find the file directly
+      const myClassFile = (await treeViewSection.findItem('MyClass.cls')) as DefaultTreeItem;
+      const contextMenu = await myClassFile.openContextMenu();
+      await contextMenu.select('SFDX: Retrieve This Source from Org');
+
+      await utilities.validateCommand('Retrieve', 'from', 'ST', 'ApexClass', ['MyClass']);
+    });
+  }
 
   step('Prefer Deploy on Save when `Push or deploy on save` is enabled', async () => {
     utilities.log(`Deploy and Retrieve - Prefer Deploy on Save when 'Push or deploy on save' is enabled`);
