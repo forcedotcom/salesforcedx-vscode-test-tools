@@ -289,14 +289,19 @@ describe('Deploy and Retrieve', async () => {
   step('SFDX: Delete This from Project and Org - Command Palette', async () => {
     utilities.log(`Deploy and Retrieve - SFDX: Delete This from Project and Org - Command Palette`);
     const workbench = utilities.getWorkbench();
+
+    // Run SFDX: Push Source to Default Org and Ignore Conflicts to be in sync with remote
+    await utilities.executeQuickPick(
+      'SFDX: Push Source to Default Org and Ignore Conflicts',
+      utilities.Duration.seconds(10)
+    );
+
     // Clear the Output view first.
     await utilities.clearOutputView();
 
-    // clear notifications
+    // Clear notifications
     await utilities.dismissAllNotifications();
 
-    await utilities.getTextEditor(workbench, 'MyClass.cls');
-    await utilities.pause(utilities.Duration.seconds(1));
     await utilities.executeQuickPick('SFDX: Delete This from Project and Org', utilities.Duration.seconds(2));
 
     // Make sure we get a notification for the source delete
