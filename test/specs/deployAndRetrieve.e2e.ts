@@ -343,26 +343,38 @@ describe('Deploy and Retrieve', async () => {
   });
 
   if (process.platform !== 'darwin') {
-    step('Create and deploy 2 apex classes', async () => {
-      utilities.log('Deploy and Retrieve - Create and deploy 2 apex classes');
+    step('Create and push 2 apex classes', async () => {
+      utilities.log('Deploy and Retrieve - Create and push 2 apex classes');
 
-      // Create an Apex Class.
+      // Create the Apex Classes.
       await utilities.createCommand('Apex Class', 'ExampleApexClass1', 'classes', 'cls');
-
-      // Clear the Output view first.
-      await utilities.clearOutputView();
-
-      // Deploy ExampleApexClass1 to the default org.
-      await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'ExampleApexClass1');
-
-      // Create an Apex Class.
       await utilities.createCommand('Apex Class', 'ExampleApexClass2', 'classes', 'cls');
 
-      // Clear the Output view first.
-      await utilities.clearOutputView();
+      // Reload the VSCode window to allow the LWC to be indexed by the Apex Language Server
+      await utilities.reloadWindow(utilities.Duration.seconds(20));
 
-      // Deploy ExampleApexClass2 to the default org.
-      await utilities.runAndValidateCommand('Deploy', 'to', 'no-ST', 'ApexClass', 'ExampleApexClass2');
+      // Push source to org
+      await utilities.executeQuickPick(
+        'SFDX: Push Source to Default Org and Ignore Conflicts',
+        utilities.Duration.seconds(1)
+      );
+
+      // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
+      let successPushNotificationWasFound;
+      try {
+        successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
+          utilities.Duration.TEN_MINUTES
+        );
+        expect(successPushNotificationWasFound).to.equal(true);
+      } catch (error) {
+        await utilities.getWorkbench().openNotificationsCenter();
+        successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+          /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
+          utilities.Duration.TEN_MINUTES
+        );
+        expect(successPushNotificationWasFound).to.equal(true);
+      }
     });
 
     step('SFDX: Delete This from Project and Org - Right click from editor view', async () => {
