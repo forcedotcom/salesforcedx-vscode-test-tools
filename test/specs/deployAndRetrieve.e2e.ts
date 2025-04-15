@@ -302,6 +302,8 @@ describe('Deploy and Retrieve', async () => {
     // Clear notifications
     await utilities.dismissAllNotifications();
 
+    await utilities.getTextEditor(workbench, 'MyClass.cls');
+    await utilities.pause(utilities.Duration.seconds(1));
     await utilities.executeQuickPick('SFDX: Delete This from Project and Org', utilities.Duration.seconds(2));
 
     // Make sure we get a notification for the source delete
