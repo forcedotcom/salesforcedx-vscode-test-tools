@@ -428,6 +428,8 @@ describe('Deploy and Retrieve', async () => {
       );
       utilities.log('Output panel text is: ' + outputPanelText);
 
+      const pathToClass = path.join('force-app', 'main', 'default', 'classes', 'ExampleApexClass1');
+
       const expectedTexts = [
         '=== Deleted Source',
         'ExampleApexClass1',
@@ -496,6 +498,8 @@ describe('Deploy and Retrieve', async () => {
         10
       );
       utilities.log('Output panel text is: ' + outputPanelText);
+
+      const pathToClass = path.join('force-app', 'main', 'default', 'classes', 'ExampleApexClass2');
 
       const expectedTexts = [
         '=== Deleted Source',
