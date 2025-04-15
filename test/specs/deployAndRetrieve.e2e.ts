@@ -390,6 +390,9 @@ describe('Deploy and Retrieve', async () => {
       // Clear the Output view first.
       await utilities.clearOutputView();
 
+      // Clear notifications
+      await utilities.dismissAllNotifications();
+
       const textEditor = await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
       const contextMenu = await textEditor.openContextMenu();
       await contextMenu.select('SFDX: Delete This from Project and Org');
@@ -442,6 +445,10 @@ describe('Deploy and Retrieve', async () => {
       utilities.log('SFDX: Delete This from Project and Org - Right click from explorer view');
       // Clear the Output view first.
       await utilities.clearOutputView();
+
+      // Clear notifications
+      await utilities.dismissAllNotifications();
+
       await utilities.executeQuickPick('File: Focus on Files Explorer');
       await utilities.pause(utilities.Duration.seconds(2));
       const workbench = utilities.getWorkbench();
