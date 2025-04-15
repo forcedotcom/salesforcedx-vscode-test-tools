@@ -466,7 +466,7 @@ describe('Deploy and Retrieve', async () => {
       // The force-app/main/default and classes folders are already expanded, so we can find the file directly
       const myClassFile = (await treeViewSection.findItem('ExampleApexClass2.cls')) as DefaultTreeItem;
       const contextMenu = await myClassFile.openContextMenu();
-      await contextMenu.select('SFDX: Delete This from Project and Org');
+      await contextMenu.select('SFDX: Delete from Project and Org');
 
       // Make sure we get a notification for the source delete
       const notificationFound = await utilities.notificationIsPresentWithTimeout(
