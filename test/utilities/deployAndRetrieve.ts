@@ -31,11 +31,22 @@ export const validateCommand = async (
   prefix: string = ''
 ): Promise<void> => {
   utilities.log(`validateCommand()`);
-  const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-    new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
-    utilities.Duration.TEN_MINUTES
-  );
-  expect(successNotificationWasFound).to.equal(true);
+
+  let successNotificationWasFound;
+  try {
+    successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
+      utilities.Duration.TEN_MINUTES
+    );
+    expect(successNotificationWasFound).to.equal(true);
+  } catch (error) {
+    await utilities.getWorkbench().openNotificationsCenter();
+    successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
+      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
+      utilities.Duration.ONE_MINUTE
+    );
+    expect(successNotificationWasFound).to.equal(true);
+  }
 
   // Verify Output tab
   const outputPanelText = await utilities.attemptToFindOutputPanelText(
@@ -47,7 +58,15 @@ export const validateCommand = async (
 
   const pathSeparator = process.platform === 'win32' ? '\\' : '/';
   const longestFullName = fullNames.reduce((a, b) => (a.length > b.length ? a : b), '');
-  const expectedTexts = constructExpectedTexts(operation, fromTo, metadataType, fullNames, prefix, longestFullName, pathSeparator);
+  const expectedTexts = constructExpectedTexts(
+    operation,
+    fromTo,
+    metadataType,
+    fullNames,
+    prefix,
+    longestFullName,
+    pathSeparator
+  );
 
   expect(outputPanelText).to.not.be.undefined;
   await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
@@ -62,9 +81,9 @@ export const validateCommand = async (
 export const calculateSpacer = (longestFullName: string, currentFileName: string): string => {
   let numberOfSpaces = 2;
   if (longestFullName.length < 'FULL_NAME'.length) {
-    numberOfSpaces += ('FULL_NAME'.length - currentFileName.length);
+    numberOfSpaces += 'FULL_NAME'.length - currentFileName.length;
   } else {
-    numberOfSpaces += (longestFullName.length - currentFileName.length);
+    numberOfSpaces += longestFullName.length - currentFileName.length;
   }
   return ' '.repeat(numberOfSpaces);
 };
@@ -106,7 +125,7 @@ const constructExpectedTexts = (
   }
 
   const metadataPath = metadataPaths[metadataType];
-  const additionalTexts = fullNames.flatMap((fullName) => {
+  const additionalTexts = fullNames.flatMap(fullName => {
     const spacer = calculateSpacer(longestFullName, fullName);
     if (metadataType === 'CustomObject') {
       return [
@@ -130,11 +149,11 @@ const constructExpectedTexts = (
           `${prefix}${objectName}${customObjectSpacer}CustomObject  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}${objectName}.object-meta.xml`
         ];
       } else {
-        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`
+        `${prefix}${fullName}${spacer}${metadataType}  ${metadataPath}${pathSeparator}${objectName}${pathSeparator}fields${pathSeparator}${fieldName}.field-meta.xml`;
       }
     }
   });
 
-  additionalTexts.filter((text): text is string => text !== undefined).forEach((text) => expectedTexts.push(text));
+  additionalTexts.filter((text): text is string => text !== undefined).forEach(text => expectedTexts.push(text));
   return expectedTexts;
 };
