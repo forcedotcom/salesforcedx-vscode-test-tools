@@ -357,6 +357,12 @@ describe('Run Apex Tests', async () => {
   step('Run Single Test via the Test Sidebar', async () => {
     utilities.log(`RunApexTests - 'Run Single Test via the Test Sidebar`);
     const workbench = utilities.getWorkbench();
+
+    // Enable highlighting of test coverage
+    await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Highlight Apex Code Coverage');
+    await statusBar.click();
+
     // Clear the Output view.
     await utilities.dismissAllNotifications();
     await utilities.clearOutputView(utilities.Duration.seconds(2));
@@ -385,11 +391,6 @@ describe('Run Apex Tests', async () => {
     // Open class file
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
-
-    // Enable highlighting of test coverage
-    const statusBar = await utilities.getStatusBarItemWhichIncludes('Highlight Apex Code Coverage');
-    await statusBar.click();
-    await utilities.pause(utilities.Duration.seconds(2));
 
     // Make sure that the highlighted code is present.
     const highlightedCode = await workbench.findElements(By.css('div.cdr.ced-1-TextEditorDecorationType2-0'));
