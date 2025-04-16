@@ -379,6 +379,24 @@ describe('Run Apex Tests', async () => {
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
   });
 
+  step('Verify highlighting of test coverage', async () => {
+    utilities.log(`RunApexTests - Verify highlighting of test coverage`);
+
+    // Open class file
+    const workbench = utilities.getWorkbench();
+    await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
+
+    // Enable highlighting of test coverage
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Highlight Apex Code Coverage');
+    await statusBar.click();
+    await utilities.pause(utilities.Duration.seconds(2));
+
+    // Make sure that the highlighted code is present.
+    const highlightedCode = await workbench.findElements(By.css('div.cdr.ced-1-TextEditorDecorationType2-0'));
+    expect(highlightedCode).to.not.be.undefined;
+    expect(highlightedCode.length).to.equal(1);
+  });
+
   step('Run a test that fails and fix it', async () => {
     utilities.log(`RunApexTests - Run a test that fails and fix it`);
     // Create Apex class AccountService
