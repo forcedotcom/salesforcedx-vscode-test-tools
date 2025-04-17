@@ -75,6 +75,7 @@ describe('Run Apex Tests', async () => {
     utilities.log(`RunApexTests - Enable Retrieve Test Code Coverage Setting`);
 
     expect(await utilities.enableBooleanSetting(WSK.RETRIEVE_TEST_CODE_COVERAGE)).to.equal(true);
+    await utilities.closeCurrentEditor();
     await utilities.reloadWindow(utilities.Duration.seconds(30));
   });
 
