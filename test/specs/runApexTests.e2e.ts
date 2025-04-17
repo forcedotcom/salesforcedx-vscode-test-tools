@@ -76,7 +76,7 @@ describe('Run Apex Tests', async () => {
 
     expect(await utilities.enableBooleanSetting(WSK.RETRIEVE_TEST_CODE_COVERAGE)).to.equal(true);
     await utilities.closeCurrentEditor();
-    await utilities.reloadWindow(utilities.Duration.seconds(30));
+    await utilities.reloadWindow(utilities.Duration.ONE_MINUTE);
   });
 
   step('Verify LSP finished indexing', async () => {
