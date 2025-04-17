@@ -4,11 +4,12 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import { expect } from 'chai';
 import { step } from 'mocha-steps';
 import { By, InputBox, QuickOpenBox, SideBarView, after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
-import { expect } from 'chai';
+import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
 
 describe('Run Apex Tests', async () => {
   let prompt: InputBox | QuickOpenBox;
@@ -354,14 +355,16 @@ describe('Run Apex Tests', async () => {
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
   });
 
+  step('Enable Retrieve Test Code Coverage Setting', async () => {
+    utilities.log(`RunApexTests - Enable Retrieve Test Code Coverage Setting`);
+
+    expect(await utilities.enableBooleanSetting(WSK.RETRIEVE_TEST_CODE_COVERAGE)).to.equal(true);
+    await utilities.reloadWindow(utilities.Duration.seconds(30));
+  });
+
   step('Run Single Test via the Test Sidebar', async () => {
     utilities.log(`RunApexTests - 'Run Single Test via the Test Sidebar`);
     const workbench = utilities.getWorkbench();
-
-    // Enable highlighting of test coverage
-    await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
-    const statusBar = await utilities.getStatusBarItemWhichIncludes('Highlight Apex Code Coverage');
-    await statusBar.click();
 
     // Clear the Output view.
     await utilities.dismissAllNotifications();
@@ -388,9 +391,11 @@ describe('Run Apex Tests', async () => {
   step('Verify highlighting of test coverage', async () => {
     utilities.log(`RunApexTests - Verify highlighting of test coverage`);
 
-    // Open class file
+    // Enable highlighting of test coverage
     const workbench = utilities.getWorkbench();
     await utilities.getTextEditor(workbench, 'ExampleApexClass1.cls');
+    const statusBar = await utilities.getStatusBarItemWhichIncludes('Highlight Apex Code Coverage');
+    await statusBar.click();
 
     // Make sure that the highlighted code is present.
     const highlightedCode = await workbench.findElements(By.css('div.cdr.ced-1-TextEditorDecorationType2-0'));

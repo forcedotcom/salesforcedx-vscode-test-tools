@@ -10,8 +10,8 @@ export const WORKSPACE_SETTING_KEYS = {
   ENABLE_SOURCE_TRACKING_FOR_DEPLOY_AND_RETRIEVE:
     'salesforcedx-vscode-core.experimental.enableSourceTrackingForDeployAndRetrieve',
   PUSH_OR_DEPLOY_ON_SAVE_ENABLED: 'salesforcedx-vscode-core.push-or-deploy-on-save.enabled',
-  PUSH_OR_DEPLOY_ON_SAVE_PREFER_DEPLOY_ON_SAVE:
-    'salesforcedx-vscode-core.push-or-deploy-on-save.preferDeployOnSave'
+  PUSH_OR_DEPLOY_ON_SAVE_PREFER_DEPLOY_ON_SAVE: 'salesforcedx-vscode-core.push-or-deploy-on-save.preferDeployOnSave',
+  RETRIEVE_TEST_CODE_COVERAGE: 'salesforcedx-vscode-core.retrieve-test-code-coverage'
 };
 
 export const LOG_LEVELS = ['trace', 'debug', 'info', 'warn', 'error', 'silent'] as const;
