@@ -71,6 +71,13 @@ describe('Run Apex Tests', async () => {
     }
   });
 
+  step('Enable Retrieve Test Code Coverage Setting', async () => {
+    utilities.log(`RunApexTests - Enable Retrieve Test Code Coverage Setting`);
+
+    expect(await utilities.enableBooleanSetting(WSK.RETRIEVE_TEST_CODE_COVERAGE)).to.equal(true);
+    await utilities.reloadWindow(utilities.Duration.seconds(30));
+  });
+
   step('Verify LSP finished indexing', async () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Verify LSP finished indexing`);
 
@@ -353,13 +360,6 @@ describe('Run Apex Tests', async () => {
     ];
     expect(outputPanelText).to.not.be.undefined;
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
-  });
-
-  step('Enable Retrieve Test Code Coverage Setting', async () => {
-    utilities.log(`RunApexTests - Enable Retrieve Test Code Coverage Setting`);
-
-    expect(await utilities.enableBooleanSetting(WSK.RETRIEVE_TEST_CODE_COVERAGE)).to.equal(true);
-    await utilities.reloadWindow(utilities.Duration.seconds(30));
   });
 
   step('Run Single Test via the Test Sidebar', async () => {
