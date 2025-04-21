@@ -73,6 +73,7 @@ export async function attemptToFindOutputPanelText(
   debug(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
   while (attempts > 0) {
     const outputViewText = await getOutputViewText(outputChannelName);
+    console.log(`outputViewText: ${outputViewText}`);
     if (outputViewText.includes(searchString)) {
       return outputViewText;
     }
@@ -116,7 +117,7 @@ export async function clearOutputView(wait = Duration.seconds(1)) {
   if (process.platform === 'linux') {
     // In Linux, clear the output by clicking the "Clear Output" button in the Output Tab
     const clearButton = await outputView.findElement(By.className('codicon-clear-all'));
-    await outputView.getDriver().executeScript("arguments[0].click();", clearButton);
+    await outputView.getDriver().executeScript('arguments[0].click();', clearButton);
   } else {
     // In Mac and Windows, clear the output by calling the "View: Clear Output" command in the command palette
     await executeQuickPick('View: Clear Output', wait);
