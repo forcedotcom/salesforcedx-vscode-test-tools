@@ -129,8 +129,9 @@ describe('Run Apex Tests', async () => {
       'ExampleApexClass1Test.validateSayHello  Pass',
       'ended SFDX: Run Apex Tests'
     ];
-
+    console.log(`outputPanelText: ${outputPanelText}`);
     expect(outputPanelText).to.not.be.undefined;
+    console.log('lolobrillidas');
     await utilities.verifyOutputPanelText(outputPanelText!, expectedTexts);
   });
 
