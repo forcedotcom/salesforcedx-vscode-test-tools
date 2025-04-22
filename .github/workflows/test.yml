@@ -39,6 +39,14 @@ jobs:
         run: npm ci
       - name: Install Salesforce CLI
         run: npm install -g @salesforce/cli
+      - name: Display chromedriver version
+        run: chromedriver --version
+      - name: Setup Fluxbox and Xvfb
+        run: |
+          sudo apt-get -y install fluxbox
+          Xvfb :99 &
+          fluxbox -display :99 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
       - name: Compile and test
         env:
           CODE_VERSION: 'latest'
