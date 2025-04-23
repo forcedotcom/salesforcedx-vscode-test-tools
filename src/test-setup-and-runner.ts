@@ -254,11 +254,11 @@ const argv = yargs(hideBin(process.argv))
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
 
-const testSetupAnRunner = new TestSetupAndRunner(testConfig, argv.spec);
+const testSetupAndRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {
   try {
-    await testSetupAnRunner.setup();
-    const result = await testSetupAnRunner.runTests();
+    await testSetupAndRunner.setup();
+    const result = await testSetupAndRunner.runTests();
     console.log(result);
     process.exit(result);
   } catch (error) {

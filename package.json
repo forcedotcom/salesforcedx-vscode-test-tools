@@ -83,12 +83,7 @@
       ],
       "files": [
         "lib/test/selfSpecs/**/*.test.js"
-      ],
-      "service": {
-        "wireitConfig": {
-          "cache": false
-        }
-      }
+      ]
     },
     "automation-tests": {
       "command": "node ./lib/test-setup-and-runner.js",
