@@ -8,7 +8,7 @@
 import { expect } from 'chai';
 import { fail } from 'assert';
 import { log } from 'console';
-import { executeQuickPick, notificationIsPresentWithTimeout, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText } from '../ui-interaction';
+import { executeQuickPick, notificationIsPresentWithTimeout, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText, getWorkbench } from '../ui-interaction';
 import { Duration } from '../core/miscellaneous';
 
 /**
@@ -43,11 +43,22 @@ export const validateCommand = async (
   prefix = ''
 ): Promise<void> => {
   log(`validateCommand()`);
-  const successNotificationWasFound = await notificationIsPresentWithTimeout(
-    new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
-    Duration.TEN_MINUTES
-  );
-  expect(successNotificationWasFound).to.equal(true);
+
+  let successNotificationWasFound;
+  try {
+    successNotificationWasFound = await notificationIsPresentWithTimeout(
+      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
+      Duration.TEN_MINUTES
+    );
+    expect(successNotificationWasFound).to.equal(true);
+  } catch (error) {
+    await getWorkbench().openNotificationsCenter();
+    successNotificationWasFound = await notificationIsPresentWithTimeout(
+      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
+      Duration.ONE_MINUTE
+    );
+    expect(successNotificationWasFound).to.equal(true);
+  }
 
   // Verify Output tab
   const outputPanelText = await attemptToFindOutputPanelText(
