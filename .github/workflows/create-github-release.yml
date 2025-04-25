@@ -16,7 +16,8 @@ on:
 jobs:
   release:
     uses: salesforcecli/github-workflows/.github/workflows/create-github-release.yml@main
-    secrets: inherit
+    secrets:
+      SVC_CLI_BOT_GITHUB_TOKEN: ${{ secrets.IDEE_GH_TOKEN }}
     with:
       prerelease: ${{ inputs.prerelease }}
       # If this is a push event, we want to skip the release if there are no semantic commits
