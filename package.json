@@ -8,7 +8,8 @@
     "lib",
     "src",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "dist"
   ],
   "scripts": {
     "test": "wireit",
@@ -26,7 +27,9 @@
     "commitlint": "commitlint --edit",
     "prepublishOnly": "npm run clean && npm run lint && npm run compile",
     "docs": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals",
-    "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch"
+    "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch",
+    "build": "npm run compile && esbuild src/index.ts --bundle --platform=node --outfile=dist/bundle.js",
+    "publish-bundle": "npm run build && npm publish"
   },
   "overrides": {
     "typedoc": {
@@ -149,6 +152,7 @@
     "typedoc": "^0.25.12",
     "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "5.6.3",
-    "wireit": "^0.14.11"
+    "wireit": "^0.14.11",
+    "esbuild": "^0.20.1"
   }
 }
