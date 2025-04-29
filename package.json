@@ -29,7 +29,7 @@
     "docs": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals",
     "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch",
     "build": "npm run compile && esbuild src/index.ts --bundle --platform=node --outfile=dist/bundle.js",
-    "publish-bundle": "npm run build && npm publish"
+    "publish": "npm run build && npm publish"
   },
   "overrides": {
     "typedoc": {
