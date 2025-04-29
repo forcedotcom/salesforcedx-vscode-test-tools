@@ -28,8 +28,7 @@
     "prepublishOnly": "npm run clean && npm run lint && npm run compile",
     "docs": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals",
     "docs:watch": "typedoc --out docs src/index.ts --excludePrivate --excludeExternals --watch",
-    "build": "npm run compile && esbuild src/index.ts --bundle --platform=node --outfile=dist/bundle.js",
-    "publish": "npm run build && npm publish"
+    "build": "npm run compile"
   },
   "overrides": {
     "typedoc": {
