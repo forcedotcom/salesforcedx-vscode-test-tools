@@ -23,18 +23,10 @@ jobs:
       - uses: salesforcecli/github-workflows/.github/actions/getPreReleaseTag@main
         id: distTag
 
-  npm:
-    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml@main
-    needs: [getDistTag]
-    with:
-      tag: ${{ needs.getDistTag.outputs.tag || 'latest' }}
-      githubTag: ${{ github.event.release.tag_name || inputs.tag }}
-    secrets: inherit
-
-  publish-bundle:
+  npm-publish:
     if: ${{ success() && needs.getDistTag.outputs.tag == '' }}
-    uses: ./.github/workflows/esbuild-publish.yml
-    needs: [getDistTag, npm]
+    uses: ./.github/workflows/npm-publish.yml
+    needs: [getDistTag]
     with:
       branch: 'main'
       nodeVersion: 'lts/*'
