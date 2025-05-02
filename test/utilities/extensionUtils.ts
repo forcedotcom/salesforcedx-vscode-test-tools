@@ -196,6 +196,7 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
     await Promise.race([
       (async () => {
         do {
+          await utilities.executeQuickPick('Developer: Toggle Developer Tools');
           extensionsStatus = await findExtensionsInRunningExtensionsList(extensionsToVerify);
 
           // Log the current state of the activation check for each extension
