@@ -125,7 +125,7 @@ export const extensions: ExtensionType[] = [
     name: 'Lightning Web Components',
     vsixPath: '',
     shouldInstall: 'optional',
-    shouldVerifyActivation: true
+    shouldVerifyActivation: false
   },
   {
     extensionId: 'salesforcedx-vscode-visualforce',
