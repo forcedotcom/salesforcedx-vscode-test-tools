@@ -67,6 +67,11 @@ class TestSetupAndRunner extends ExTester {
   public async runTests(): Promise<number> {
     const useExistingProject = EnvironmentSettings.getInstance().useExistingProject;
     const resources = useExistingProject ? [useExistingProject] : [];
+
+    log(`starting runTests with useExistingProject: ${useExistingProject}`);
+    log(`starting runTests with resources: ${resources}`);
+    log(`starting runTests with spec: ${this.spec}`);
+
     return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
   }
   public async installExtension(extension: string): Promise<void> {
@@ -217,12 +222,14 @@ class TestSetupAndRunner extends ExTester {
     // Step 1: Authorize to Testing Org
     const authorizeOrg = await orgLoginSfdxUrl(authFilePath);
     expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName}`);
+    log(`Successfully authorized ${devHubUserName}`);
 
     // Step 2: Set Alias for the Org
     const setAliasResult = await setAlias(devHubAliasName, devHubUserName);
     expect(setAliasResult.stdout).to.contain(devHubAliasName);
     expect(setAliasResult.stdout).to.contain(devHubUserName);
     expect(setAliasResult.stdout).to.contain('true');
+    log(`Successfully setAliasResult ${setAliasResult.stdout}`);
   }
 
   async downloadCode(version = 'latest'): Promise<void> {
