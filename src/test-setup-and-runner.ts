@@ -17,11 +17,14 @@ import { verifyAliasAndUserName } from './salesforce-components/authorization';
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
   private testConfig: TestConfig;
+  private spec: string | string[] | undefined;
 
   constructor(
     testConfig?: Partial<TestConfig>,
-    private spec?: string | string[] | undefined
+    spec?: string | string[] | undefined
   ) {
+    log(`Init testConfig with testConfig: ${testConfig}`);
+    log(`Init testConfig with spec: ${spec}`);
     // Create config with defaults and overrides
     const config = createDefaultTestConfig(testConfig);
 
@@ -30,6 +33,7 @@ class TestSetupAndRunner extends ExTester {
 
     super(undefined, ReleaseQuality.Stable);
     this.testConfig = config;
+    this.spec = spec;
   }
 
   /**
@@ -254,12 +258,28 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false,
     array: true
   })
+  .option('workspace-path', {
+    alias: 'w',
+    type: 'string',
+    description: 'Path to workspace directory',
+    demandOption: false
+  })
   .help().argv as {
   spec: string | string[] | undefined;
+  workspacePath?: string;
 };
 
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};
+
+if (argv.workspacePath) {
+  testConfig.workspacePath = argv.workspacePath;
+  testConfig.extensionsPath = path.join(argv.workspacePath, 'extensions');
+}
+
+if (argv.spec) {
+  log(`Spec passed in: ${argv.spec}`);
+}
 
 const testSetupAndRunner = new TestSetupAndRunner(testConfig, argv.spec);
 async function run() {
