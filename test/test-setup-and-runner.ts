@@ -40,36 +40,39 @@ class TestSetupAndRunner extends ExTester {
     const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
     const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
-    const foundInstalledExtensions = await Promise.all(
-      extensionsDirEntries
-        .filter(async entry => {
-          try {
-            const stats = await fs.stat(entry);
-            return stats.isDirectory();
-          } catch (e) {
-            utilities.log(`stat failed for file ${entry}`);
-            return false;
-          }
+
+    // Filter directories first
+    const validDirectories = [];
+    for (const entry of extensionsDirEntries) {
+      try {
+        const stats = await fs.stat(entry);
+        if (stats.isDirectory()) {
+          validDirectories.push(entry);
+        }
+      } catch (e) {
+        utilities.log(`stat failed for file ${entry}`);
+      }
+    }
+
+    const foundInstalledExtensions = validDirectories
+      .map(entry => {
+        const match = path.basename(entry).match(extensionPattern);
+        if (match?.groups) {
+          return {
+            publisher: match.groups.publisher,
+            extensionId: match.groups.extensionId,
+            version: match.groups.version,
+            path: entry
+          };
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .filter(ext =>
+        extensions.find(refExt => {
+          return refExt.extensionId === ext?.extensionId;
         })
-        .map(entry => {
-          const match = path.basename(entry).match(extensionPattern);
-          if (match?.groups) {
-            return {
-              publisher: match.groups.publisher,
-              extensionId: match.groups.extensionId,
-              version: match.groups.version,
-              path: entry
-            };
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .filter(ext =>
-          extensions.find(refExt => {
-            return refExt.extensionId === ext?.extensionId;
-          })
-        )
-    );
+      );
 
     if (
       foundInstalledExtensions.length > 0 &&
