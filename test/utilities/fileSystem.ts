@@ -113,3 +113,49 @@ export function getFolderName(folderPath: string): string | null {
     return null; // The path doesn't exist or isn't accessible
   }
 }
+
+/**
+ * Validates that a VSIX file exists and is a valid ZIP archive
+ * @param vsixPath Path to the VSIX file to validate
+ * @returns true if valid, throws an error if invalid
+ */
+export async function validateVsixFile(vsixPath: string): Promise<boolean> {
+  const fs = require('fs/promises');
+  const path = require('path');
+
+  // Check file exists
+  try {
+    const stats = await fs.stat(vsixPath);
+    if (!stats.isFile()) {
+      throw new Error(`VSIX file ${vsixPath} is not a file`);
+    }
+
+    // Check file size is reasonable
+    if (stats.size < 1000) {
+      throw new Error(`VSIX file ${vsixPath} is too small (${stats.size} bytes), likely corrupt or truncated`);
+    }
+
+    // Try to read the ZIP header (PK magic signature)
+    const fileHandle = await fs.open(vsixPath, 'r');
+    try {
+      const buffer = Buffer.alloc(4);
+      const { bytesRead } = await fileHandle.read(buffer, 0, 4, 0);
+
+      if (bytesRead < 4) {
+        throw new Error(`Could not read enough bytes from ${vsixPath}`);
+      }
+
+      // Check for ZIP file signature (PK\x03\x04)
+      if (buffer[0] !== 0x50 || buffer[1] !== 0x4b || buffer[2] !== 0x03 || buffer[3] !== 0x04) {
+        throw new Error(`${vsixPath} is not a valid ZIP file (invalid header signature)`);
+      }
+
+      return true;
+    } finally {
+      await fileHandle.close();
+    }
+  } catch (error) {
+    console.error(`VSIX validation failed for ${vsixPath}: ${error}`);
+    throw error;
+  }
+}
