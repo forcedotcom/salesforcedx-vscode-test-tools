@@ -147,7 +147,7 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
 
   if (cleanDb) {
     const releaseDir = findReleaseDir();
-    const standardApexLibraryPath = path.join(PATHS.tools, releaseDir, 'StandardApexLibrary');
+    const standardApexLibraryPath = path.normalize(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'));
     await utilities.removeFolder(standardApexLibraryPath);
     expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal(null);
   }
@@ -164,10 +164,11 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
   await verifyLspRestart(cleanDb);
 
   if (cleanDb) {
+    // Add extra wait time for Windows file operations
+    await utilities.pause(utilities.Duration.seconds(5));
     const releaseDir = findReleaseDir();
-    expect(await utilities.getFolderName(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'))).to.equal(
-      'StandardApexLibrary'
-    );
+    const standardApexLibraryPath = path.normalize(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'));
+    expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal('StandardApexLibrary');
   }
 };
 
