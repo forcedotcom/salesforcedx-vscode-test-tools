@@ -47,7 +47,7 @@ export class EnvironmentSettings {
   private _logLevel: LogLevel = 'info';
 
   private constructor() {
-    this._vscodeVersion = process.env.CODE_VERSION || this._vscodeVersion;
+    this._vscodeVersion = process.env.VSCODE_VERSION || this._vscodeVersion;
 
     if (process.env.SPEC_FILES) {
       this._specFiles = ['lib/specs/' + process.env.SPEC_FILES];
