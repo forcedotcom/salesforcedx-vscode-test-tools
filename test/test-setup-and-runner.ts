@@ -22,9 +22,6 @@ class TestSetupAndRunner extends ExTester {
   public async setup(): Promise<void> {
     await this.downloadCode(EnvironmentSettings.getInstance().vscodeVersion);
     await this.downloadChromeDriver(EnvironmentSettings.getInstance().vscodeVersion);
-    const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
-    const extensionsDirEntries = await fs.readdir(extensionsDir);
-    console.log('extensions directory entries: ', extensionsDirEntries);
     await this.installExtensions();
     await this.setupAndAuthorizeOrg();
   }
