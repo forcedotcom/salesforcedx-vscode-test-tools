@@ -32,48 +32,25 @@ class TestSetupAndRunner extends ExTester {
     return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
   }
   public async installExtension(extension: string): Promise<void> {
-    try {
-      // Validate the VSIX file before attempting to install it
-      await utilities.validateVsixFile(extension);
-
-      utilities.log(`SetUp - Started Install extension ${path.basename(extension)}`);
-      try {
-        await this.installVsix({
-          useYarn: false,
-          vsixFile: extension
-        });
-      } catch (installError: any) {
-        throw new Error(
-          `Failed to install VSIX: ${installError.message}\nCommand output: ${installError.stdout || 'no output'}\nError output: ${installError.stderr || 'no error output'}`
-        );
-      }
-    } catch (error) {
-      utilities.log(`Error installing extension ${extension}: ${error}`);
-      throw error;
-    }
+    utilities.log(`SetUp - Started Install extension ${path.basename(extension)}`);
+    await this.installVsix({ useYarn: false, vsixFile: extension });
   }
 
   public async installExtensions(excludeExtensions: utilities.ExtensionId[] = []): Promise<void> {
-    try {
-      const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
-      utilities.log(`Looking for extensions in: ${extensionsDir}`);
-      const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-      const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
-
-      // Filter directories first
-      const validDirectories = [];
-      for (const entry of extensionsDirEntries) {
-        try {
-          const stats = await fs.stat(entry);
-          if (stats.isDirectory()) {
-            validDirectories.push(entry);
+    const extensionsDir = path.resolve(path.join(EnvironmentSettings.getInstance().extensionPath));
+    const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
+    const extensionsDirEntries = (await fs.readdir(extensionsDir)).map(entry => path.resolve(extensionsDir, entry));
+    const foundInstalledExtensions = await Promise.all(
+      extensionsDirEntries
+        .filter(async entry => {
+          try {
+            const stats = await fs.stat(entry);
+            return stats.isDirectory();
+          } catch (e) {
+            utilities.log(`stat failed for file ${entry}`);
+            return false;
           }
-        } catch (e) {
-          utilities.log(`stat failed for file ${entry}`);
-        }
-      }
-
-      const foundInstalledExtensions = validDirectories
+        })
         .map(entry => {
           const match = path.basename(entry).match(extensionPattern);
           if (match?.groups) {
@@ -91,84 +68,57 @@ class TestSetupAndRunner extends ExTester {
           extensions.find(refExt => {
             return refExt.extensionId === ext?.extensionId;
           })
-        );
+        )
+    );
 
-      if (
-        foundInstalledExtensions.length > 0 &&
-        foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
-      ) {
-        utilities.log(
-          `Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`
-        );
-        foundInstalledExtensions.forEach(ext => {
-          utilities.log(`Extension ${ext?.extensionId} version ${ext?.version}`);
-        });
-        return;
-      }
-
-      const extensionsVsixs = utilities.getVsixFilesFromDir(extensionsDir);
-      if (extensionsVsixs.length === 0) {
-        throw new Error(`No vsix files were found in dir ${extensionsDir}`);
-      }
-
-      // Add more detailed logging for VSIX files
-      for (const vsix of extensionsVsixs) {
-        try {
-          const stats = await fs.stat(vsix);
-          utilities.log(`Found VSIX file: ${vsix} (size: ${stats.size} bytes)`);
-
-          // Pre-validate VSIX files before attempting installation
-          await utilities.validateVsixFile(vsix);
-          utilities.log(`Validated VSIX file: ${vsix} (valid ZIP archive confirmed)`);
-        } catch (error) {
-          utilities.log(`Warning: VSIX validation failed for ${vsix}: ${error}`);
-          // Continue with other files even if one fails validation - we'll handle errors during installation
-        }
-      }
-
-      const mergeExcluded = Array.from(
-        new Set([
-          ...excludeExtensions,
-          ...extensions.filter(ext => ext.shouldInstall === 'never').map(ext => ext.extensionId)
-        ])
+    if (
+      foundInstalledExtensions.length > 0 &&
+      foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
+    ) {
+      utilities.log(
+        `Found the following pre-installed extensions in dir ${extensionsDir}, skipping installation of vsix`
       );
-
-      // Refactored part to use the extensions array
-      extensionsVsixs.forEach(vsix => {
-        const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
-        if (match?.groups) {
-          const { extension, version } = match.groups;
-          const foundExtension = extensions.find(e => e.extensionId === extension);
-          if (foundExtension) {
-            foundExtension.vsixPath = vsix;
-            // assign 'never' to this extension if its id is included in excluedExtensions
-            foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId) ? 'never' : 'always';
-            // if not installing, don't verify, otherwise use default value
-            foundExtension.shouldVerifyActivation =
-              foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
-            utilities.log(
-              `SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`
-            );
-          }
-        }
+      foundInstalledExtensions.forEach(ext => {
+        utilities.log(`Extension ${ext?.extensionId} version ${ext?.version}`);
       });
+      return;
+    }
 
-      // Iterate over the extensions array to install extensions
-      for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
-        try {
-          await this.installExtension(extensionObj.vsixPath);
-        } catch (error) {
-          utilities.log(`Error installing extension ${extensionObj.extensionId}: ${error}`);
-          // Continue with other extensions even if one fails
-          // If this is a critical extension, you might want to throw here instead
-          if (extensionObj.shouldInstall === 'always') {
-            throw error;
-          }
+    const extensionsVsixs = utilities.getVsixFilesFromDir(extensionsDir);
+    if (extensionsVsixs.length === 0) {
+      throw new Error(`No vsix files were found in dir ${extensionsDir}`);
+    }
+
+    const mergeExcluded = Array.from(
+      new Set([
+        ...excludeExtensions,
+        ...extensions.filter(ext => ext.shouldInstall === 'never').map(ext => ext.extensionId)
+      ])
+    );
+
+    // Refactored part to use the extensions array
+    extensionsVsixs.forEach(vsix => {
+      const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+      if (match?.groups) {
+        const { extension, version } = match.groups;
+        const foundExtension = extensions.find(e => e.extensionId === extension);
+        if (foundExtension) {
+          foundExtension.vsixPath = vsix;
+          // assign 'never' to this extension if its id is included in excluedExtensions
+          foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId) ? 'never' : 'always';
+          // if not installing, don't verify, otherwise use default value
+          foundExtension.shouldVerifyActivation =
+            foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
+          utilities.log(
+            `SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`
+          );
         }
       }
-    } catch (error) {
-      utilities.log(`Error in installExtensions: ${error}`);
-      throw error;
+    });
+
+    // Iterate over the extensions array to install extensions
+    for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
+      await this.installExtension(extensionObj.vsixPath);
     }
   }
 
