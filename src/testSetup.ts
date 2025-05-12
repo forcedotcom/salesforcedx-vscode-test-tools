@@ -73,7 +73,8 @@ export class TestSetup {
    */
   private configureExtensions(testReqConfig: core.TestReqConfig): void {
     // Start with all default extensions from salesforceExtensions
-    this.configuredExtensions = testReqConfig.extensionConfigs || extensions;
+    this.configuredExtensions = testReqConfig.extensionConfigs || [];
+    testReqConfig.extensionConfigs = testReqConfig.extensionConfigs || extensions;
 
     // If extensionConfigs is provided, configure the specific extensions
     if (testReqConfig.extensionConfigs) {
