@@ -120,7 +120,7 @@ export class EnvironmentSettings {
    */
   private constructor() {
     // Use vscode-extension-tester standard environment variables
-    this._codeVersion = process.env.CODE_VERSION || this._codeVersion;
+    this._codeVersion = process.env.VSCODE_VERSION || this._codeVersion;
     this._testResources = process.env.TEST_RESOURCES || this._testResources;
     this._extensionsFolder = process.env.EXTENSIONS_FOLDER || this._extensionsFolder;
     this._chromeDriverArgs = process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS;
