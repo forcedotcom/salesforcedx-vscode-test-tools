@@ -23,7 +23,7 @@ class TestSetupAndRunner extends ExTester {
     testConfig?: Partial<TestConfig>,
     spec?: string | string[] | undefined
   ) {
-    log(`Init testConfig with testConfig: ${testConfig}`);
+    log(`Init testConfig with testConfig: ${JSON.stringify(testConfig)}`);
     log(`Init testConfig with spec: ${spec}`);
     // Create config with defaults and overrides
     const config = createDefaultTestConfig(testConfig);
@@ -85,6 +85,7 @@ class TestSetupAndRunner extends ExTester {
 
   public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
     const vsixToInstallDir = this.testConfig.vsixToInstallDir || EnvironmentSettings.getInstance().vsixToInstallDir;
+    log(`Installing extension from vsixToInstallDir: ${vsixToInstallDir}`);
 
     if (!vsixToInstallDir) {
       log(`No VSIX_TO_INSTALL directory specified, the tests will run without installing any extensions`);
@@ -151,6 +152,8 @@ class TestSetupAndRunner extends ExTester {
       return; // Skip installation instead of throwing an error
     }
 
+    log(`VSIX files count: ${extensionsVsixs.length} were found in dir ${vsixToInstallDir}, skipping extension installation`);
+
     const mergeExcluded = Array.from(
       new Set([
         ...excludeExtensions,
@@ -161,6 +164,7 @@ class TestSetupAndRunner extends ExTester {
     // Refactored part to use the extensions array
     extensionsVsixs.forEach(vsix => {
       const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+      log(`Found extension: ${vsix} with match ${match}`)
       if (match?.groups) {
         const { extension, version } = match.groups;
         const foundExtension = extensions.find(e => e.extensionId === extension);
@@ -172,9 +176,15 @@ class TestSetupAndRunner extends ExTester {
           foundExtension.shouldVerifyActivation =
             foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
           log(`SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`);
+        } else {
+          log(`SetUp - Not found extension ${extension} version ${version}`);
         }
       }
     });
+
+    if (extensions.length === 0) {
+      log(`No extensions found, cannot proceed with install`);
+    }
 
     // Iterate over the extensions array to install extensions
     for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
