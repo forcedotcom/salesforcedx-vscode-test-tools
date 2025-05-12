@@ -75,7 +75,7 @@ const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
   // Wait for LSP to enter restarting state
   await verifyLspStatus(LSP_STATUS.restarting);
   // Allow time for LSP to fully restart and reindex
-  await utilities.pause(utilities.Duration.seconds(12));
+  await utilities.pause(utilities.Duration.seconds(30));
   await verifyLspStatus(LSP_STATUS.indexingComplete);
 
   const outputViewText = await utilities.getOutputViewText('Apex Language Server');
@@ -164,8 +164,6 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
   await verifyLspRestart(cleanDb);
 
   if (cleanDb) {
-    // Add extra wait time for Windows file operations
-    await utilities.pause(utilities.Duration.seconds(5));
     const releaseDir = findReleaseDir();
     const standardApexLibraryPath = path.normalize(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'));
     expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal('StandardApexLibrary');
