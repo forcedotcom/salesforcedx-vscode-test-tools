@@ -14,7 +14,85 @@ import { getBrowser, getWorkbench, reloadWindow, enableAllExtensions, zoom, zoom
 
 const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(60);
 
-export const extensions: ExtensionType[] = [];
+export const extensions: ExtensionType[] = [
+  {
+    extensionId: 'salesforcedx-vscode',
+    name: 'Salesforce Extension Pack',
+    vsixPath: '',
+    shouldInstall: 'never',
+    shouldVerifyActivation: false
+  },
+  {
+    extensionId: 'salesforcedx-vscode-expanded',
+    name: 'Salesforce Extension Pack (Expanded)',
+    vsixPath: '',
+    shouldInstall: 'never',
+    shouldVerifyActivation: false
+  },
+  {
+    extensionId: 'salesforcedx-vscode-soql',
+    name: 'SOQL',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-einstein-gpt',
+    name: 'Einstein for Developers (Beta)',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: false
+  },
+  {
+    extensionId: 'salesforcedx-vscode-core',
+    name: 'Salesforce CLI Integration',
+    vsixPath: '',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-apex',
+    name: 'Apex',
+    vsixPath: '',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-apex-debugger',
+    name: 'Apex Interactive Debugger',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-apex-replay-debugger',
+    name: 'Apex Replay Debugger',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-lightning',
+    name: 'Lightning Web Components',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-lwc',
+    name: 'Lightning Web Components',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-visualforce',
+    name: 'salesforcedx-vscode-visualforce',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  }
+];
 
 /**
  * Shows the list of running extensions in VS Code
