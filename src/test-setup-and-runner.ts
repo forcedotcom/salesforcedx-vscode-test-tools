@@ -188,7 +188,17 @@ class TestSetupAndRunner extends ExTester {
 
     // Iterate over the extensions array to install extensions
     for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
-      await this.installExtension(extensionObj.vsixPath);
+      let vsixPath = path.resolve(extensionObj.vsixPath);
+
+      // Avoid Windows paths being parsed as URLs by the tester
+      if (process.platform === 'win32') {
+        vsixPath = vsixPath.replace(/\\/g, '/');
+        if (/^[a-zA-Z]:\//.test(vsixPath)) {
+          vsixPath = '/' + vsixPath; // Prevent `new URL()` from treating it as a URL
+        }
+      }
+
+      await this.installExtension(vsixPath);
     }
   }
 
