@@ -75,7 +75,7 @@ const verifyLspRestart = async (cleanDb: boolean): Promise<void> => {
   // Wait for LSP to enter restarting state
   await verifyLspStatus(LSP_STATUS.restarting);
   // Allow time for LSP to fully restart and reindex
-  await utilities.pause(utilities.Duration.seconds(12));
+  await utilities.pause(utilities.Duration.seconds(25 * EnvironmentSettings.getInstance().throttleFactor));
   await verifyLspStatus(LSP_STATUS.indexingComplete);
 
   const outputViewText = await utilities.getOutputViewText('Apex Language Server');
@@ -147,7 +147,7 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
 
   if (cleanDb) {
     const releaseDir = findReleaseDir();
-    const standardApexLibraryPath = path.join(PATHS.tools, releaseDir, 'StandardApexLibrary');
+    const standardApexLibraryPath = path.normalize(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'));
     await utilities.removeFolder(standardApexLibraryPath);
     expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal(null);
   }
@@ -165,9 +165,8 @@ const testLspRestart = async (testSetup: TestSetup, cleanDb: boolean): Promise<v
 
   if (cleanDb) {
     const releaseDir = findReleaseDir();
-    expect(await utilities.getFolderName(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'))).to.equal(
-      'StandardApexLibrary'
-    );
+    const standardApexLibraryPath = path.normalize(path.join(PATHS.tools, releaseDir, 'StandardApexLibrary'));
+    expect(await utilities.getFolderName(standardApexLibraryPath)).to.equal('StandardApexLibrary');
   }
 };
 
