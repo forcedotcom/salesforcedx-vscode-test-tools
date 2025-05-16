@@ -541,7 +541,7 @@ describe('Run Apex Tests', async () => {
 
     // Choose tests that will belong to the already created Apex Test Suite
     await prompt.setText('ExampleApexClass2Test');
-    const checkbox = await prompt.findElement(By.css('input.quick-input-list-checkbox'));
+    const checkbox = await prompt.findElement(By.css('div.monaco-custom-toggle.codicon.codicon-check.monaco-checkbox'));
     await checkbox.click();
     await utilities.clickFilePathOkButton();
 
