@@ -18,7 +18,7 @@ export class TestSetup {
   public scratchOrgAliasName: string | undefined;
   public scratchOrgId: string | undefined;
 
-  private constructor() {}
+  private constructor() { }
 
   public get tempProjectName(): string {
     return 'TempProject-' + this.testSuiteSuffixName;
@@ -31,6 +31,7 @@ export class TestSetup {
     utilities.log(`${testSetup.testSuiteSuffixName} - Starting TestSetup.setUp()...`);
     /* The expected workspace will be open up after setUpTestingWorkspace */
     await testSetup.setUpTestingWorkspace(testReqConfig.projectConfig);
+    await utilities.executeQuickPick('View: Close All Editors');
     if (testReqConfig.projectConfig.projectShape !== ProjectShapeOption.NONE) {
       await utilities.verifyExtensionsAreRunning(utilities.getExtensionsToVerifyActive());
       const scratchOrgEdition = testReqConfig.scratchOrgEdition || 'developer';
