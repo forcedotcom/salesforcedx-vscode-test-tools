@@ -7,7 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import * as utilities from './utilities/index';
-import { EnvironmentSettings as Env } from './environmentSettings';
+import { EnvironmentSettings as Env, EnvironmentSettings } from './environmentSettings';
 import { ProjectConfig, ProjectShapeOption } from './utilities/index';
 
 export class TestSetup {
@@ -18,7 +18,7 @@ export class TestSetup {
   public scratchOrgAliasName: string | undefined;
   public scratchOrgId: string | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public get tempProjectName(): string {
     return 'TempProject-' + this.testSuiteSuffixName;
@@ -181,12 +181,15 @@ export class TestSetup {
     let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
 
     // Update settings to set workbench.hover.delay
+    const workBenchHoverDelay = 300000 * EnvironmentSettings.getInstance().throttleFactor; // 5 minutes by default.
     settings = {
       ...settings,
-      'workbench.hover.delay': 300000
+      'workbench.hover.delay': workBenchHoverDelay
     };
 
     fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
-    utilities.log(`${this.testSuiteSuffixName} - Set 'workbench.hover.delay' to '300000' in ${vscodeSettingsPath}`);
+    utilities.log(
+      `${this.testSuiteSuffixName} - Set 'workbench.hover.delay' to '${workBenchHoverDelay}' in ${vscodeSettingsPath}`
+    );
   }
 }
