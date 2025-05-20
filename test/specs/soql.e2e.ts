@@ -22,7 +22,6 @@ describe('SOQL', async () => {
 
   step('Set up the testing environment', async () => {
     testSetup = await TestSetup.setUp(testReqConfig);
-    await utilities.executeQuickPick('View: Close All Editors');
   });
 
   step('SFDX: Create Query in SOQL Builder', async () => {
