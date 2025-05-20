@@ -24,7 +24,7 @@ import {
   checkForUncaughtErrors,
   extensions,
 } from './testing';
-import { verifyProjectLoaded } from './ui-interaction';
+import { executeQuickPick, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 
 export class TestSetup {
@@ -37,7 +37,7 @@ export class TestSetup {
   public scratchOrgId: string | undefined;
   private configuredExtensions: ExtensionConfig[] = [];
 
-  private constructor() {}
+  private constructor() { }
 
   public get tempProjectName(): string {
     return 'TempProject-' + this.testSuiteSuffixName;
@@ -54,6 +54,7 @@ export class TestSetup {
 
     /* The expected workspace will be open up after setUpTestingWorkspace */
     await testSetup.setUpTestingWorkspace(testReqConfig.projectConfig);
+    await executeQuickPick('View: Close All Editors');
     if (testReqConfig.projectConfig.projectShape !== ProjectShapeOption.NONE) {
       await verifyExtensionsAreRunning(testSetup.getExtensionsToVerify());
       const scratchOrgEdition = testReqConfig.scratchOrgEdition || 'developer';
