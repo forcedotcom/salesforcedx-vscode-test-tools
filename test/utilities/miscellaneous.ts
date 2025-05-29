@@ -17,6 +17,7 @@ import { By, WebElement } from 'vscode-extension-tester';
 import { getBrowser, getWorkbench } from './workbench';
 import { expect } from 'chai';
 import { retryOperation } from './retryUtils';
+import { clickButtonOnModalDialog } from './modalDialog';
 
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {
   await sleep(duration.milliseconds);
@@ -119,6 +120,8 @@ export async function createCommand(
   await retryOperation(async () => {
     await inputBox.setText(name);
     await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await clickButtonOnModalDialog('Overwrite');
     await pause(Duration.seconds(1));
   });
 

@@ -7,6 +7,7 @@
 
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, pause } from './miscellaneous';
+import { clickButtonOnModalDialog } from './modalDialog';
 import { retryOperation } from './retryUtils';
 import { getTextEditor } from './textEditorView';
 import { getWorkbench } from './workbench';
@@ -27,6 +28,8 @@ export async function createLwc(name: string): Promise<void> {
     await inputBox.confirm();
     await pause(Duration.seconds(1));
     await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await clickButtonOnModalDialog('Overwrite');
     await pause(Duration.seconds(1));
   });
 
@@ -118,6 +121,8 @@ export async function createAura(name: string): Promise<void> {
     await inputBox.confirm();
     await pause(Duration.seconds(1));
     await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await clickButtonOnModalDialog('Overwrite');
     await pause(Duration.seconds(1));
   });
 
