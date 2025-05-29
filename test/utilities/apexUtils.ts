@@ -9,6 +9,7 @@ import { executeQuickPick } from './commandPrompt';
 import { Duration, log, pause } from './miscellaneous';
 import { getWorkbench } from './workbench';
 import { getTextEditor } from './textEditorView';
+import { retryOperation } from './retryUtils';
 
 export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
@@ -16,12 +17,14 @@ export async function createApexClass(name: string, classText: string, breakpoin
   const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
 
   // Set the name of the new Apex Class
-  await inputBox.setText(name);
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await inputBox.setText(name);
+    await pause(Duration.seconds(1));
+    await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await inputBox.confirm();
+    await pause(Duration.seconds(1));
+  });
 
   // Modify class content
   const workbench = getWorkbench();
