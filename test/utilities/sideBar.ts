@@ -79,21 +79,11 @@ export async function getFilteredVisibleTreeViewItemLabels(
   const treeViewSection = await expandProjectInSideBar(workbench, projectName);
 
   // Warning, we can only retrieve the items which are visible.
-  const visibleItems = (await treeViewSection.getVisibleItems()) as DefaultTreeItem[];
-  const filteredItems = (await visibleItems.reduce(
-    async (previousPromise: Promise<string[]>, currentItem: ViewItem) => {
-      const results = await previousPromise;
-      const label = await (currentItem as TreeItem).getLabel();
-      if (label.startsWith(searchString)) {
-        results.push(label);
-      }
-
-      return results;
-    },
-    Promise.resolve([])
-  )) as string[];
-
-  return filteredItems;
+  return (
+    await Promise.all(
+      ((await treeViewSection.getVisibleItems()) as DefaultTreeItem[]).map(async item => item.getLabel())
+    )
+  ).filter(label => label.startsWith(searchString));
 }
 
 export async function getVisibleChild(defaultTreeItem: DefaultTreeItem, name: string): Promise<TreeItem | undefined> {
