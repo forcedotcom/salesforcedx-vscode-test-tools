@@ -54,7 +54,9 @@ export const retryOperation = async <T>(
   maxAttempts = 2,
   errorMessage = 'Operation failed'
 ): Promise<T> => {
+  log(`retryOperation() - Attempting operation with maxAttempts=${maxAttempts}`);
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    log(`retryOperation() - Attempt ${attempt} of ${maxAttempts}`);
     try {
       return await operation();
     } catch (error) {
@@ -62,5 +64,6 @@ export const retryOperation = async <T>(
       log(`${errorMessage} ${JSON.stringify(error)}, trying again...`);
     }
   }
+  log(`retryOperation() - Failed after ${maxAttempts} attempts`);
   throw new Error(`${errorMessage} after ${maxAttempts} attempts`);
 };
