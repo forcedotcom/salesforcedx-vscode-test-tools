@@ -18,10 +18,9 @@ import { log } from './miscellaneous';
  */
 export const clickButtonOnModalDialog = async (buttonText: string): Promise<void> => {
   const modalDialog = new ModalDialog();
-  if (modalDialog) {
-    log(`clickButtonOnModalDialog() - modalDialog is present`);
+  try {
     await modalDialog.pushButton(buttonText);
-  } else {
-    log(`clickButtonOnModalDialog() - modalDialog is not present`);
+  } catch (error) {
+    log(`clickButtonOnModalDialog() - Error pushing button ${buttonText}: ${error}`);
   }
 }
