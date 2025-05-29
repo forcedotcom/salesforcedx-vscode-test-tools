@@ -29,11 +29,16 @@ export async function createApexClass(name: string, classText: string, breakpoin
     await pause(Duration.seconds(1));
   });
 
+  log(`Blank Apex Class ${name} created successfully.`);
   // Modify class content
   const workbench = getWorkbench();
+  log('Getting text editor for the new Apex Class');
   const textEditor = await getTextEditor(workbench, name + '.cls');
+  log('Done getting text editor for the new Apex Class');
   await pause(Duration.seconds(1));
+  log(`Setting text for Apex Class ${name}`);
   await textEditor.setText(classText);
+  log(`Done setting text for Apex Class ${name}`);
   await pause(Duration.seconds(1));
   await textEditor.save();
   await pause(Duration.seconds(1));
@@ -41,6 +46,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
     await textEditor.toggleBreakpoint(breakpoint);
   }
   await pause(Duration.seconds(1));
+  log(`Apex Class ${name} modified successfully.`);
 }
 
 export async function createApexClassWithTest(name: string): Promise<void> {
