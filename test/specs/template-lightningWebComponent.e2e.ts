@@ -25,6 +25,7 @@ describe('Lightning Web Component Template', () => {
     utilities.log(`${testReqConfig.testSuiteSuffixName} - Set up the testing environment`);
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
+    await utilities.dismissAllNotifications();
   });
 
   // Lightning Web Component
