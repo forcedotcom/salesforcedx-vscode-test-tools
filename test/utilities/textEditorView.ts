@@ -19,9 +19,12 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     await pause(Duration.seconds(1));
   });
   log('getTextEditor() - File opened, getting editor view');
-  const editorView = workbench.getEditorView();
-  const textEditor = (await editorView.openEditor(fileName)) as TextEditor;
-  return textEditor;
+
+  return await retryOperation(async () => {
+    const editorView = workbench.getEditorView();
+    const textEditor = (await editorView.openEditor(fileName)) as TextEditor;
+    return textEditor;
+  });
 }
 
 export async function checkFileOpen(
