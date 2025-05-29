@@ -83,7 +83,7 @@ export async function getFilteredVisibleTreeViewItemLabels(
     await Promise.all(
       ((await treeViewSection.getVisibleItems()) as DefaultTreeItem[]).map(async item => {
         const label = await item.getLabel();
-        console.log(`label: ${label}`);
+        log(`label: ${label}`);
         return label;
       })
     )
@@ -107,7 +107,7 @@ export async function getVisibleChild(defaultTreeItem: DefaultTreeItem, name: st
 // getVisibleChildren() is very much like DefaultTreeItem.getChildren(), except it calls
 // getVisibleItems().
 export async function getVisibleChildren(defaultTreeItem: DefaultTreeItem): Promise<TreeItem[]> {
-  console.log(`${defaultTreeItem}`);
+  log(`${defaultTreeItem}`);
   // const rows = await getVisibleItems(
   //   defaultTreeItem,
   //   defaultTreeItem.locatorMap.DefaultTreeSection.itemRow as string
