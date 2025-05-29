@@ -31,7 +31,9 @@ describe('Apex Class Template', () => {
     utilities.log(`${testSetup.testSuiteSuffixName} - Create an Apex Class`);
     // Using the Command palette, run SFDX: Create Apex Class.
     await utilities.createCommand('Apex Class', 'ApexClass1', 'classes', 'cls');
+  });
 
+  it('shows up in the Explorer view', async () => {
     // Check for expected items in the Explorer view.
     const workbench = utilities.getWorkbench();
 
