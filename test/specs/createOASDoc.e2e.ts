@@ -7,6 +7,7 @@
 import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
+import { verifyNotificationWithRetry } from '../utilities/retryUtils';
 import { expect } from 'chai';
 import path from 'path';
 import {
@@ -116,19 +117,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     );
 
     // Look for the success notification that appears which says, "SFDX: Push Source to Default Org and Ignore Conflicts successfully ran".
-    let successPushNotificationWasFound;
-    try {
-      successPushNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran'
-      );
-      expect(successPushNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await utilities.getWorkbench().openNotificationsCenter();
-      successPushNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'SFDX: Push Source to Default Org and Ignore Conflicts successfully ran'
-      );
-      expect(successPushNotificationWasFound).to.equal(true);
-    }
+    await verifyNotificationWithRetry(/SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/);
   });
 
   step('Verify LSP finished indexing', async () => {
@@ -155,17 +144,15 @@ describe('Create OpenAPI v3 Specifications', async () => {
     }
     try {
       await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      const failureNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\\.'
+      await verifyNotificationWithRetry(
+        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./
       );
-      expect(failureNotificationWasFound).to.equal(true);
     } catch (error) {
       await utilities.pause(utilities.Duration.minutes(1));
       await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      const failureNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\\.'
+      await verifyNotificationWithRetry(
+        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./
       );
-      expect(failureNotificationWasFound).to.equal(true);
     }
   });
 
@@ -184,10 +171,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
 
-        const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-          'OpenAPI Document created for class: CaseManager\\.'
-        );
-        expect(successNotificationWasFound).to.equal(true);
+        await verifyNotificationWithRetry(/OpenAPI Document created for class: CaseManager\./);
 
         // Verify the generated OAS doc is open in the Editor View
         await utilities.executeQuickPick('View: Open Last Editor in Group');
@@ -282,10 +266,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
     step('Revalidate the OAS doc', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Revalidate the OAS doc`);
       await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
-      const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'Validated OpenAPI Document CaseManager.externalServiceRegistration-meta.xml successfully'
+      await verifyNotificationWithRetry(
+        /Validated OpenAPI Document CaseManager.externalServiceRegistration-meta.xml successfully/
       );
-      expect(successNotificationWasFound).to.equal(true);
 
       const problems = await utilities.countProblemsInProblemsTab(2);
       expect(await problems[0].getLabel()).to.equal('CaseManager.externalServiceRegistration-meta.xml');
@@ -323,10 +306,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
       // Click the Manual Merge button on the popup
       await utilities.clickButtonOnModalDialog('Manually merge with existing ESR');
 
-      const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'A new OpenAPI Document class CaseManager_\\d{8}_\\d{6} is created for CaseManager\\. Manually merge the two files using the diff editor\\.'
+      await verifyNotificationWithRetry(
+        /A new OpenAPI Document class CaseManager_\d{8}_\d{6} is created for CaseManager\. Manually merge the two files using the diff editor\./
       );
-      expect(successNotificationWasFound).to.equal(true);
 
       // Verify the generated OAS doc and the diff editor are both open in the Editor View
       await utilities.executeQuickPick('View: Open First Editor in Group');
@@ -406,10 +388,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
 
-        const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-          'OpenAPI Document created for class: SimpleAccountResource\\.'
-        );
-        expect(successNotificationWasFound).to.equal(true);
+        await verifyNotificationWithRetry(/OpenAPI Document created for class: SimpleAccountResource\./);
 
         // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
         await utilities.executeQuickPick('View: Open Last Editor in Group');
@@ -527,10 +506,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
       } else {
         await utilities.executeQuickPick('SFDX: Validate OpenAPI Document (Beta)');
       }
-      const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-        'Validated OpenAPI Document SimpleAccountResource.yaml successfully'
-      );
-      expect(successNotificationWasFound).to.equal(true);
+      await verifyNotificationWithRetry(/Validated OpenAPI Document SimpleAccountResource.yaml successfully/);
 
       await utilities.countProblemsInProblemsTab(0);
     });
@@ -594,10 +570,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
         // Click the Overwrite button on the popup
         await utilities.clickButtonOnModalDialog('Overwrite');
 
-        const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-          'OpenAPI Document created for class: SimpleAccountResource\\.'
-        );
-        expect(successNotificationWasFound).to.equal(true);
+        await verifyNotificationWithRetry(/OpenAPI Document created for class: SimpleAccountResource\./);
 
         // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
         await utilities.executeQuickPick('View: Open Last Editor in Group');
@@ -672,10 +645,9 @@ describe('Create OpenAPI v3 Specifications', async () => {
         // Click the Manual Merge button on the popup
         await utilities.clickButtonOnModalDialog('Manually merge with existing ESR');
 
-        const successNotificationWasFound = await checkSuccessNotificationWithRetry(
-          'A new OpenAPI Document class SimpleAccountResource_\\d{8}_\\d{6} is created for SimpleAccountResource\\. Manually merge the two files using the diff editor\\.'
+        await verifyNotificationWithRetry(
+          /A new OpenAPI Document class SimpleAccountResource_\d{8}_\d{6} is created for SimpleAccountResource\. Manually merge the two files using the diff editor\./
         );
-        expect(successNotificationWasFound).to.equal(true);
 
         // Verify the generated OAS doc and the diff editor are both open in the Editor View
         await utilities.executeQuickPick('View: Open First Editor in Group');
@@ -775,47 +747,6 @@ describe('Create OpenAPI v3 Specifications', async () => {
     utilities.log(`CreateOASDoc - Tear down and clean up the testing environment`);
     await testSetup?.tearDown();
   });
-
-  const checkSuccessNotificationWithRetry = async (
-    notificationPattern: string,
-    maxRetries: number = 3
-  ): Promise<boolean> => {
-    utilities.log(`Checking for success notification: ${notificationPattern}`);
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      utilities.log(`Attempt ${attempt} of ${maxRetries} to find notification`);
-
-      try {
-        const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-          new RegExp(notificationPattern),
-          utilities.Duration.TEN_MINUTES
-        );
-
-        if (successNotificationWasFound) {
-          utilities.log(`Success notification found on attempt ${attempt}`);
-          return true;
-        }
-      } catch (error) {
-        utilities.log(`Attempt ${attempt} failed: ${error}`);
-
-        if (attempt < maxRetries) {
-          utilities.log('Opening notifications center and retrying...');
-          try {
-            await utilities.getWorkbench().openNotificationsCenter();
-            await utilities.pause(utilities.Duration.seconds(2));
-          } catch (notificationCenterError) {
-            utilities.log(`Failed to open notifications center: ${notificationCenterError}`);
-          }
-        }
-      }
-
-      if (attempt < maxRetries) {
-        await utilities.pause(utilities.Duration.seconds(5));
-      }
-    }
-
-    throw new Error(`Failed to find success notification after ${maxRetries} attempts: ${notificationPattern}`);
-  };
 
   const getQuickOpenBoxOrInputBox = async (): Promise<QuickOpenBox | InputBox | undefined> => {
     utilities.log('Enter getQuickOpenBoxOrInputBox()');
