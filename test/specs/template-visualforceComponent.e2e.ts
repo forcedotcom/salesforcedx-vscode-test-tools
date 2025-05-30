@@ -25,6 +25,7 @@ describe('Visualforce Component Template', () => {
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
     await utilities.dismissAllNotifications();
+    await utilities.executeQuickPick('View: Close All Editors');
   });
 
   // Visualforce Component

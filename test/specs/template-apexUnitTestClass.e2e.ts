@@ -25,6 +25,7 @@ describe('Apex Unit Test Class Template', () => {
     testSetup = await TestSetup.setUp(testReqConfig);
     projectName = testSetup.tempProjectName;
     await utilities.dismissAllNotifications();
+    await utilities.executeQuickPick('View: Close All Editors');
   });
 
   // Apex Unit Test Class
