@@ -11,12 +11,9 @@ import { EnvironmentSettings as Env } from '../environmentSettings';
 import { TestSetup } from '../testSetup';
 import { expect } from 'chai';
 
-export async function setUpScratchOrg(
-  testSetup: TestSetup,
-  scratchOrgEdition: utilities.OrgEdition
-) {
+export async function setUpScratchOrg(testSetup: TestSetup) {
   await authorizeDevHub(testSetup);
-  await createDefaultScratchOrg(testSetup, scratchOrgEdition);
+  await createDefaultScratchOrg();
 }
 
 export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
@@ -78,88 +75,7 @@ async function verifyAliasAndUserName() {
   );
 }
 
-async function createDefaultScratchOrg(
-  testSetup: TestSetup,
-  edition: utilities.OrgEdition = 'developer'
-): Promise<void> {
-  // utilities.log('');
-  // utilities.log(`${testSetup.testSuiteSuffixName} - Starting createDefaultScratchOrg()...`);
-
-  // const definitionFile = path.join(
-  //   testSetup.projectFolderPath!,
-  //   'config',
-  //   'project-scratch-def.json'
-  // );
-
-  // utilities.debug(`${testSetup.testSuiteSuffixName} - constructing scratchOrgAliasName...`);
-  // // Org alias format: TempScratchOrg_yyyy_mm_dd_username_ticks_testSuiteSuffixName
-  // const currentDate = new Date();
-  // const day = currentDate.getDate().toString().padStart(2, '0');
-  // const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-  // const year = currentDate.getFullYear();
-
-  // const currentOsUserName = utilities.transformedUserName();
-
-  // testSetup.scratchOrgAliasName = `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${currentDate.getTime()}_${testSetup.testSuiteSuffixName}`;
-  // utilities.log(
-  //   `${testSetup.testSuiteSuffixName} - temporary scratch org name is ${testSetup.scratchOrgAliasName}...`
-  // );
-
-  // const startHr = process.hrtime();
-
-  // const sfOrgCreateResult = await utilities.scratchOrgCreate(
-  //   edition,
-  //   definitionFile,
-  //   testSetup.scratchOrgAliasName,
-  //   1
-  // );
-  // utilities.debug(`${testSetup.testSuiteSuffixName} - calling JSON.parse()...`);
-  // const result = JSON.parse(sfOrgCreateResult.stdout).result;
-
-  // const endHr = process.hrtime(startHr);
-  // const time = endHr[0] * 1_000_000_000 + endHr[1] - (startHr[0] * 1_000_000_000 + startHr[1]);
-
-  // utilities.log(
-  //   `Creating ${testSetup.scratchOrgAliasName} took ${time} ticks (${time / 1_000.0} seconds)`
-  // );
-  // if (!result?.authFields?.accessToken || !result.orgId || !result.scratchOrgInfo.SignupEmail) {
-  //   throw new Error(
-  //     `In createDefaultScratchOrg(), result is missing required fields.\nAuth Fields: ${result.authFields}\nOrg ID: ${result.orgId}\nSign Up Email: ${result.scratchOrgInfo.SignupEmail}.`
-  //   );
-  // }
-  // testSetup.scratchOrgId = result.orgId as string;
-
-  // // Run SFDX: Set a Default Org
-  // utilities.log(`${testSetup.testSuiteSuffixName} - selecting SFDX: Set a Default Org...`);
-
-  // await utilities.setDefaultOrg(testSetup.scratchOrgAliasName);
-
-  // await utilities.pause(utilities.Duration.seconds(3));
-
-  // // Look for the success notification.
-  // const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-  //   /SFDX: Set a Default Org successfully ran/,
-  //   utilities.Duration.TEN_MINUTES
-  // );
-  // if (!successNotificationWasFound) {
-  //   throw new Error(
-  //     'In createDefaultScratchOrg(), the notification of "SFDX: Set a Default Org successfully ran" was not found'
-  //   );
-  // }
-
-  // // Look for this.scratchOrgAliasName in the list of status bar items.
-  // const scratchOrgStatusBarItem = await utilities.getStatusBarItemWhichIncludes(
-  //   testSetup.scratchOrgAliasName
-  // );
-  // if (!scratchOrgStatusBarItem) {
-  //   throw new Error(
-  //     'In createDefaultScratchOrg(), getStatusBarItemWhichIncludes() returned a scratchOrgStatusBarItem with a value of null (or undefined)'
-  //   );
-  // }
-
-  // utilities.log(`${testSetup.testSuiteSuffixName} - ...finished createDefaultScratchOrg()`);
-  // utilities.log('');
-
+export async function createDefaultScratchOrg(): Promise<string> {
   const prompt = await utilities.executeQuickPick(
     'SFDX: Create a Default Scratch Org...',
     utilities.Duration.seconds(1)
@@ -233,6 +149,7 @@ async function createDefaultScratchOrg(
   // Look for the org's alias name in the list of status bar items.
   const scratchOrgStatusBarItem = await utilities.getStatusBarItemWhichIncludes(scratchOrgAliasName);
   expect(scratchOrgStatusBarItem).to.not.be.undefined;
+  return scratchOrgAliasName;
 }
 
 export async function deleteScratchOrgInfo(testSetup: TestSetup): Promise<void> {

@@ -11,11 +11,15 @@ import { getWorkbench } from './workbench';
 import { getTextEditor } from './textEditorView';
 import { retryOperation } from './retryUtils';
 import { clickButtonOnModalDialog } from './modalDialog';
+import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
 
 export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
-  // Using the Command palette, run SFDX: Create Apex Class to create the main class
-  const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
+  let inputBox: InputBox | QuickOpenBox;
+  await retryOperation(async () => {
+    // Using the Command palette, run SFDX: Create Apex Class to create the main class
+    inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
+  });
 
   // Set the name of the new Apex Class
   await retryOperation(async () => {
