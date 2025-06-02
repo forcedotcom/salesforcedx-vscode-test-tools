@@ -18,7 +18,7 @@ export class TestSetup {
   public scratchOrgAliasName: string | undefined;
   public scratchOrgId: string | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public get tempProjectName(): string {
     return 'TempProject-' + this.testSuiteSuffixName;
@@ -52,6 +52,16 @@ export class TestSetup {
       await utilities.deleteScratchOrgInfo(this);
     } catch (error) {
       utilities.log(`Deleting scratch org (or info) failed with Error: ${(error as Error).message}`);
+    }
+
+    // Delete the e2eTemp directory
+    try {
+      if (fs.existsSync(this.tempFolderPath)) {
+        utilities.removeFolder(this.tempFolderPath);
+        utilities.log(`${this.testSuiteSuffixName} - Successfully deleted e2eTemp directory: ${this.tempFolderPath}`);
+      }
+    } catch (error) {
+      utilities.log(`Deleting e2eTemp directory failed with Error: ${(error as Error).message}`);
     }
   }
 
