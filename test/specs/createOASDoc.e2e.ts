@@ -142,18 +142,10 @@ describe('Create OpenAPI v3 Specifications', async () => {
     } else {
       await utilities.pause(utilities.Duration.seconds(5));
     }
-    try {
-      await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      await verifyNotificationWithRetry(
-        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./
-      );
-    } catch (error) {
-      await utilities.pause(utilities.Duration.minutes(1));
-      await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
-      await verifyNotificationWithRetry(
-        /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./
-      );
-    }
+    await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
+    await verifyNotificationWithRetry(
+      /Failed to create OpenAPI Document: The Apex Class IneligibleApexClass is not valid for OpenAPI document generation\./
+    );
   });
 
   describe('Composed mode', async () => {
