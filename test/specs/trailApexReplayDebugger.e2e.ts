@@ -15,7 +15,7 @@ import { expect } from 'chai';
  * which can be found with the following link:
  * https://trailhead.salesforce.com/content/learn/projects/find-and-fix-bugs-with-apex-replay-debugger
  */
-describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', async () => {
+describe('"Find and Fix Bugs with Apex Replay Debugger" Trailhead Module', () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {

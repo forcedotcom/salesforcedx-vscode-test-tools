@@ -12,7 +12,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 
-describe('Authentication', async () => {
+describe('Authentication', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let projectFolderPath: string;
   let scratchOrgAliasName: string;

@@ -11,7 +11,7 @@ import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { By, after } from 'vscode-extension-tester';
 
-describe('Visualforce LSP', async () => {
+describe('Visualforce LSP', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

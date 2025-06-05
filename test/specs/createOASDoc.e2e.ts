@@ -21,7 +21,7 @@ import {
   DefaultTreeItem
 } from 'vscode-extension-tester';
 
-describe('Create OpenAPI v3 Specifications', async () => {
+describe('Create OpenAPI v3 Specifications', () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
@@ -148,7 +148,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     );
   });
 
-  describe('Composed mode', async () => {
+  describe('Composed mode', () => {
     step(
       'Generate OAS doc from a valid Apex class using command palette - Composed mode, initial generation',
       async () => {
@@ -328,7 +328,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     });
   });
 
-  describe('Decomposed mode', async () => {
+  describe('Decomposed mode', () => {
     step('Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json', async () => {
       utilities.log(
         `${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`
@@ -676,7 +676,7 @@ describe('Create OpenAPI v3 Specifications', async () => {
     );
   });
 
-  describe('Disable A4D extension and ensure the commands to generate and validate OAS docs are not present', async () => {
+  describe('Disable A4D extension and ensure the commands to generate and validate OAS docs are not present', () => {
     step('Disable A4D extension', async () => {
       utilities.log(`${testSetup.testSuiteSuffixName} - Disable A4D extension`);
 

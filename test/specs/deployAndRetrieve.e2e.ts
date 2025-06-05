@@ -12,7 +12,7 @@ import { WORKSPACE_SETTING_KEYS as WSK } from '../utilities/index';
 import { after, DefaultTreeItem } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
-describe('Deploy and Retrieve', async () => {
+describe('Deploy and Retrieve', () => {
   let projectName: string;
   const pathToClass = path.join('force-app', 'main', 'default', 'classes', 'MyClass');
   let testSetup: TestSetup;

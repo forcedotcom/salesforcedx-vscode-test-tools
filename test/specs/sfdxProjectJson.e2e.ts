@@ -11,7 +11,7 @@ import path from 'path';
 import { expect } from 'chai';
 import { after } from 'vscode-extension-tester';
 
-describe('Customize sfdx-project.json', async () => {
+describe('Customize sfdx-project.json', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

@@ -9,7 +9,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { after } from 'vscode-extension-tester';
 
-describe('SFDX: Create Project', async () => {
+describe('SFDX: Create Project', () => {
   let testSetup: TestSetup;
 
   const testReqConfig: utilities.TestReqConfig = {

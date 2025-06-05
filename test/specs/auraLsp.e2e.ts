@@ -10,7 +10,7 @@ import * as utilities from '../utilities/index';
 import { By, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
-describe('Aura LSP', async () => {
+describe('Aura LSP', () => {
   let testSetup: TestSetup;
 
   const testReqConfig: utilities.TestReqConfig = {

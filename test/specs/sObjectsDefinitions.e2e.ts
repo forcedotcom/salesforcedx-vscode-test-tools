@@ -10,7 +10,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 
-describe('SObjects Definitions', async () => {
+describe('SObjects Definitions', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

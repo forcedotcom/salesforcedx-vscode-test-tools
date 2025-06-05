@@ -12,7 +12,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
 // In future we will merge the test together with deployAndRetrieve
-describe('metadata mdDeployRetrieve', async () => {
+describe('metadata mdDeployRetrieve', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

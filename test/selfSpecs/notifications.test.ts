@@ -28,7 +28,7 @@ async function showNotificationWithActions(message: string, ...actions: string[]
   //   .then(() => {});
 }
 
-describe('Notifications', async () => {
+describe('Notifications', () => {
   // Show a notification
   it('should show an info notification', async () => {
     await showNotification('Modify the file and retrieve again');

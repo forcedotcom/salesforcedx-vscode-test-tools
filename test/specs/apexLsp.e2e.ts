@@ -195,7 +195,7 @@ const testStatusBarRestart = async (testSetup: TestSetup, cleanDb: boolean): Pro
   }
 };
 
-describe('Apex LSP', async () => {
+describe('Apex LSP', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

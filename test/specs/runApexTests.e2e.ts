@@ -12,7 +12,7 @@ import { EnvironmentSettings } from '../environmentSettings';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('Run Apex Tests', async () => {
+describe('Run Apex Tests', () => {
   let prompt: InputBox | QuickOpenBox;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
@@ -521,9 +521,11 @@ describe('Run Apex Tests', async () => {
     // Choose tests that will belong to the new Apex Test Suite
     await prompt.setText('ExampleApexClass1Test');
     // Use different selector depending on VSCode version
-    const selector = EnvironmentSettings.getInstance().vscodeVersion === 'latest' ||
-      semver.gte(EnvironmentSettings.getInstance().vscodeVersion, '1.100.0') ?
-       'div.monaco-custom-toggle.codicon.codicon-check.monaco-checkbox' : 'input.quick-input-list-checkbox';
+    const selector =
+      EnvironmentSettings.getInstance().vscodeVersion === 'latest' ||
+      semver.gte(EnvironmentSettings.getInstance().vscodeVersion, '1.100.0')
+        ? 'div.monaco-custom-toggle.codicon.codicon-check.monaco-checkbox'
+        : 'input.quick-input-list-checkbox';
     const checkbox = await prompt.findElement(By.css(selector));
     await checkbox.click();
     await utilities.clickFilePathOkButton();
@@ -548,9 +550,11 @@ describe('Run Apex Tests', async () => {
     // Choose tests that will belong to the already created Apex Test Suite
     await prompt.setText('ExampleApexClass2Test');
     // Use different selector depending on VSCode version
-    const selector = EnvironmentSettings.getInstance().vscodeVersion === 'latest' ||
-      semver.gte(EnvironmentSettings.getInstance().vscodeVersion, '1.100.0') ?
-       'div.monaco-custom-toggle.codicon.codicon-check.monaco-checkbox' : 'input.quick-input-list-checkbox';
+    const selector =
+      EnvironmentSettings.getInstance().vscodeVersion === 'latest' ||
+      semver.gte(EnvironmentSettings.getInstance().vscodeVersion, '1.100.0')
+        ? 'div.monaco-custom-toggle.codicon.codicon-check.monaco-checkbox'
+        : 'input.quick-input-list-checkbox';
     const checkbox = await prompt.findElement(By.css(selector));
     await checkbox.click();
     await utilities.clickFilePathOkButton();

@@ -10,7 +10,7 @@ import * as utilities from '../utilities/index';
 import { TreeItem, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
-describe('Debug Apex Tests', async () => {
+describe('Debug Apex Tests', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

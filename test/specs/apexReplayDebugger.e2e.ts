@@ -11,7 +11,7 @@ import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 
-describe('Apex Replay Debugger', async () => {
+describe('Apex Replay Debugger', () => {
   let prompt: QuickOpenBox | InputBox;
   let testSetup: TestSetup;
   let projectFolderPath: string;

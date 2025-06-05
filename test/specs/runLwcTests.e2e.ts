@@ -12,7 +12,7 @@ import { TreeItem, after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('Run LWC Tests', async () => {
+describe('Run LWC Tests', () => {
   let projectFolderPath: string;
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {

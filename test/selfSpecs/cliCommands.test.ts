@@ -11,7 +11,7 @@ import { EnvironmentSettings } from '../environmentSettings';
 import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 
-describe('CLI Commands', async () => {
+describe('CLI Commands', () => {
   const environmentSettings = EnvironmentSettings.getInstance();
   const devHubUserName = environmentSettings.devHubUserName;
   const devHubAliasName = environmentSettings.devHubAliasName;

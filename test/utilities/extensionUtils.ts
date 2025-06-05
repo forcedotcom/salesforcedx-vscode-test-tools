@@ -180,7 +180,7 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
     return true;
   }
 
-  const extensionsToVerify = extensions.map(extension => extension.extensionId);
+  const extensionIDsToVerify = extensions.map(extension => extension.extensionId);
 
   await pause(Duration.seconds(15));
   await utilities.zoom('Out', 4, Duration.seconds(1));
@@ -196,17 +196,18 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionType[], ti
     await Promise.race([
       (async () => {
         do {
-          extensionsStatus = await findExtensionsInRunningExtensionsList(extensionsToVerify);
+          extensionsStatus = await findExtensionsInRunningExtensionsList(extensionIDsToVerify);
+          extensions.map(e => {
+            const found = extensionsStatus.find(es => es.extensionId === e.extensionId);
+            if (found) {
+              // Log the current state of the activation check for each extension
+              log(`Extension ${found.extensionId}: ${found.activationTime ?? 'No activation time'}`);
+            } else {
+              log(`Extension ${e.extensionId}: ${e.name} is not activated yet`);
+            }
+          });
 
-          // Log the current state of the activation check for each extension
-          for (const extensionStatus of extensionsStatus) {
-            log(
-              // prettier-ignore
-              `Extension ${extensionStatus.extensionId}: ${extensionStatus.activationTime ?? 'Not activated'}`
-            );
-          }
-
-          allActivated = extensionsToVerify.every(
+          allActivated = extensionIDsToVerify.every(
             extensionId =>
               extensionsStatus.find(extensionStatus => extensionStatus.extensionId === extensionId)
                 ?.isActivationComplete
