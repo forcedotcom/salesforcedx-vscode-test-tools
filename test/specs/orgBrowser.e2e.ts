@@ -10,7 +10,7 @@ import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { By, ModalDialog, after } from 'vscode-extension-tester';
 
-describe('Org Browser', async () => {
+describe('Org Browser', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

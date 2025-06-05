@@ -13,7 +13,7 @@ import { after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('Push and Pull', async () => {
+describe('Push and Pull', () => {
   let projectName = '';
   let adminName = '';
   let adminEmailAddress = '';

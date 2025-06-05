@@ -10,7 +10,7 @@ import { By, after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('LWC LSP', async () => {
+describe('LWC LSP', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

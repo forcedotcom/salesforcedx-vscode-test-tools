@@ -24,7 +24,7 @@ Please note that none of the other suites depend on this suite to run, it's just
 suite does run, it needs to run first.
 */
 
-describe('An Initial Suite', async () => {
+describe('An Initial Suite', () => {
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
       projectShape: utilities.ProjectShapeOption.NEW

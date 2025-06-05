@@ -12,7 +12,7 @@ import { SideBarView, TreeItem, after } from 'vscode-extension-tester';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('Debug LWC Tests', async () => {
+describe('Debug LWC Tests', () => {
   let testSetup: TestSetup;
   let projectFolderPath: string;
   const testReqConfig: utilities.TestReqConfig = {

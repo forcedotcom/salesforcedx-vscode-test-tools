@@ -10,7 +10,7 @@ import * as utilities from '../utilities/index';
 import { expect } from 'chai';
 import { after } from 'vscode-extension-tester';
 
-describe('SOQL', async () => {
+describe('SOQL', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {

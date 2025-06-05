@@ -16,7 +16,7 @@ import { after } from 'vscode-extension-tester';
 
 const exec = util.promisify(child_process.exec);
 
-describe('Templates', async () => {
+describe('Templates', () => {
   let testSetup: TestSetup;
   let projectName: string;
   const testReqConfig: utilities.TestReqConfig = {

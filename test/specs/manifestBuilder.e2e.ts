@@ -11,7 +11,7 @@ import * as utilities from '../utilities/index';
 import { DefaultTreeItem, InputBox, after } from 'vscode-extension-tester';
 import { expect } from 'chai';
 
-describe('Manifest Builder', async () => {
+describe('Manifest Builder', () => {
   let testSetup: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
@@ -136,9 +136,7 @@ describe('Manifest Builder', async () => {
       // Locate the "manifest.xml" file within the expanded "manifest" folder
       const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
       if (!manifestXmlFile) {
-        throw new Error(
-          'No manifest.xml file found'
-        );
+        throw new Error('No manifest.xml file found');
       }
       expect(manifestXmlFile).to.not.be.undefined;
 
@@ -193,9 +191,7 @@ describe('Manifest Builder', async () => {
       // Locate the "manifest.xml" file within the expanded "manifest" folder
       const manifestXmlFile = (await treeViewSection.findItem('manifest.xml')) as DefaultTreeItem;
       if (!manifestXmlFile) {
-        throw new Error(
-          'No manifest.xml file found'
-        );
+        throw new Error('No manifest.xml file found');
       }
       expect(manifestXmlFile).to.not.be.undefined;
 

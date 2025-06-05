@@ -9,7 +9,7 @@ import { step } from 'mocha-steps';
 import { TestSetup } from '../testSetup';
 import * as utilities from '../utilities/index';
 
-describe('Use existing project', async () => {
+describe('Use existing project', () => {
   const testReqConfig: utilities.TestReqConfig = {
     projectConfig: {
       projectShape: utilities.ProjectShapeOption.NEW
