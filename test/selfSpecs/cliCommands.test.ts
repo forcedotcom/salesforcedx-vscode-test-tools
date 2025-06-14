@@ -18,7 +18,7 @@ import {
   setAlias
 } from '../../src/system-operations';
 
-describe('CLI Commands', async () => {
+describe('CLI Commands', () => {
   const environmentSettings = EnvironmentSettings.getInstance();
   const devHubUserName = environmentSettings.devHubUserName;
   const devHubAliasName = environmentSettings.devHubAliasName;

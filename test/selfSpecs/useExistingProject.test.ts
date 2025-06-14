@@ -10,7 +10,7 @@ import { TestSetup } from '../../src/testSetup';
 import { ProjectShapeOption, TestReqConfig, log } from '../../src/core';
 import { verifyProjectLoaded } from '../../src/ui-interaction';
 
-describe('Use existing project', async () => {
+describe('Use existing project', () => {
   const testReqConfig: TestReqConfig = {
     projectConfig: {
       projectShape: ProjectShapeOption.NAMED,

@@ -8,7 +8,7 @@ import { step } from 'mocha-steps';
 import { Duration, pause } from '../../src/core';
 import { disableBooleanSetting, enableBooleanSetting } from '../../src/system-operations';
 
-describe('Settings', async () => {
+describe('Settings', () => {
   step('Test Settings', async () => {
     await disableBooleanSetting('editor.find.addExtraSpaceOnTop', 'user');
     await pause(Duration.seconds(5));
