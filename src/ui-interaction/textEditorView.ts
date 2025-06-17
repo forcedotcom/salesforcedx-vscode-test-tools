@@ -1,4 +1,4 @@
-import { EditorView, TextEditor, Workbench } from 'vscode-extension-tester';
+import { By, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
@@ -61,4 +61,14 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
   const editorView = new EditorView();
   const editor = await editorView.openEditor(fileName);
   return await editor.getText();
+}
+
+export async function overrideTextInFile(textEditor: TextEditor, classText: string) {
+  const inputarea = await textEditor.findElement(By.css('.monaco-editor textarea'));
+  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
+  await pause(Duration.seconds(3));
+  await textEditor.setText(classText);
+  await pause(Duration.seconds(1));
+  await textEditor.save();
+  await pause(Duration.seconds(1));
 }

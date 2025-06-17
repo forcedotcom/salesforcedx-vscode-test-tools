@@ -8,8 +8,7 @@
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
-import { getTextEditor } from '../ui-interaction/textEditorView';
-import { By, Key, TextEditor } from 'vscode-extension-tester';
+import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
 
 /**
  * Creates an Apex class with the specified name and content
@@ -33,20 +32,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
   // Modify class content
   const workbench = getWorkbench();
   const textEditor = await getTextEditor(workbench, name + '.cls');
-  const inputarea = await textEditor.findElement(By.css('.monaco-editor textarea'));
-  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
-  await inputarea.sendKeys(Key.DELETE);
-  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
-  await inputarea.sendKeys(Key.DELETE); // Extra delete to be sure
-  await pause(Duration.seconds(1));
-  await inputarea.sendKeys(classText); // Type the new content
-  await pause(Duration.seconds(1));;
-  await textEditor.save();
-  await pause(Duration.seconds(1));
-  await textEditor.setText(classText);
-  await pause(Duration.seconds(1));
-  await textEditor.save();
-  await pause(Duration.seconds(1));
+  await overrideTextInFile(textEditor, classText);
   if (breakpoint) {
     await textEditor.toggleBreakpoint(breakpoint);
   }
