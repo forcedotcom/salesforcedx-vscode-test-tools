@@ -28,18 +28,22 @@ export function removeFolder(folderPath: string): void {
 
 /**
  * Creates custom Salesforce objects in the project's force-app directory
- * Copies object definitions from testData to the project
+ * Copies object definitions from testSetup.testDataFolderPath to the project
  * @param testSetup - The test setup object containing project paths
  * @throws Error if copying fails or paths are undefined
  */
 export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
   const projectPath = testSetup.projectFolderPath;
-  const tempFolderPath = testSetup.tempFolderPath;
-  if (!tempFolderPath) {
-    throw new Error('tempFolderPath is undefined');
+  const testDataFolderPath = testSetup.testDataFolderPath;
+  if (!testDataFolderPath) {
+    throw new Error('testDataFolderPath is undefined');
   }
-  const source = path.join(tempFolderPath, '..', 'test', 'testData', 'CustomSObjects');
-  const destination = path.join(projectPath!, 'force-app', 'main', 'default', 'objects');
+  if (!projectPath) {
+    throw new Error('projectPath is undefined');
+  }
+
+  const source = testDataFolderPath;
+  const destination = path.join(projectPath, 'force-app', 'main', 'default', 'objects');
 
   // Ensure the project path has been created
   fs.mkdirSync(path.dirname(destination), { recursive: true });
@@ -75,11 +79,10 @@ export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
  */
 export async function createGlobalSnippetsFile(testSetup: TestSetup): Promise<void> {
   const projectPath = testSetup.projectFolderPath;
-  const tempFolderPath = testSetup.tempFolderPath;
-  if (!tempFolderPath) {
-    throw new Error('tempFolderPath is undefined');
+  if (!projectPath) {
+    throw new Error('projectPath is undefined');
   }
-  const destination = path.join(projectPath!, '.vscode', 'apex.json.code-snippets');
+  const destination = path.join(projectPath, '.vscode', 'apex.json.code-snippets');
   const apexSnippet = [
     `{`,
     `"SOQL": {`,

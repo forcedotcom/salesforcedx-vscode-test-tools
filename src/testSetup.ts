@@ -32,6 +32,7 @@ export class TestSetup {
   // this needs to be defined in EnvironmentSettings with the default being os.tmpDir()
   public tempFolderPath = path.join(process.cwd(), 'e2e-temp');
   public projectFolderPath: string | undefined;
+  public testDataFolderPath: string | undefined;
   public aliasAndUserNameWereVerified = false;
   public scratchOrgAliasName: string | undefined;
   public scratchOrgId: string | undefined;
