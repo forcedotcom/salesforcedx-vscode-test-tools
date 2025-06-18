@@ -9,6 +9,8 @@ import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
 import { getWorkbench } from '../ui-interaction/workbench';
+import { retryOperation } from '../retryUtils';
+import { clickButtonOnModalDialog } from '../ui-interaction';
 
 /**
  * Creates a Lightning Web Component with the specified name
@@ -27,12 +29,9 @@ export async function createLwc(name: string): Promise<void> {
 
   log('createLwc() - Set the name of the new component');
   // Set the name of the new component
-  await inputBox.setText(name);
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await createComponentAndSetName(inputBox, name);
+  });
 
   log('createLwc() - Modify js content');
   // Modify js content
@@ -108,6 +107,17 @@ export async function createLwc(name: string): Promise<void> {
   await textEditor.toggleBreakpoint(25);
 }
 
+async function createComponentAndSetName(inputBox, name: string) {
+  await inputBox.setText(name);
+  await pause(Duration.seconds(1));
+  await inputBox.confirm();
+  await pause(Duration.seconds(1));
+  await inputBox.confirm();
+  await pause(Duration.seconds(1));
+  await clickButtonOnModalDialog('Overwrite');
+  await pause(Duration.seconds(1));
+}
+
 /**
  * Creates an Aura component with the specified name
  * Generates component markup with a simple contact form
@@ -122,12 +132,9 @@ export async function createAura(name: string): Promise<void> {
 
   log('createAura() - Set the name of the new component');
   // Set the name of the new component
-  await inputBox.setText(name);
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await createComponentAndSetName(inputBox, name);
+  });
 
   log('createAura() - Modify html content');
   // Modify html content

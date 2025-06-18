@@ -55,5 +55,7 @@ export * from './environmentSettings';
 export * from './test-setup-and-runner';
 export * from './testSetup';
 
+export * from "./retryUtils";
+
 export { TestConfig } from './core/types';
 export { EnvironmentSettings } from './environmentSettings';

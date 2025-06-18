@@ -26,6 +26,7 @@ import {
 } from './testing';
 import { executeQuickPick, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
+import { retryOperation } from './retryUtils';
 
 export class TestSetup {
   public testSuiteSuffixName = '';
@@ -58,10 +59,9 @@ export class TestSetup {
     await executeQuickPick('View: Close All Editors');
     if (testReqConfig.projectConfig.projectShape !== ProjectShapeOption.NONE) {
       await verifyExtensionsAreRunning(testSetup.getExtensionsToVerify());
-      const scratchOrgEdition = testReqConfig.scratchOrgEdition || 'developer';
-      testSetup.updateScratchOrgDefWithEdition(scratchOrgEdition);
+
       if (process.platform === 'darwin') testSetup.setJavaHomeConfigEntry(); // Extra config needed for Apex LSP on GHA
-      if (testReqConfig.isOrgRequired) await setUpScratchOrg(testSetup, scratchOrgEdition);
+      if (testReqConfig.isOrgRequired) await setUpScratchOrg(testSetup);
       await reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
     testSetup.setWorkbenchHoverDelay();
@@ -164,7 +164,7 @@ export class TestSetup {
 
   public async setUpTestingWorkspace(projectConfig: ProjectConfig) {
     core.log(`${this.testSuiteSuffixName} - Starting setUpTestingWorkspace()...`);
-    let projectName;
+    let projectName: string | null;
     switch (projectConfig.projectShape) {
       case ProjectShapeOption.NEW:
         await this.initializeNewSfProject();
@@ -232,7 +232,9 @@ export class TestSetup {
       core.log(`Project folder to open: ${this.projectFolderPath}`);
       await core.openFolder(this.projectFolderPath!);
       // Verify the project was loaded.
-      await verifyProjectLoaded(projectName ?? this.tempProjectName);
+      await retryOperation(async () => {
+        await verifyProjectLoaded(projectName ?? this.tempProjectName);
+      });
     }
   }
 

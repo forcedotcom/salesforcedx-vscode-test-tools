@@ -28,7 +28,7 @@ export * from './deployAndRetrieve';
 export * from './orgBrowser';
 
 // Re-export everything from authorization except OrgEdition
-export { setUpScratchOrg, authorizeDevHub, deleteScratchOrgInfo } from './authorization';
+export { setUpScratchOrg, authorizeDevHub, deleteScratchOrgInfo, createDefaultScratchOrg } from './authorization';
 
 // Re-export CLI commands
 export * from '../system-operations/cliCommands';

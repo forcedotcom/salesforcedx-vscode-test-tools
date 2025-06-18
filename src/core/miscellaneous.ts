@@ -16,6 +16,8 @@ import { PredicateWithTimeout } from '../testing/predicates';
 import { By, WebElement } from 'vscode-extension-tester';
 import { getBrowser, getWorkbench } from '../ui-interaction/workbench';
 import { expect } from 'chai';
+import { retryOperation } from '../retryUtils';
+import { clickButtonOnModalDialog } from '../ui-interaction';
 
 /**
  * Pauses execution for a specified duration
@@ -136,9 +138,13 @@ export async function createCommand(
   const inputBox = await executeQuickPick(`SFDX: Create ${type}`, Duration.seconds(1));
 
   // Set the name of the new component to name.
-  await inputBox.setText(name);
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await inputBox.setText(name);
+    await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await clickButtonOnModalDialog('Overwrite');
+    await pause(Duration.seconds(1));
+  });
 
   // Select the default directory (press Enter/Return).
   await inputBox.confirm();

@@ -9,6 +9,9 @@ import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
 import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
+import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
+import { retryOperation } from '../retryUtils';
+import { clickButtonOnModalDialog } from '../ui-interaction';
 
 /**
  * Creates an Apex class with the specified name and content
@@ -19,24 +22,42 @@ import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorV
 export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
   // Using the Command palette, run SFDX: Create Apex Class to create the main class
-  const inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
+  let inputBox: InputBox | QuickOpenBox;
+  await retryOperation(async () => {
+    // Using the Command palette, run SFDX: Create Apex Class to create the main class
+    inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
+  });
 
   // Set the name of the new Apex Class
-  await inputBox.setText(name);
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
-  await inputBox.confirm();
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await inputBox.setText(name);
+    await pause(Duration.seconds(1));
+    await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await inputBox.confirm();
+    await pause(Duration.seconds(1));
+    await clickButtonOnModalDialog('Overwrite');
+    await pause(Duration.seconds(1));
+  });
 
+  log(`Blank Apex Class ${name} created successfully.`);
   // Modify class content
   const workbench = getWorkbench();
+  log('Getting text editor for the new Apex Class');
   const textEditor = await getTextEditor(workbench, name + '.cls');
-  await overrideTextInFile(textEditor, classText);
+  log('Done getting text editor for the new Apex Class');
+  await pause(Duration.seconds(1));
+  log(`Setting text for Apex Class ${name}`);
+  await textEditor.setText(classText);
+  log(`Done setting text for Apex Class ${name}`);
+  await pause(Duration.seconds(1));
+  await textEditor.save();
+  await pause(Duration.seconds(1));
   if (breakpoint) {
     await textEditor.toggleBreakpoint(breakpoint);
   }
   await pause(Duration.seconds(1));
+  log(`Apex Class ${name} modified successfully.`);
 }
 
 /**
