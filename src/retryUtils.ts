@@ -28,13 +28,16 @@ export const verifyNotificationWithRetry = async (
       await methodToRunForEachTry();
     }
     const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
-    expect(notificationWasFound, `Notification: ${notificationPattern} was not found`).to.equal(true);
+    if (!notificationWasFound) {
+      log(`Notification ${notificationPattern} was not found, trying again...`);
+    }
+    expect(notificationWasFound).to.equal(true);
     return notificationWasFound;
   } catch (error) {
     if (methodToRunForEachTry) {
       await methodToRunForEachTry();
     }
-    log(`Error finding notification ${notificationPattern} ${JSON.stringify(error)}, trying again...`);
+    log(`Error finding notification ${notificationPattern}:\n${error instanceof Error ? error.stack : JSON.stringify(error)}\nTrying again...`);
     await getWorkbench().openNotificationsCenter();
   }
   return false;

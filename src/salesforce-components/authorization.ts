@@ -9,15 +9,13 @@ import fs from 'fs';
 import { EnvironmentSettings as Env } from '../../src/environmentSettings';
 import { TestSetup } from '../../src/testSetup';
 import { log, pause, Duration, transformedUserName } from '../core/miscellaneous';
-import { notificationIsPresentWithTimeout } from '../ui-interaction/notifications';
 import { getStatusBarItemWhichIncludes } from '../ui-interaction/statusBar';
 import {
   orgDisplay,
   orgList,
   orgLoginSfdxUrl,
   runCliCommand} from '../system-operations/cliCommands';
-import { attemptToFindOutputPanelText, executeQuickPick } from '../ui-interaction';
-import { expect } from 'chai';
+import { attemptToFindOutputPanelText, executeQuickPick, getWorkbench } from '../ui-interaction';
 import { verifyNotificationWithRetry, retryOperation } from '../retryUtils';
 
 /**
@@ -137,7 +135,10 @@ export async function createDefaultScratchOrg(): Promise<string> {
     // Press Enter/Return.
     await prompt.confirm();
 
-    const successNotificationWasFound = await verifyNotificationWithRetry(/SFDX: Create a Default Scratch Org\.\.\. successfully ran/, Duration.TEN_MINUTES);
+    const successNotificationWasFound = await verifyNotificationWithRetry(
+      /SFDX: Create a Default Scratch Org\.\.\. successfully ran/,
+      Duration.TEN_MINUTES
+    );
 
     if (successNotificationWasFound !== true) {
       const failureNotificationWasFound = await verifyNotificationWithRetry(
