@@ -7,7 +7,7 @@
 
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
-import { getTextEditor } from '../ui-interaction/textEditorView';
+import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
 import { getWorkbench } from '../ui-interaction/workbench';
 
 /**
@@ -45,7 +45,7 @@ export async function createLwc(name: string): Promise<void> {
     `\tgreeting = 'World';`,
     `}`
   ].join('\n');
-  await textEditor.setText(jsText);
+  await overrideTextInFile(textEditor, jsText);
   await pause(Duration.seconds(1));
   await textEditor.save();
   await pause(Duration.seconds(1));
@@ -62,7 +62,7 @@ export async function createLwc(name: string): Promise<void> {
     ``,
     `</template>`
   ].join('\n');
-  await textEditor.setText(htmlText);
+  await overrideTextInFile(textEditor, htmlText);
   await textEditor.save();
   await pause(Duration.seconds(1));
 
@@ -99,7 +99,7 @@ export async function createLwc(name: string): Promise<void> {
     `    });`,
     `});`
   ].join('\n');
-  await textEditor.setText(testText);
+  await overrideTextInFile(textEditor, testText);
   await textEditor.save();
   await pause(Duration.seconds(1));
 
@@ -145,7 +145,7 @@ export async function createAura(name: string): Promise<void> {
     '\t</aura:if>',
     '</aura:component>'
   ].join('\n');
-  await textEditor.setText(htmlText);
+  await overrideTextInFile(textEditor, htmlText);
   await pause(Duration.seconds(1));
   await textEditor.save();
   await pause(Duration.seconds(1));
