@@ -21,15 +21,15 @@ import { expect } from 'chai';
 export const verifyNotificationWithRetry = async (
   notificationPattern: RegExp,
   wait = Duration.TEN_MINUTES,
-  methodToRunForEachTry?: () => Promise<void>
+  methodToRunForEachTry?: () => Promise<boolean>
 ) => {
   try {
     if (methodToRunForEachTry) {
       await methodToRunForEachTry();
     }
     const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
-    expect(notificationWasFound).to.equal(true);
-    return;
+    expect(notificationWasFound, `Notification: ${notificationPattern} was not found`).to.equal(true);
+    return notificationWasFound;
   } catch (error) {
     if (methodToRunForEachTry) {
       await methodToRunForEachTry();
@@ -37,6 +37,7 @@ export const verifyNotificationWithRetry = async (
     log(`Error finding notification ${notificationPattern} ${JSON.stringify(error)}, trying again...`);
     await getWorkbench().openNotificationsCenter();
   }
+  return false;
 };
 
 /**

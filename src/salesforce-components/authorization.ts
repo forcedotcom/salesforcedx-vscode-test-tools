@@ -18,6 +18,7 @@ import {
   runCliCommand} from '../system-operations/cliCommands';
 import { attemptToFindOutputPanelText, executeQuickPick } from '../ui-interaction';
 import { expect } from 'chai';
+import { verifyNotificationWithRetry } from '../retryUtils';
 
 /**
  * Sets up a scratch org for testing
@@ -133,15 +134,14 @@ export async function createDefaultScratchOrg(): Promise<string> {
   // Press Enter/Return.
   await prompt.confirm();
 
-  const successNotificationWasFound = await notificationIsPresentWithTimeout(
-    /SFDX: Create a Default Scratch Org\.\.\. successfully ran/,
-    Duration.TEN_MINUTES
-  );
+  const successNotificationWasFound = await verifyNotificationWithRetry(/SFDX: Create a Default Scratch Org\.\.\. successfully ran/, Duration.TEN_MINUTES);
+
   if (successNotificationWasFound !== true) {
-    const failureNotificationWasFound = await notificationIsPresentWithTimeout(
+    const failureNotificationWasFound = await verifyNotificationWithRetry(
       /SFDX: Create a Default Scratch Org\.\.\. failed to run/,
       Duration.TEN_MINUTES
     );
+
     if (failureNotificationWasFound === true) {
       if (
         await attemptToFindOutputPanelText(
@@ -171,7 +171,7 @@ export async function createDefaultScratchOrg(): Promise<string> {
       );
     }
   }
-  expect(successNotificationWasFound).to.equal(true);
+  expect(successNotificationWasFound, 'success notification message was not found').to.equal(true);
 
   // Look for the org's alias name in the list of status bar items.
   const scratchOrgStatusBarItem = await getStatusBarItemWhichIncludes(scratchOrgAliasName);
