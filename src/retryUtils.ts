@@ -13,7 +13,6 @@ import { expect } from 'chai';
 
 /**
  * Retry a notification check
- * TODO: Consider moving this to salesforcedx-vscode-test-tools
  * @param notificationPattern - The notification pattern to check
  * @param wait - The wait time for the notification to appear
  * @param methodToRunForEachTry - The method to run for each try
@@ -42,7 +41,6 @@ export const verifyNotificationWithRetry = async (
 
 /**
  * Retry an operation
- * TODO: Consider moving this to salesforcedx-vscode-test-tools
  * @param operation - The operation to retry
  * @param maxAttempts - The maximum number of attempts
  * @param errorMessage - The error message to log
