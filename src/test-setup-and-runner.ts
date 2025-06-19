@@ -31,7 +31,7 @@ class TestSetupAndRunner extends ExTester {
     // Validate config and set defaults for missing values
     validateTestConfig(config);
 
-    super(undefined, ReleaseQuality.Stable);
+    super(config?.testResources, ReleaseQuality.Stable);
     this.testConfig = config;
     this.spec = spec;
   }
