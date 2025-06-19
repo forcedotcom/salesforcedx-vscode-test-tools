@@ -4,6 +4,7 @@ import { notificationIsPresentWithTimeout } from '../ui-interaction/notification
 import { attemptToFindOutputPanelText } from '../ui-interaction/outputView';
 import { getTerminalViewText } from '../ui-interaction/terminalView';
 import { Duration, log, pause } from '../core/miscellaneous';
+import { retryOperation } from '../retryUtils';
 
 export async function retrieveExpectedNumTestsFromSidebar(
   expectedNumTests: number,
@@ -175,10 +176,12 @@ export async function verifyTestItemsInSideBar(
 }
 
 export async function continueDebugging(times: number, seconds = 5): Promise<void> {
-  const bar = await DebugToolbar.create();
-  // Continue with the debug session
-  for (let i = 0; i < times; i++) {
-    await bar.continue();
-    await pause(Duration.seconds(seconds));
-  }
+    const bar = await DebugToolbar.create();
+    // Continue with the debug session
+    for (let i = 0; i < times; i++) {
+      await retryOperation(async () => {
+        await bar.continue();
+      }, 3, 'Failed to continue debugging - continue button not found');
+      await pause(Duration.seconds(seconds));
+    }
 }
