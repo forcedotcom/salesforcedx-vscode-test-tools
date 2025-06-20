@@ -52,9 +52,45 @@ class TestSetupAndRunner extends ExTester {
     }
   }
 
+  /**
+   * Sets up Ubuntu-specific Chrome driver arguments to avoid user data directory conflicts
+   */
+  private setupUbuntuChromeArgs(): void {
+    // Only apply Ubuntu-specific settings if we're on Linux and no custom args are already set
+    if (process.platform !== 'linux') {
+      return;
+    }
+
+    const existingArgs = EnvironmentSettings.getInstance().chromeDriverArgs;
+    if (existingArgs) {
+      log(`Chrome driver arguments already set: ${existingArgs}`);
+      return;
+    }
+
+    // Generate a unique user data directory for this test run
+    const uniqueId = Date.now().toString();
+    const tempDir = path.join(this.testConfig.testResources || 'test-resources', 'chrome-user-data', uniqueId);
+
+    const ubuntuChromeArgs = [
+      `--user-data-dir=${tempDir}`,
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-web-security',
+      '--disable-features=VizDisplayCompositor'
+    ].join(' ');
+
+    // Set the environment variable for vscode-extension-tester to pick up
+    process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
+
+    log(`Set Ubuntu Chrome driver arguments: ${ubuntuChromeArgs}`);
+  }
+
   public async setup(): Promise<void> {
     // Log the test environment configuration
     this.logTestEnvironment();
+
+    // Set Ubuntu-specific Chrome driver arguments if needed
+    this.setupUbuntuChromeArgs();
 
     await this.downloadCode(this.testConfig.codeVersion);
     await this.downloadChromeDriver(this.testConfig.codeVersion);
