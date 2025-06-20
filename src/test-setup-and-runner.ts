@@ -55,7 +55,7 @@ class TestSetupAndRunner extends ExTester {
   /**
    * Sets up Ubuntu-specific Chrome driver arguments to avoid user data directory conflicts
    */
-  private setupUbuntuChromeArgs(): void {
+  private async setupUbuntuChromeArgs(): Promise<void> {
     // Only apply Ubuntu-specific settings if we're on Linux and no custom args are already set
     if (process.platform !== 'linux') {
       console.log(`Not on Linux, skipping setupUbuntuChromeArgs: ${process.platform}`);
@@ -69,21 +69,83 @@ class TestSetupAndRunner extends ExTester {
     }
 
     // Generate a unique user data directory for this test run
-    const uniqueId = Date.now().toString();
+    const uniqueId = `${Date.now()}-${process.pid}`;
     const tempDir = path.join(this.testConfig.testResources || 'test-resources', 'chrome-user-data', uniqueId);
+
+    // Ensure the directory exists
+    try {
+      await fs.mkdir(tempDir, { recursive: true });
+      log(`Created Chrome user data directory: ${tempDir}`);
+    } catch (error) {
+      log(`Warning: Could not create Chrome user data directory: ${error}`);
+    }
 
     const ubuntuChromeArgs = [
       `--user-data-dir=${tempDir}`,
       '--no-sandbox',
       '--disable-dev-shm-usage',
       '--disable-web-security',
-      '--disable-features=VizDisplayCompositor'
+      '--disable-features=VizDisplayCompositor',
+      '--disable-gpu',
+      '--disable-software-rasterizer',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
+      '--disable-field-trial-config',
+      '--disable-ipc-flooding-protection',
+      '--single-process',
+      '--no-zygote'
     ].join(' ');
 
-    // Set the environment variable for vscode-extension-tester to pick up
+        // Set the environment variable for vscode-extension-tester to pick up
     process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
 
     log(`Set Ubuntu Chrome driver arguments: ${ubuntuChromeArgs}`);
+    log(`Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`);
+
+    // Also try setting the user data dir in a more explicit way
+    const userDataDir = tempDir;
+    process.env.CHROME_USER_DATA_DIR = userDataDir;
+    log(`Set CHROME_USER_DATA_DIR: ${userDataDir}`);
+  }
+
+  /**
+   * Kills existing Chrome processes that might be using the user data directory
+   */
+  private async killExistingChromeProcesses(): Promise<void> {
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+
+      log('Attempting to kill existing Chrome processes...');
+
+      // Kill Chrome processes
+      const commands = [
+        'pkill -f "chrome.*--test-type"',
+        'pkill -f "chromium.*--test-type"',
+        'pkill -f "google-chrome.*--test-type"',
+        'pkill -f "chrome.*--user-data-dir"',
+        'pkill -f "chromium.*--user-data-dir"'
+      ];
+
+      for (const command of commands) {
+        try {
+          await execAsync(command);
+          log(`Executed: ${command}`);
+        } catch (error) {
+          // It's normal for pkill to exit with code 1 if no processes are found
+          log(`Command ${command} completed (processes may not have been running)`);
+        }
+      }
+
+      // Wait a moment for processes to fully terminate
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      log('Chrome process cleanup completed');
+
+    } catch (error) {
+      log(`Warning: Could not kill Chrome processes: ${error}`);
+    }
   }
 
   public async setup(): Promise<void> {
@@ -91,7 +153,12 @@ class TestSetupAndRunner extends ExTester {
     this.logTestEnvironment();
 
     // Set Ubuntu-specific Chrome driver arguments if needed
-    this.setupUbuntuChromeArgs();
+    await this.setupUbuntuChromeArgs();
+
+    // Kill any existing Chrome processes on Linux
+    if (process.platform === 'linux') {
+      await this.killExistingChromeProcesses();
+    }
 
     await this.downloadCode(this.testConfig.codeVersion);
     await this.downloadChromeDriver(this.testConfig.codeVersion);
