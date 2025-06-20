@@ -183,7 +183,102 @@ class TestSetupAndRunner extends ExTester {
     }
   }
 
-  public async setup(): Promise<void> {
+  /**
+   * Creates a Chrome wrapper script that forces Ubuntu-specific arguments
+   */
+  private async createChromeWrapper(): Promise<void> {
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+
+      // Find Chrome executable
+      const chromeCommands = [
+        'which google-chrome',
+        'which google-chrome-stable',
+        'which chromium-browser',
+        'which chromium'
+      ];
+
+      let chromeExePath = '';
+      for (const command of chromeCommands) {
+        try {
+          const result = await execAsync(command);
+          chromeExePath = result.stdout.trim();
+          if (chromeExePath) {
+            log(`Found Chrome at: ${chromeExePath}`);
+            break;
+          }
+        } catch (error) {
+          // Command failed, try next one
+        }
+      }
+
+      if (!chromeExePath) {
+        log('Warning: Could not find Chrome executable for wrapper');
+        return;
+      }
+
+      // Create unique user data directory
+      const uniqueId = `${Date.now()}-${process.pid}`;
+      const tempDir = path.join(this.testConfig.testResources || 'test-resources', 'chrome-user-data', uniqueId);
+      await fs.mkdir(tempDir, { recursive: true });
+
+      // Create wrapper script
+      const wrapperPath = path.join(this.testConfig.testResources || 'test-resources', 'chrome-wrapper.sh');
+      const wrapperScript = `#!/bin/bash
+# Chrome wrapper script for Ubuntu testing
+exec "${chromeExePath}" \\
+  --user-data-dir="${tempDir}" \\
+  --no-sandbox \\
+  --disable-dev-shm-usage \\
+  --disable-web-security \\
+  --disable-features=VizDisplayCompositor \\
+  --disable-gpu \\
+  --disable-software-rasterizer \\
+  --disable-background-timer-throttling \\
+  --disable-backgrounding-occluded-windows \\
+  --disable-renderer-backgrounding \\
+  --disable-field-trial-config \\
+  --disable-ipc-flooding-protection \\
+  --single-process \\
+  --no-zygote \\
+  "$@"
+`;
+
+      await fs.writeFile(wrapperPath, wrapperScript);
+      await execAsync(`chmod +x "${wrapperPath}"`);
+
+            // Override Chrome path in environment
+      process.env.CHROME_BIN = wrapperPath;
+      process.env.CHROMIUM_BIN = wrapperPath;
+      process.env.GOOGLE_CHROME_BIN = wrapperPath;
+
+            // Create wrapper scripts for common Chrome names in our own directory
+      const wrapperDir = path.join(this.testConfig.testResources || 'test-resources', 'chrome-wrappers');
+      await fs.mkdir(wrapperDir, { recursive: true });
+
+      const chromeNames = ['google-chrome', 'google-chrome-stable', 'chromium-browser', 'chromium'];
+      for (const name of chromeNames) {
+        const nameWrapperPath = path.join(wrapperDir, name);
+        await fs.writeFile(nameWrapperPath, wrapperScript);
+        await execAsync(`chmod +x "${nameWrapperPath}"`);
+        log(`Created ${name} wrapper at: ${nameWrapperPath}`);
+      }
+
+      // Prepend our wrapper directory to PATH so our wrappers are found first
+      process.env.PATH = `${wrapperDir}:${process.env.PATH}`;
+      log(`Prepended ${wrapperDir} to PATH`);
+
+      log(`Created Chrome wrapper at: ${wrapperPath}`);
+      log(`Set CHROME_BIN to: ${wrapperPath}`);
+
+    } catch (error) {
+      log(`Warning: Could not create Chrome wrapper: ${error}`);
+    }
+  }
+
+    public async setup(): Promise<void> {
     // Log the test environment configuration
     this.logTestEnvironment();
 
@@ -197,6 +292,11 @@ class TestSetupAndRunner extends ExTester {
 
     await this.downloadCode(this.testConfig.codeVersion);
     await this.downloadChromeDriver(this.testConfig.codeVersion);
+
+    // Create Chrome wrapper script for Ubuntu
+    if (process.platform === 'linux') {
+      await this.createChromeWrapper();
+    }
 
     try {
       await this.installExtensions();
@@ -221,7 +321,18 @@ class TestSetupAndRunner extends ExTester {
       await this.killExistingChromeProcesses();
     }
 
-    return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
+    // Try to pass additional launch arguments for Ubuntu
+    const runOptions: any = { resources };
+    if (process.platform === 'linux') {
+      runOptions.launchArgs = [
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        '--no-sandbox',
+        '--disable-dev-shm-usage'
+      ];
+    }
+
+    return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, runOptions);
   }
   public async installExtension(extension: string): Promise<void> {
     log(`SetUp - Started Install extension ${path.basename(extension)}`);
