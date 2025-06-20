@@ -48,7 +48,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
   log('Done getting text editor for the new Apex Class');
   await pause(Duration.seconds(1));
   log(`Setting text for Apex Class ${name}`);
-  await textEditor.setText(classText);
+  await overrideTextInFile(textEditor, classText);
   log(`Done setting text for Apex Class ${name}`);
   await pause(Duration.seconds(1));
   await textEditor.save();
