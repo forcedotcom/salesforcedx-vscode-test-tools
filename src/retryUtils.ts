@@ -23,24 +23,18 @@ export const verifyNotificationWithRetry = async (
   wait = Duration.TEN_MINUTES,
   methodToRunForEachTry?: () => Promise<boolean>
 ) => {
-  try {
+  return await retryOperation(async () => {
     if (methodToRunForEachTry) {
       await methodToRunForEachTry();
     }
     const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
     if (!notificationWasFound) {
-      log(`Notification ${notificationPattern} was not found, trying again...`);
+      log(`Notification ${notificationPattern} was not found, will retry...`);
+      await getWorkbench().openNotificationsCenter();
+      throw new Error(`Notification ${notificationPattern} was not found`);
     }
-    expect(notificationWasFound).to.equal(true);
     return notificationWasFound;
-  } catch (error) {
-    if (methodToRunForEachTry) {
-      await methodToRunForEachTry();
-    }
-    log(`Error finding notification ${notificationPattern}:\n${error instanceof Error ? error.stack : JSON.stringify(error)}\nTrying again...`);
-    await getWorkbench().openNotificationsCenter();
-  }
-  return false;
+  }, 3, `Failed to find notification ${notificationPattern}`);
 };
 
 /**
