@@ -58,6 +58,7 @@ class TestSetupAndRunner extends ExTester {
   private setupUbuntuChromeArgs(): void {
     // Only apply Ubuntu-specific settings if we're on Linux and no custom args are already set
     if (process.platform !== 'linux') {
+      console.log(`Not on Linux, skipping setupUbuntuChromeArgs: ${process.platform}`);
       return;
     }
 
