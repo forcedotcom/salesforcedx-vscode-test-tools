@@ -9,7 +9,6 @@ import {
   getWorkbench,
   notificationIsPresentWithTimeout
 } from './ui-interaction';
-import { expect } from 'chai';
 
 /**
  * Retry a notification check
@@ -21,7 +20,7 @@ import { expect } from 'chai';
 export const verifyNotificationWithRetry = async (
   notificationPattern: RegExp,
   wait = Duration.TEN_MINUTES,
-  methodToRunForEachTry?: () => Promise<boolean>
+  methodToRunForEachTry?: () => Promise<void>
 ) => {
   return await retryOperation(async () => {
     if (methodToRunForEachTry) {
