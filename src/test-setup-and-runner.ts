@@ -14,6 +14,35 @@ import { TestConfig } from './core/types';
 import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
 import { verifyAliasAndUserName } from './salesforce-components/authorization';
 
+// Set Ubuntu Chrome arguments immediately when module loads
+if (process.platform === 'linux') {
+  const uniqueId = `${Date.now()}-${process.pid}`;
+  const tempDir = path.join(process.cwd(), 'test-resources', 'chrome-user-data', uniqueId);
+
+  const ubuntuChromeArgs = [
+    `--user-data-dir=${tempDir}`,
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-web-security',
+    '--disable-features=VizDisplayCompositor',
+    '--disable-gpu',
+    '--disable-software-rasterizer',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
+    '--disable-field-trial-config',
+    '--disable-ipc-flooding-protection',
+    '--single-process',
+    '--no-zygote'
+  ].join(' ');
+
+  process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
+  process.env.CHROME_OPTIONS = ubuntuChromeArgs;
+  process.env.CHROMIUM_FLAGS = ubuntuChromeArgs;
+
+  log(`Early Ubuntu Chrome setup: ${ubuntuChromeArgs}`);
+}
+
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
   private testConfig: TestConfig;
@@ -97,8 +126,13 @@ class TestSetupAndRunner extends ExTester {
       '--no-zygote'
     ].join(' ');
 
-        // Set the environment variable for vscode-extension-tester to pick up
+            // Set the environment variable for vscode-extension-tester to pick up
     process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
+
+    // Also try other possible environment variables
+    process.env.CHROME_OPTIONS = ubuntuChromeArgs;
+    process.env.CHROMIUM_FLAGS = ubuntuChromeArgs;
+    process.env.GOOGLE_CHROME_OPTS = ubuntuChromeArgs;
 
     log(`Set Ubuntu Chrome driver arguments: ${ubuntuChromeArgs}`);
     log(`Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`);
@@ -106,6 +140,7 @@ class TestSetupAndRunner extends ExTester {
     // Also try setting the user data dir in a more explicit way
     const userDataDir = tempDir;
     process.env.CHROME_USER_DATA_DIR = userDataDir;
+    process.env.CHROMIUM_USER_DATA_DIR = userDataDir;
     log(`Set CHROME_USER_DATA_DIR: ${userDataDir}`);
   }
 
@@ -179,6 +214,12 @@ class TestSetupAndRunner extends ExTester {
     log(`starting runTests with useExistingProject: ${useExistingProject}`);
     log(`starting runTests with resources: ${resources}`);
     log(`starting runTests with spec: ${this.spec}`);
+
+    // Set Ubuntu Chrome arguments just before running tests
+    if (process.platform === 'linux') {
+      await this.setupUbuntuChromeArgs();
+      await this.killExistingChromeProcesses();
+    }
 
     return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
   }
