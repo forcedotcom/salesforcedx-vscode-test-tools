@@ -160,6 +160,8 @@ describe('Create OpenAPI v3 Specifications', () => {
           path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls')
         );
         await utilities.pause(utilities.Duration.seconds(5));
+        // Dismiss all notifications.
+        await utilities.dismissAllNotifications();
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
 
@@ -334,7 +336,6 @@ describe('Create OpenAPI v3 Specifications', () => {
         `${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`
       );
       const workbench = utilities.getWorkbench();
-      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
       const textEditor = await utilities.getTextEditor(workbench, 'sfdx-project.json');
       const newSfdxProjectJsonContents = [
         `{`,
@@ -377,6 +378,8 @@ describe('Create OpenAPI v3 Specifications', () => {
           )
         );
         await utilities.pause(utilities.Duration.seconds(5));
+        // Dismiss all notifications.
+        await utilities.dismissAllNotifications();
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
 
