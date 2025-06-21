@@ -164,7 +164,8 @@ describe('Create OpenAPI v3 Specifications', () => {
         await utilities.dismissAllNotifications();
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
-
+        utilities.log('made it this far')
+        await utilities.getWorkbench().openNotificationsCenter();
         await verifyNotificationWithRetry(/OpenAPI Document created for class: CaseManager\./);
 
         // Verify the generated OAS doc is open in the Editor View
