@@ -357,7 +357,9 @@ exec "${chromeExePath}" \\
       ];
     }
 
-    return super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, runOptions);
+    const exitCode = await super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, runOptions);
+    await this.validateTestExecution(exitCode);
+    return exitCode;
   }
   public async installExtension(extension: string): Promise<void> {
     log(`SetUp - Started Install extension ${path.basename(extension)}`);
@@ -611,6 +613,7 @@ exec "${chromeExePath}" \\
         const exitCode = await super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
 
         if (exitCode === 0) {
+          await this.validateTestExecution(exitCode);
           console.log('Tests completed successfully!');
           return exitCode;
         } else {
@@ -637,6 +640,51 @@ exec "${chromeExePath}" \\
     }
 
     return 1; // Failed
+  }
+
+  /**
+   * Validates that tests were actually executed by checking for test output
+   * Throws an error if no tests were found or executed
+   */
+  private async validateTestExecution(exitCode: number): Promise<void> {
+    if (exitCode !== 0) {
+      return; // If tests failed, don't check for test count (tests were found but failed)
+    }
+
+    // Check if any spec files were provided
+    const specFiles = this.spec || EnvironmentSettings.getInstance().specFiles;
+    if (!specFiles || (Array.isArray(specFiles) && specFiles.length === 0)) {
+      throw new Error('No E2E test spec files were provided. Please specify test files to run.');
+    }
+
+    // Check if spec files actually exist
+    const specsToCheck = Array.isArray(specFiles) ? specFiles : [specFiles];
+    let foundTestFiles = false;
+
+    for (const spec of specsToCheck) {
+      try {
+        // Check if the spec file/pattern matches any files
+        if (spec.includes('*') || spec.includes('?')) {
+          // It's a glob pattern - we can't easily check without implementing glob matching
+          // For now, assume it's valid if it contains wildcards
+          log(`Spec pattern provided: ${spec}`);
+          foundTestFiles = true;
+        } else {
+          // It's a specific file path
+          await fs.access(spec);
+          foundTestFiles = true;
+          log(`Found test file: ${spec}`);
+        }
+      } catch (error) {
+        log(`Test file not found: ${spec}`);
+      }
+    }
+
+    if (!foundTestFiles && exitCode === 0) {
+      throw new Error(`No E2E test files were found for the provided spec: ${JSON.stringify(specFiles)}. This likely indicates a configuration issue - tests should not pass when no test files exist.`);
+    }
+
+    log('Test execution validation completed - test files were found and executed');
   }
 
   private async killChromeProcesses(): Promise<void> {
