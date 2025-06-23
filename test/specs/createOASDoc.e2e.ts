@@ -160,12 +160,11 @@ describe('Create OpenAPI v3 Specifications', () => {
           path.join(testSetup.projectFolderPath!, 'force-app', 'main', 'default', 'classes', 'CaseManager.cls')
         );
         await utilities.pause(utilities.Duration.seconds(5));
-        // Dismiss all notifications.
-        await utilities.dismissAllNotifications();
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
-        utilities.log('made it this far')
-        await utilities.getWorkbench().openNotificationsCenter();
+        if (process.platform === 'win32') {
+          await utilities.pause(utilities.Duration.seconds(10));
+        }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: CaseManager\./);
 
         // Verify the generated OAS doc is open in the Editor View
@@ -379,11 +378,11 @@ describe('Create OpenAPI v3 Specifications', () => {
           )
         );
         await utilities.pause(utilities.Duration.seconds(5));
-        // Dismiss all notifications.
-        await utilities.dismissAllNotifications();
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
-
+        if (process.platform === 'win32') {
+          await utilities.pause(utilities.Duration.seconds(10));
+        }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: SimpleAccountResource\./);
 
         // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View
