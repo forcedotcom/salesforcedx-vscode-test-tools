@@ -584,7 +584,7 @@ exec "${chromeExePath}" \\
     await execAsync(command);
   }
 
-    private async runTestsWithRetry(): Promise<number> {
+  private async runTestsWithRetry(): Promise<number> {
     const maxRetries = TestSetupAndRunner.MAX_RETRIES;
 
     // Setup virtual display for Ubuntu
@@ -600,7 +600,7 @@ exec "${chromeExePath}" \\
         }
 
         // Create a unique user data directory for this attempt
-        const uniqueUserDataDir = `/tmp/vscode-chrome-${Date.now()}-${attempt}-${Math.random().toString(36).substr(2, 9)}`;
+        const uniqueUserDataDir = `/tmp/vscode-chrome-${Date.now()}-${attempt}-${Math.random().toString(36).slice(2, 11)}`;
 
         // Update environment variables with unique directory
         process.env.CHROME_USER_DATA_DIR = uniqueUserDataDir;
@@ -622,7 +622,9 @@ exec "${chromeExePath}" \\
 
         // Clean up the user data directory for this attempt
         if (process.platform === 'linux') {
-          await this.execShellCommand(`rm -rf /tmp/vscode-chrome-${attempt}-* /tmp/chrome-user-data-*`).catch(() => {});
+          await this.execShellCommand(`rm -rf /tmp/vscode-chrome-${attempt}-* /tmp/chrome-user-data-*`).catch(() => {
+            console.log('Failed to clean up user data directories, continuing anyway');
+          });
         }
 
         if (attempt === maxRetries) {
@@ -662,7 +664,9 @@ exec "${chromeExePath}" \\
       }
 
       // Clean up any leftover user data directories and lock files
-      await this.execShellCommand('rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver').catch(() => {});
+      await this.execShellCommand('rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver').catch(() => {
+        console.log('Failed to clean up leftover files, continuing anyway');
+      });
 
       // Wait a moment for processes to fully terminate
       await new Promise(resolve => setTimeout(resolve, 3000));

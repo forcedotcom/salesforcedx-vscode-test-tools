@@ -15,8 +15,11 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
   await retryOperation(async () => {
     log('getTextEditor() - Attempting to open file');
     const inputBox = await executeQuickPick('Go to File...', Duration.seconds(1));
+    log('getTextEditor() - executeQuickPick() - inputBox');
     await inputBox.setText(fileName);
+    log(`getTextEditor() - executeQuickPick() - inputBox.setText(${fileName})`);
     await inputBox.confirm();
+    log('getTextEditor() - executeQuickPick() - inputBox.confirm()');
     await pause(Duration.seconds(1));
     // throwing an error here will cause the retryOperation to fail
     await checkFileOpen(workbench, fileName);
