@@ -18,12 +18,16 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     await inputBox.setText(fileName);
     await inputBox.confirm();
     await pause(Duration.seconds(1));
+    // throwing an error here will cause the retryOperation to fail
+    await checkFileOpen(workbench, fileName);
   });
   log('getTextEditor() - File opened, getting editor view');
 
   return await retryOperation(async () => {
     const editorView = workbench.getEditorView();
     const textEditor = (await editorView.openEditor(fileName)) as TextEditor;
+    // throwing an error here will cause the retryOperation to fail
+    await checkFileOpen(workbench, fileName);
     return textEditor;
   });
 }
