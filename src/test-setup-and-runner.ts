@@ -43,10 +43,30 @@ if (process.platform === 'linux') {
   log(`Early Ubuntu Chrome setup: ${ubuntuChromeArgs}`);
 }
 
+// Set Chrome-related environment variables early
+process.env.CHROME_OPTIONS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
+process.env.CHROMIUM_FLAGS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
+process.env.CHROME_BIN = '/usr/bin/google-chrome';
+process.env.CHROMIUM_BIN = '/usr/bin/google-chrome';
+
+// For Ubuntu CI environments
+if (process.platform === 'linux') {
+  // Set up virtual display for headless operation
+  process.env.DISPLAY = ':99';
+  process.env.CHROME_NO_SANDBOX = 'true';
+  process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = 'true';
+  process.env.PUPPETEER_EXECUTABLE_PATH = '/usr/bin/google-chrome';
+
+  // Additional Chrome flags for CI
+  process.env.CHROME_DEVEL_SANDBOX = '/usr/lib/chromium-browser/chrome-sandbox';
+}
+
 class TestSetupAndRunner extends ExTester {
   protected static _exTestor: TestSetupAndRunner;
   private testConfig: TestConfig;
   private spec: string | string[] | undefined;
+  private static readonly MAX_RETRIES = 3;
+  private static readonly RETRY_DELAY = 5000;
 
   constructor(
     testConfig?: Partial<TestConfig>,
@@ -315,15 +335,20 @@ exec "${chromeExePath}" \\
     log(`starting runTests with resources: ${resources}`);
     log(`starting runTests with spec: ${this.spec}`);
 
-    // Set Ubuntu Chrome arguments just before running tests
-    if (process.platform === 'linux') {
+        // Set Ubuntu Chrome arguments just before running tests
+    const isLinux = process.platform === 'linux';
+    if (isLinux) {
       await this.setupUbuntuChromeArgs();
       await this.killExistingChromeProcesses();
+
+      // Use retry mechanism for Ubuntu
+      log('Using retry mechanism for Ubuntu Chrome issues...');
+      return await this.runTestsWithRetry();
     }
 
     // Try to pass additional launch arguments for Ubuntu
     const runOptions: any = { resources };
-    if (process.platform === 'linux') {
+    if (isLinux) {
       runOptions.launchArgs = [
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
@@ -522,6 +547,129 @@ exec "${chromeExePath}" \\
     }
     TestSetupAndRunner._exTestor = new TestSetupAndRunner();
     return TestSetupAndRunner._exTestor;
+  }
+
+    private async setupVirtualDisplay(): Promise<void> {
+    if (process.platform !== 'linux') {
+      return;
+    }
+
+    try {
+      console.log('Setting up virtual display for Ubuntu...');
+
+      // Start Xvfb virtual display
+      await this.execShellCommand('Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &').catch(() => {
+        console.log('Xvfb might already be running or not available');
+      });
+
+      // Wait for display to be ready
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Verify display is working
+      await this.execShellCommand('export DISPLAY=:99 && xdpyinfo > /dev/null 2>&1').catch(() => {
+        console.log('Virtual display verification failed, continuing anyway');
+      });
+
+      console.log('Virtual display setup completed');
+
+    } catch (error) {
+      console.warn('Failed to setup virtual display:', error);
+    }
+  }
+
+  private async execShellCommand(command: string): Promise<void> {
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    const execAsync = promisify(exec);
+    await execAsync(command);
+  }
+
+    private async runTestsWithRetry(): Promise<number> {
+    const maxRetries = TestSetupAndRunner.MAX_RETRIES;
+
+    // Setup virtual display for Ubuntu
+    await this.setupVirtualDisplay();
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Running tests (attempt ${attempt}/${maxRetries})...`);
+
+        // Kill any existing Chrome processes before each attempt
+        if (process.platform === 'linux') {
+          await this.killChromeProcesses();
+        }
+
+        // Create a unique user data directory for this attempt
+        const uniqueUserDataDir = `/tmp/vscode-chrome-${Date.now()}-${attempt}-${Math.random().toString(36).substr(2, 9)}`;
+
+        // Update environment variables with unique directory
+        process.env.CHROME_USER_DATA_DIR = uniqueUserDataDir;
+
+                // Call the existing runTests method
+        const useExistingProject = EnvironmentSettings.getInstance().useExistingProject;
+        const resources = useExistingProject ? [useExistingProject] : [];
+        const exitCode = await super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
+
+        if (exitCode === 0) {
+          console.log('Tests completed successfully!');
+          return exitCode;
+        } else {
+          throw new Error(`Tests failed with exit code: ${exitCode}`);
+        }
+
+      } catch (error) {
+        console.error(`Test attempt ${attempt} failed:`, error);
+
+        // Clean up the user data directory for this attempt
+        if (process.platform === 'linux') {
+          await this.execShellCommand(`rm -rf /tmp/vscode-chrome-${attempt}-* /tmp/chrome-user-data-*`).catch(() => {});
+        }
+
+        if (attempt === maxRetries) {
+          throw error;
+        }
+
+        console.log(`Retrying in ${TestSetupAndRunner.RETRY_DELAY}ms...`);
+        await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
+      }
+    }
+
+    return 1; // Failed
+  }
+
+  private async killChromeProcesses(): Promise<void> {
+    try {
+      console.log('Killing existing Chrome processes...');
+
+      const commands = [
+        'pkill -f "chrome.*--test-type"',
+        'pkill -f "chrome.*--remote-debugging-port"',
+        'pkill -f "chrome.*--user-data-dir"',
+        'pkill -f "chrome.*--disable-dev-shm-usage"',
+        'pkill -f chromium',
+        'pkill -f google-chrome',
+        'pkill -f chrome',
+        'pkill -f "Code.*--extensionDevelopmentPath"',
+        'pkill -f "code.*--extensionDevelopmentPath"'
+      ];
+
+      for (const cmd of commands) {
+        try {
+          await this.execShellCommand(cmd);
+        } catch (error) {
+          // Ignore errors - processes might not exist
+        }
+      }
+
+      // Clean up any leftover user data directories and lock files
+      await this.execShellCommand('rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver').catch(() => {});
+
+      // Wait a moment for processes to fully terminate
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+    } catch (error) {
+      console.warn('Failed to kill Chrome processes:', error);
+    }
   }
 }
 
