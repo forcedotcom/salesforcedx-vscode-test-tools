@@ -293,4 +293,5 @@ export async function openFile(path: string) {
   await pause(Duration.seconds(2));
   const fileName = path.substring(path.lastIndexOf(process.platform === 'win32' ? '\\' : '/') + 1);
   await prompt.selectQuickPick(fileName);
+  await pause(Duration.seconds(5)); // wait for the file to open
 }
