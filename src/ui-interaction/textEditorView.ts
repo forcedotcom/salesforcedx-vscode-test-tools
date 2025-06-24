@@ -87,3 +87,13 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
   await textEditor.save();
   await pause(Duration.seconds(1));
 }
+
+export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string) {
+  await retryOperation(async () => {
+    const lens = await textEditor.getCodeLens(codeLensName);
+    if (!lens) {
+        throw new Error(`Code lens ${codeLensName} not found`);
+    }
+    return lens;
+  });
+}
