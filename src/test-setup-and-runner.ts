@@ -335,15 +335,15 @@ exec "${chromeExePath}" \\
     log(`starting runTests with resources: ${resources}`);
     log(`starting runTests with spec: ${this.spec}`);
 
-        // Set Ubuntu Chrome arguments just before running tests
+    // Set Ubuntu Chrome arguments just before running tests
     const isLinux = process.platform === 'linux';
     if (isLinux) {
       await this.setupUbuntuChromeArgs();
       await this.killExistingChromeProcesses();
 
-      // Use retry mechanism for Ubuntu
-      log('Using retry mechanism for Ubuntu Chrome issues...');
-      return await this.runTestsWithRetry();
+      // Use Ubuntu-specific test runner
+      log('Using Ubuntu-specific test runner...');
+      return await this.runTestsUbuntu();
     }
 
     // Try to pass additional launch arguments for Ubuntu
@@ -586,60 +586,35 @@ exec "${chromeExePath}" \\
     await execAsync(command);
   }
 
-  private async runTestsWithRetry(): Promise<number> {
-    const maxRetries = TestSetupAndRunner.MAX_RETRIES;
-
+  private async runTestsUbuntu(): Promise<number> {
     // Setup virtual display for Ubuntu
     await this.setupVirtualDisplay();
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Running tests (attempt ${attempt}/${maxRetries})...`);
+    console.log('Running tests...');
 
-        // Kill any existing Chrome processes before each attempt
-        if (process.platform === 'linux') {
-          await this.killChromeProcesses();
-        }
-
-        // Create a unique user data directory for this attempt
-        const uniqueUserDataDir = `/tmp/vscode-chrome-${Date.now()}-${attempt}-${Math.random().toString(36).slice(2, 11)}`;
-
-        // Update environment variables with unique directory
-        process.env.CHROME_USER_DATA_DIR = uniqueUserDataDir;
-
-                // Call the existing runTests method
-        const useExistingProject = EnvironmentSettings.getInstance().useExistingProject;
-        const resources = useExistingProject ? [useExistingProject] : [];
-        const exitCode = await super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
-
-        if (exitCode === 0) {
-          await this.validateTestExecution(exitCode);
-          console.log('Tests completed successfully!');
-          return exitCode;
-        } else {
-          throw new Error(`Tests failed with exit code: ${exitCode}`);
-        }
-
-      } catch (error) {
-        console.error(`Test attempt ${attempt} failed:`, error);
-
-        // Clean up the user data directory for this attempt
-        if (process.platform === 'linux') {
-          await this.execShellCommand(`rm -rf /tmp/vscode-chrome-${attempt}-* /tmp/chrome-user-data-*`).catch(() => {
-            console.log('Failed to clean up user data directories, continuing anyway');
-          });
-        }
-
-        if (attempt === maxRetries) {
-          throw error;
-        }
-
-        console.log(`Retrying in ${TestSetupAndRunner.RETRY_DELAY}ms...`);
-        await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
-      }
+    // Kill any existing Chrome processes before running
+    if (process.platform === 'linux') {
+      await this.killChromeProcesses();
     }
 
-    return 1; // Failed
+    // Create a unique user data directory
+    const uniqueUserDataDir = `/tmp/vscode-chrome-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+    // Update environment variables with unique directory
+    process.env.CHROME_USER_DATA_DIR = uniqueUserDataDir;
+
+    // Call the existing runTests method
+    const useExistingProject = EnvironmentSettings.getInstance().useExistingProject;
+    const resources = useExistingProject ? [useExistingProject] : [];
+    const exitCode = await super.runTests(this.spec || EnvironmentSettings.getInstance().specFiles, { resources });
+
+    await this.validateTestExecution(exitCode);
+
+    if (exitCode === 0) {
+      console.log('Tests completed successfully!');
+    }
+
+    return exitCode;
   }
 
   /**
