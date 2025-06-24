@@ -54,7 +54,7 @@ describe('Run Apex Tests', () => {
     try {
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -93,7 +93,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -139,7 +139,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -184,7 +184,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -231,7 +231,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -291,7 +291,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -393,7 +393,7 @@ describe('Run Apex Tests', () => {
     try {
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -420,7 +420,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -457,7 +457,7 @@ describe('Run Apex Tests', () => {
     try {
       successPushNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successPushNotification2WasFound).to.equal(true);
     } catch (error) {
@@ -483,7 +483,7 @@ describe('Run Apex Tests', () => {
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
     const successNotification2WasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Run Apex Tests successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotification2WasFound).to.equal(true);
 
@@ -528,7 +528,7 @@ describe('Run Apex Tests', () => {
     // Look for the success notification that appears which says, "SFDX: Build Apex Test Suite successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Build Apex Test Suite successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
   });
@@ -557,7 +557,7 @@ describe('Run Apex Tests', () => {
     // Look for the success notification that appears which says, "SFDX: Build Apex Test Suite successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Build Apex Test Suite successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
   });
@@ -578,7 +578,7 @@ describe('Run Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {

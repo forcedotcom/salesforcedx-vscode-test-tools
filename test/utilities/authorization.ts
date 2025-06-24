@@ -108,12 +108,12 @@ export async function createDefaultScratchOrg(): Promise<string> {
 
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
     /SFDX: Create a Default Scratch Org\.\.\. successfully ran/,
-    utilities.Duration.TEN_MINUTES
+    utilities.Duration.FIVE_MINUTES
   );
   if (successNotificationWasFound !== true) {
     const failureNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Create a Default Scratch Org\.\.\. failed to run/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     if (failureNotificationWasFound === true) {
       if (

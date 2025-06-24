@@ -272,7 +272,7 @@ describe('Push and Pull', () => {
     // Look for the success notification.
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Set a Default Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     if (!successNotificationWasFound) {
       throw new Error(
@@ -314,7 +314,7 @@ describe('Push and Pull', () => {
   ): Promise<string | undefined> => {
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       new RegExp(`SFDX: ${operation} Source ${fromTo} Default Org successfully ran`),
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
     // Check the output.
@@ -339,7 +339,7 @@ describe('Push and Pull', () => {
   };
 });
 
-async function verifyPushSuccess(wait = utilities.Duration.TEN_MINUTES) {
+async function verifyPushSuccess(wait = utilities.Duration.FIVE_MINUTES) {
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
     /SFDX: Push Source to Default Org successfully ran/,
     wait
@@ -347,7 +347,7 @@ async function verifyPushSuccess(wait = utilities.Duration.TEN_MINUTES) {
   expect(successNotificationWasFound).to.equal(true);
 }
 
-async function verifyPullSuccess(wait = utilities.Duration.TEN_MINUTES) {
+async function verifyPullSuccess(wait = utilities.Duration.FIVE_MINUTES) {
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
     /SFDX: Pull Source from Default Org successfully ran/,
     wait

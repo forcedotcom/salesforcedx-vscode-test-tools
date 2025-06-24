@@ -22,7 +22,7 @@ import { expect } from 'chai';
  */
 export const verifyNotificationWithRetry = async (
   notificationPattern: RegExp,
-  wait = Duration.TEN_MINUTES,
+  wait = Duration.FIVE_MINUTES,
   methodToRunForEachTry?: () => Promise<void>
 ) => {
   try {

@@ -89,7 +89,7 @@ export async function runTestCaseFromSideBar(
     try {
       successNotificationWasFound = await notificationIsPresentWithTimeout(
         /SFDX: Run Apex Tests successfully ran/,
-        Duration.TEN_MINUTES
+        Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {

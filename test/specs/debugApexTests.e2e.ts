@@ -46,14 +46,14 @@ describe('Debug Apex Tests', () => {
     try {
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     } catch (error) {
       await utilities.getWorkbench().openNotificationsCenter();
       successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successPushNotificationWasFound).to.equal(true);
     }
@@ -86,7 +86,7 @@ describe('Debug Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /Debug Test\(s\) successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -120,7 +120,7 @@ describe('Debug Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /Debug Test\(s\) successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -161,7 +161,7 @@ describe('Debug Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /Debug Test\(s\) successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {
@@ -199,7 +199,7 @@ describe('Debug Apex Tests', () => {
     try {
       successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /Debug Test\(s\) successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
     } catch (error) {

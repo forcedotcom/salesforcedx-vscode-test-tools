@@ -36,7 +36,7 @@ export const validateCommand = async (
   try {
     successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
   } catch (error) {

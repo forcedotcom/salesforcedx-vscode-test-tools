@@ -408,7 +408,7 @@ describe('Templates', () => {
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Create Sample Analytics Template successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
