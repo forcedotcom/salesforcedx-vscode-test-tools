@@ -22,7 +22,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     log('getTextEditor() - executeQuickPick() - inputBox.confirm()');
     await pause(Duration.seconds(1));
     // throwing an error here will cause the retryOperation to fail
-    await checkFileOpen(workbench, fileName);
+    await waitForFileOpen(workbench, fileName);
   });
   log('getTextEditor() - File opened, getting editor view');
 
@@ -30,7 +30,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     const editorView = workbench.getEditorView();
     const textEditor = (await editorView.openEditor(fileName)) as TextEditor;
     // throwing an error here will cause the retryOperation to fail
-    await checkFileOpen(workbench, fileName);
+    await waitForFileOpen(workbench, fileName);
     return textEditor;
   });
 }
@@ -63,6 +63,67 @@ export async function checkFileOpen(
     options.msg ?? `Expected to find file ${name} open in TextEditor before ${options.timeout}`,
     500 // Check every 500 ms
   );
+}
+
+/**
+ * Waits for a file to be open in the editor with a 30-second timeout
+ * @param workbench - The VSCode workbench instance
+ * @param fileName - Name of the file to wait for
+ * @returns Promise that resolves when file is open or rejects on timeout
+ */
+export async function waitForFileOpen(workbench: Workbench, fileName: string): Promise<void> {
+  const timeout = 30_000; // 30 seconds
+  const checkInterval = 500; // Check every 500ms
+  const startTime = Date.now();
+  const endTime = startTime + timeout;
+  let attemptCount = 0;
+
+  log(`waitForFileOpen() - Starting wait for file: ${fileName}`);
+  log(`waitForFileOpen() - Timeout: ${timeout}ms, Check interval: ${checkInterval}ms`);
+
+  while (Date.now() < endTime) {
+    attemptCount++;
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - startTime;
+    const remainingTime = endTime - currentTime;
+
+    log(`waitForFileOpen() - Attempt ${attemptCount}, Elapsed: ${elapsedTime}ms, Remaining: ${remainingTime}ms`);
+
+    try {
+      const editorView = workbench.getEditorView();
+      log(`waitForFileOpen() - Got editor view`);
+
+      const activeTab = await editorView.getActiveTab();
+      log(`waitForFileOpen() - Got active tab: ${activeTab ? 'exists' : 'null'}`);
+
+      if (activeTab) {
+        const tabTitle = await activeTab.getTitle();
+        log(`waitForFileOpen() - Active tab title: "${tabTitle}", Expected: "${fileName}"`);
+
+        if (tabTitle === fileName) {
+          log(`waitForFileOpen() - SUCCESS: File ${fileName} is now open in editor after ${elapsedTime}ms and ${attemptCount} attempts`);
+          return; // File is open, success!
+        } else {
+          log(`waitForFileOpen() - File not matched, continuing to wait...`);
+        }
+      } else {
+        log(`waitForFileOpen() - No active tab found, continuing to wait...`);
+      }
+    } catch (error) {
+      // Continue checking if there's an error getting editor state
+      log(`waitForFileOpen() - Error checking file open status (attempt ${attemptCount}): ${error}`);
+    }
+
+    // Wait before next check
+    log(`waitForFileOpen() - Waiting ${checkInterval}ms before next check...`);
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+  }
+
+  // If we reach here, timeout occurred
+  const totalElapsed = Date.now() - startTime;
+  const errorMsg = `Timeout: File ${fileName} was not found open in editor after ${totalElapsed}ms (${attemptCount} attempts)`;
+  log(`waitForFileOpen() - TIMEOUT: ${errorMsg}`);
+  throw new Error(errorMsg);
 }
 
 /**
