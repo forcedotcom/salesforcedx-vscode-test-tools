@@ -150,11 +150,14 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
 }
 
 export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
+  log(`waitForAndGetCodeLens() - Waiting for code lens: ${codeLensName}`);
   return await retryOperation(async () => {
     const lens = await textEditor.getCodeLens(codeLensName);
     if (!lens) {
-        throw new Error(`Code lens ${codeLensName} not found`);
+      log(`waitForAndGetCodeLens() - Code lens ${codeLensName} NOT FOUND`);
+      throw new Error(`Code lens ${codeLensName} not found`);
     }
+    log(`waitForAndGetCodeLens() - Code lens ${codeLensName} found`);
     return lens;
   });
 }
