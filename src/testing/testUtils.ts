@@ -1,10 +1,9 @@
 import { By, DebugToolbar, SideBarView, TreeItem, ViewSection, Workbench } from 'vscode-extension-tester';
 import { expect } from 'chai';
-import { notificationIsPresentWithTimeout } from '../ui-interaction/notifications';
 import { attemptToFindOutputPanelText } from '../ui-interaction/outputView';
 import { getTerminalViewText } from '../ui-interaction/terminalView';
 import { Duration, log, pause } from '../core/miscellaneous';
-import { retryOperation } from '../retryUtils';
+import { retryOperation, verifyNotificationWithRetry } from '../retryUtils';
 
 export async function retrieveExpectedNumTestsFromSidebar(
   expectedNumTests: number,
@@ -86,21 +85,11 @@ export async function runTestCaseFromSideBar(
   let testResult: string | undefined;
   if (testSuite === 'Apex Tests') {
     // Look for the success notification that appears which says, "SFDX: Run Apex Tests successfully ran".
-    let successNotificationWasFound;
-    try {
-      successNotificationWasFound = await notificationIsPresentWithTimeout(
+    await verifyNotificationWithRetry(
         /SFDX: Run Apex Tests successfully ran/,
         Duration.TEN_MINUTES
       );
-      expect(successNotificationWasFound).to.equal(true);
-    } catch (error) {
-      await workbench.openNotificationsCenter();
-      successNotificationWasFound = await notificationIsPresentWithTimeout(
-        /SFDX: Run Apex Tests successfully ran/,
-        Duration.ONE_MINUTE
-      );
-      expect(successNotificationWasFound).to.equal(true);
-    }
+
     testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
   } else if (testSuite === 'LWC Tests') {
     testResult = await getTerminalViewText(workbench, 15);

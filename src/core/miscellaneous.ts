@@ -9,14 +9,13 @@ import os from 'os';
 import { EnvironmentSettings } from '../environmentSettings';
 import { attemptToFindOutputPanelText, clearOutputView } from '../ui-interaction/outputView';
 import { clickFilePathOkButton, executeQuickPick, findQuickPickItem } from '../ui-interaction/commandPrompt';
-import { notificationIsPresentWithTimeout } from '../ui-interaction/notifications';
 import * as DurationKit from '@salesforce/kit';
 import path from 'path';
 import { PredicateWithTimeout } from '../testing/predicates';
 import { By, WebElement } from 'vscode-extension-tester';
 import { getBrowser, getWorkbench } from '../ui-interaction/workbench';
 import { expect } from 'chai';
-import { retryOperation } from '../retryUtils';
+import { retryOperation, verifyNotificationWithRetry } from '../retryUtils';
 import { clickButtonOnModalDialog } from '../ui-interaction';
 
 /**
@@ -149,12 +148,10 @@ export async function createCommand(
   // Select the default directory (press Enter/Return).
   await inputBox.confirm();
 
-  const successNotificationWasFound = await notificationIsPresentWithTimeout(
+  await verifyNotificationWithRetry(
     new RegExp(`SFDX: Create ${type} successfully ran`),
     Duration.minutes(10)
   );
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(successNotificationWasFound).to.equal(true);
 
   const outputPanelText = await attemptToFindOutputPanelText(`Salesforce CLI`, `Finished SFDX: Create ${type}`, 10);
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions

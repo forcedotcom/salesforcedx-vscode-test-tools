@@ -5,11 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { expect } from 'chai';
 import { fail } from 'assert';
 import { log } from 'console';
-import { executeQuickPick, notificationIsPresentWithTimeout, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText, getWorkbench } from '../ui-interaction';
+import { executeQuickPick, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText } from '../ui-interaction';
 import { Duration } from '../core/miscellaneous';
+import { verifyNotificationWithRetry } from '../retryUtils';
 
 /**
  * Runs a Salesforce deployment or retrieval command and validates the results
@@ -44,21 +44,11 @@ export const validateCommand = async (
 ): Promise<void> => {
   log(`validateCommand()`);
 
-  let successNotificationWasFound;
-  try {
-    successNotificationWasFound = await notificationIsPresentWithTimeout(
-      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
-      Duration.TEN_MINUTES
-    );
-    expect(successNotificationWasFound).to.equal(true);
-  } catch (error) {
-    await getWorkbench().openNotificationsCenter();
-    successNotificationWasFound = await notificationIsPresentWithTimeout(
-      new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
-      Duration.ONE_MINUTE
-    );
-    expect(successNotificationWasFound).to.equal(true);
-  }
+  await verifyNotificationWithRetry(
+    new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
+    Duration.minutes(10)
+  );
+
 
   // Verify Output tab
   const outputPanelText = await attemptToFindOutputPanelText(
@@ -67,7 +57,11 @@ export const validateCommand = async (
     10
   );
 
-  log(`${operation} time ${operationType}: ` + (await getOperationTime(outputPanelText!)));
+  if (!outputPanelText) {
+    fail('No output panel text found');
+  }
+
+  log(`${operation} time ${operationType}: ` + (await getOperationTime(outputPanelText)));
 
   const pathSeparator = process.platform === 'win32' ? '\\' : '/';
   const longestFullName = fullNames.reduce((a, b) => (a.length > b.length ? a : b), '');

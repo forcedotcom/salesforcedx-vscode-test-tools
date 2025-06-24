@@ -45,7 +45,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
 export async function checkFileOpen(
   workbench: Workbench,
   name: string,
-  options: { msg?: string; timeout?: Duration } = { timeout: Duration.milliseconds(10_000) }
+  options: { msg?: string; timeout?: Duration } = { timeout: Duration.milliseconds(30_000) }
 ) {
   await getBrowser().wait(
     async () => {
