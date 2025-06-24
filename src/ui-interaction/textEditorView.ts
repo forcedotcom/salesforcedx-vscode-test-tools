@@ -1,4 +1,4 @@
-import { By, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
+import { By, CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
@@ -88,8 +88,8 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
   await pause(Duration.seconds(1));
 }
 
-export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string) {
-  await retryOperation(async () => {
+export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
+  return await retryOperation(async () => {
     const lens = await textEditor.getCodeLens(codeLensName);
     if (!lens) {
         throw new Error(`Code lens ${codeLensName} not found`);
