@@ -163,7 +163,7 @@ describe('Create OpenAPI v3 Specifications', () => {
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
         if (process.platform === 'win32') {
-          await utilities.pause(utilities.Duration.seconds(10));
+          await utilities.pause(utilities.Duration.seconds(20));
         }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: CaseManager\./);
 
@@ -381,7 +381,7 @@ describe('Create OpenAPI v3 Specifications', () => {
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
         if (process.platform === 'win32') {
-          await utilities.pause(utilities.Duration.seconds(10));
+          await utilities.pause(utilities.Duration.seconds(20));
         }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: SimpleAccountResource\./);
 
