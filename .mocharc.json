@@ -1,5 +1,5 @@
 {
-  "timeout": 300000,
+  "timeout": 720000,
   "reporter": "spec",
   "screenshotOnFail": true,
   "screenshotPath": "./test-screenshots/"

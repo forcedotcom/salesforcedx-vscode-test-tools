@@ -19,7 +19,7 @@ import {
  */
 export const verifyNotificationWithRetry = async (
   notificationPattern: RegExp,
-  wait = Duration.TEN_MINUTES,
+  wait = Duration.minutes(3),
   methodToRunForEachTry?: () => Promise<void>
 ) => {
   return await retryOperation(async () => {
