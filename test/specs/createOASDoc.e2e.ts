@@ -162,7 +162,9 @@ describe('Create OpenAPI v3 Specifications', () => {
         await utilities.pause(utilities.Duration.seconds(5));
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
-
+        if (process.platform === 'win32') {
+          await utilities.pause(utilities.Duration.seconds(20));
+        }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: CaseManager\./);
 
         // Verify the generated OAS doc is open in the Editor View
@@ -334,7 +336,6 @@ describe('Create OpenAPI v3 Specifications', () => {
         `${testSetup.testSuiteSuffixName} - Add "decomposeExternalServiceRegistrationBeta" setting to sfdx-project.json`
       );
       const workbench = utilities.getWorkbench();
-      await utilities.openFile(path.join(testSetup.projectFolderPath!, 'sfdx-project.json'));
       const textEditor = await utilities.getTextEditor(workbench, 'sfdx-project.json');
       const newSfdxProjectJsonContents = [
         `{`,
@@ -379,7 +380,9 @@ describe('Create OpenAPI v3 Specifications', () => {
         await utilities.pause(utilities.Duration.seconds(5));
         prompt = await utilities.executeQuickPick('SFDX: Create OpenAPI Document from This Class (Beta)');
         await prompt.confirm();
-
+        if (process.platform === 'win32') {
+          await utilities.pause(utilities.Duration.seconds(20));
+        }
         await verifyNotificationWithRetry(/OpenAPI Document created for class: SimpleAccountResource\./);
 
         // Verify both the YAML and XML files of the generated OAS doc are open in the Editor View

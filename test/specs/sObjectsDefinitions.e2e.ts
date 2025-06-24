@@ -70,7 +70,7 @@ describe('SObjects Definitions', () => {
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Push Source to Default Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
@@ -155,7 +155,7 @@ async function refreshSObjectDefinitions(type: string): Promise<void> {
 
   const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
     /SFDX: Refresh SObject Definitions successfully ran/,
-    utilities.Duration.TEN_MINUTES
+    utilities.Duration.FIVE_MINUTES
   );
   expect(successNotificationWasFound).to.equal(true);
 }

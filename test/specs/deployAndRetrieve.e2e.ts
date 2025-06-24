@@ -42,7 +42,7 @@ describe('Deploy and Retrieve', () => {
     const workbench = utilities.getWorkbench();
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Create Apex Class successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
@@ -323,7 +323,7 @@ describe('Deploy and Retrieve', () => {
     expect(accepted).to.equal(true);
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Delete from Project and Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
@@ -371,14 +371,14 @@ describe('Deploy and Retrieve', () => {
       try {
         successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
           /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-          utilities.Duration.TEN_MINUTES
+          utilities.Duration.FIVE_MINUTES
         );
         expect(successPushNotificationWasFound).to.equal(true);
       } catch (error) {
         await utilities.getWorkbench().openNotificationsCenter();
         successPushNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
           /SFDX: Push Source to Default Org and Ignore Conflicts successfully ran/,
-          utilities.Duration.TEN_MINUTES
+          utilities.Duration.FIVE_MINUTES
         );
         expect(successPushNotificationWasFound).to.equal(true);
       }
@@ -415,7 +415,7 @@ describe('Deploy and Retrieve', () => {
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Delete from Project and Org successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
 
@@ -486,7 +486,7 @@ describe('Deploy and Retrieve', () => {
 
       const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
         /SFDX: Delete from Project and Org successfully ran/,
-        utilities.Duration.TEN_MINUTES
+        utilities.Duration.FIVE_MINUTES
       );
       expect(successNotificationWasFound).to.equal(true);
 

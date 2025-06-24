@@ -91,7 +91,7 @@ describe('Authentication', () => {
     // Look for the notification that appears which says, "SFDX: Set a Default Org successfully ran".
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Set a Default Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
@@ -127,7 +127,7 @@ describe('Authentication', () => {
 
     const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
       /SFDX: Set a Default Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
+      utilities.Duration.FIVE_MINUTES
     );
     expect(successNotificationWasFound).to.equal(true);
 
