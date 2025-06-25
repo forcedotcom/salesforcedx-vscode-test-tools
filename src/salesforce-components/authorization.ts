@@ -14,8 +14,10 @@ import {
   orgDisplay,
   orgList,
   orgLoginSfdxUrl,
-  runCliCommand} from '../system-operations/cliCommands';
-import { attemptToFindOutputPanelText, executeQuickPick, getWorkbench } from '../ui-interaction';
+  runCliCommand,
+  scratchOrgCreate
+} from '../system-operations/cliCommands';
+import { attemptToFindOutputPanelText, executeQuickPick } from '../ui-interaction';
 import { verifyNotificationWithRetry, retryOperation } from '../retryUtils';
 
 /**
@@ -25,7 +27,7 @@ import { verifyNotificationWithRetry, retryOperation } from '../retryUtils';
  */
 export async function setUpScratchOrg(testSetup: TestSetup) {
   await authorizeDevHub(testSetup);
-  await createDefaultScratchOrg();
+  return await createDefaultScratchOrgViaCli(testSetup);
 }
 
 /**
@@ -93,6 +95,29 @@ export async function verifyAliasAndUserName() {
     `Error: matching devHub alias '${devHubAliasName}' and devHub user name '${devHubUserName}' was not found.\nPlease consult README.md and make sure DEV_HUB_ALIAS_NAME and DEV_HUB_USER_NAME are set correctly.`
   );
 }
+
+const buildAlias = () => {
+  const currentDate = new Date();
+  const ticks = currentDate.getTime();
+  const day = ('0' + currentDate.getDate()).slice(-2);
+  const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+  const year = currentDate.getFullYear();
+  const currentOsUserName = transformedUserName();
+  return `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+};
+
+export const createDefaultScratchOrgViaCli = async (testSetup: TestSetup): Promise<TestSetup> => {
+  const scratchOrgAliasName = buildAlias();
+  testSetup.scratchOrgAliasName = scratchOrgAliasName;
+  const orgCreateResult = await scratchOrgCreate('developer', 'NONE', testSetup.scratchOrgAliasName, 1);
+  if (orgCreateResult.exitCode > 0) {
+    throw new Error(
+      `Error: creating scratch org failed with exit code ${orgCreateResult.exitCode}\n stderr ${orgCreateResult.stderr}`
+    );
+  }
+  testSetup.scratchOrgId = JSON.parse(orgCreateResult.stdout).result.id;
+  return testSetup;
+};
 
 /**
  * Creates a default scratch org for testing

@@ -61,7 +61,9 @@ export class TestSetup {
       await verifyExtensionsAreRunning(testSetup.getExtensionsToVerify());
 
       if (process.platform === 'darwin') testSetup.setJavaHomeConfigEntry(); // Extra config needed for Apex LSP on GHA
-      if (testReqConfig.isOrgRequired) await setUpScratchOrg(testSetup);
+      if (testReqConfig.isOrgRequired) {
+        await setUpScratchOrg(testSetup);
+      }
       await reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
     testSetup.setWorkbenchHoverDelay();
