@@ -93,8 +93,47 @@ export async function waitForFileOpen(workbench: Workbench, fileName: string): P
       const editorView = workbench.getEditorView();
       log(`waitForFileOpen() - Got editor view`);
 
-      const activeTab = await editorView.getActiveTab();
-      log(`waitForFileOpen() - Got active tab: ${activeTab ? 'exists' : 'null'}`);
+      // Try to get the active tab with a shorter timeout
+      let activeTab;
+      try {
+        // Use a promise race to implement our own timeout for getActiveTab
+        activeTab = await Promise.race([
+          editorView.getActiveTab(),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('getActiveTab timeout')), 5000)
+          )
+        ]);
+      } catch (tabError) {
+        log(`waitForFileOpen() - getActiveTab failed: ${tabError}`);
+
+        // Try alternative approach: check if any tabs exist
+        try {
+          const tabs = await editorView.getOpenTabs();
+          log(`waitForFileOpen() - Found ${tabs.length} open tabs`);
+          if (tabs.length > 0) {
+            // Try to find our target file in the open tabs
+            for (const tab of tabs) {
+              try {
+                const tabTitle = await tab.getTitle();
+                log(`waitForFileOpen() - Checking tab: "${tabTitle}"`);
+                if (tabTitle === fileName) {
+                  log(`waitForFileOpen() - SUCCESS: Found target file in open tabs after ${elapsedTime}ms and ${attemptCount} attempts`);
+                  return;
+                }
+              } catch (titleError) {
+                log(`waitForFileOpen() - Error getting tab title: ${titleError}`);
+              }
+            }
+          }
+        } catch (tabsError) {
+          log(`waitForFileOpen() - Error getting open tabs: ${tabsError}`);
+        }
+
+        // Continue to next iteration if all approaches failed
+        log(`waitForFileOpen() - All tab approaches failed, continuing to wait...`);
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+        continue;
+      }
 
       if (activeTab) {
         const tabTitle = await activeTab.getTitle();
