@@ -23,7 +23,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     await pause(Duration.seconds(1));
     // throwing an error here will cause the retryOperation to fail
     await waitForFileOpen(workbench, fileName);
-  });
+  }, 3);
   log('getTextEditor() - File opened, getting editor view');
 
   return await retryOperation(async () => {
@@ -32,7 +32,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
     // throwing an error here will cause the retryOperation to fail
     await waitForFileOpen(workbench, fileName);
     return textEditor;
-  });
+  }, 3);
 }
 
 /**
@@ -72,7 +72,7 @@ export async function checkFileOpen(
  * @returns Promise that resolves when file is open or rejects on timeout
  */
 export async function waitForFileOpen(workbench: Workbench, fileName: string): Promise<void> {
-  const timeout = 30_000; // 30 seconds
+  const timeout = 20_000; // 20 seconds
   const checkInterval = 500; // Check every 500ms
   const startTime = Date.now();
   const endTime = startTime + timeout;
@@ -159,5 +159,5 @@ export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName
     }
     log(`waitForAndGetCodeLens() - Code lens ${codeLensName} found`);
     return lens;
-  });
+  }, 3);
 }
