@@ -75,6 +75,16 @@ async function verifyAliasAndUserName() {
   );
 }
 
+const buildAlias = () => {
+  const currentDate = new Date();
+  const ticks = currentDate.getTime();
+  const day = ('0' + currentDate.getDate()).slice(-2);
+  const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+  const year = currentDate.getFullYear();
+  const currentOsUserName = utilities.transformedUserName();
+  return `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+};
+
 export async function createDefaultScratchOrg(): Promise<string> {
   const prompt = await utilities.executeQuickPick(
     'SFDX: Create a Default Scratch Org...',
@@ -84,14 +94,7 @@ export async function createDefaultScratchOrg(): Promise<string> {
   // Select a project scratch definition file (config/project-scratch-def.json)
   await prompt.confirm();
 
-  // Enter an org alias - yyyy-mm-dd-username-ticks
-  const currentDate = new Date();
-  const ticks = currentDate.getTime();
-  const day = ('0' + currentDate.getDate()).slice(-2);
-  const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
-  const year = currentDate.getFullYear();
-  const currentOsUserName = utilities.transformedUserName();
-  const scratchOrgAliasName = `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+  const scratchOrgAliasName = buildAlias();
 
   await prompt.setText(scratchOrgAliasName);
   await utilities.pause(utilities.Duration.seconds(1));
