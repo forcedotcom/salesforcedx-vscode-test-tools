@@ -13,7 +13,7 @@ import { expect } from 'chai';
 
 export async function setUpScratchOrg(testSetup: TestSetup) {
   await authorizeDevHub(testSetup);
-  await createDefaultScratchOrg();
+  await createDefaultScratchOrgViaCli(testSetup);
 }
 
 export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
@@ -75,6 +75,29 @@ async function verifyAliasAndUserName() {
   );
 }
 
+const buildAlias = () => {
+  const currentDate = new Date();
+  const ticks = currentDate.getTime();
+  const day = ('0' + currentDate.getDate()).slice(-2);
+  const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+  const year = currentDate.getFullYear();
+  const currentOsUserName = utilities.transformedUserName();
+  return `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+};
+
+export const createDefaultScratchOrgViaCli = async (testSetup: TestSetup): Promise<TestSetup> => {
+  const scratchOrgAliasName = buildAlias();
+  testSetup.scratchOrgAliasName = scratchOrgAliasName;
+  const orgCreateResult = await utilities.scratchOrgCreate('developer', 'NONE', testSetup.scratchOrgAliasName, 1);
+  if (orgCreateResult.exitCode > 0) {
+    throw new Error(
+      `Error: creating scratch org failed with exit code ${orgCreateResult.exitCode}\n stderr ${orgCreateResult.stderr}`
+    );
+  }
+  testSetup.scratchOrgId = JSON.parse(orgCreateResult.stdout).result.id;
+  return testSetup;
+};
+
 export async function createDefaultScratchOrg(): Promise<string> {
   const prompt = await utilities.executeQuickPick(
     'SFDX: Create a Default Scratch Org...',
@@ -84,14 +107,7 @@ export async function createDefaultScratchOrg(): Promise<string> {
   // Select a project scratch definition file (config/project-scratch-def.json)
   await prompt.confirm();
 
-  // Enter an org alias - yyyy-mm-dd-username-ticks
-  const currentDate = new Date();
-  const ticks = currentDate.getTime();
-  const day = ('0' + currentDate.getDate()).slice(-2);
-  const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
-  const year = currentDate.getFullYear();
-  const currentOsUserName = utilities.transformedUserName();
-  const scratchOrgAliasName = `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+  const scratchOrgAliasName = buildAlias();
 
   await prompt.setText(scratchOrgAliasName);
   await utilities.pause(utilities.Duration.seconds(1));

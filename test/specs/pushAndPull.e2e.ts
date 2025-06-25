@@ -6,7 +6,6 @@
  */
 
 import { expect } from 'chai';
-import fs from 'fs';
 import { step } from 'mocha-steps';
 import path from 'path';
 import { after } from 'vscode-extension-tester';
@@ -15,8 +14,6 @@ import * as utilities from '../utilities/index';
 
 describe('Push and Pull', () => {
   let projectName = '';
-  let adminName = '';
-  let adminEmailAddress = '';
   let testSetup1: TestSetup;
   let testSetup2: TestSetup;
   const testReqConfig: utilities.TestReqConfig = {
@@ -215,6 +212,7 @@ describe('Push and Pull', () => {
     // Create second Project to then view Remote Changes
     // The new project will connect to the scratch org automatically on GHA, but does not work locally
     testSetup2 = await TestSetup.setUp(testReqConfig2);
+    await utilities.runCliCommand('config set', `target-org=${testSetup1.scratchOrgAliasName}`);
 
     // Run SFDX: View Changes in Default Org command to view remote changes
     await utilities.executeQuickPick('SFDX: View Changes in Default Org', utilities.Duration.seconds(5));
@@ -229,64 +227,6 @@ describe('Push and Pull', () => {
     const outputPanelText = await utilities.attemptToFindOutputPanelText(`Salesforce CLI`, `Source Status`, 10);
     expect(outputPanelText).to.not.be.undefined;
     expect(outputPanelText).to.contain(`Remote Add  ExampleApexClass1  ApexClass`);
-  });
-
-  xstep('Create an additional system admin user', async () => {
-    // Org alias format: AdminUser_yyyy_mm_dd_username_ticks__PushAndPull
-    const currentDate = new Date();
-    const ticks = currentDate.getTime();
-    const day = ('0' + currentDate.getDate()).slice(-2);
-    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
-    const year = currentDate.getFullYear();
-    const currentOsUserName = await utilities.transformedUserName();
-    adminName = `AdminUser_${year}_${month}_${day}_${currentOsUserName}_${ticks}_PushAndPull`;
-    adminEmailAddress = `${adminName}@sfdx.org`;
-    utilities.log(`PushAndPull - admin alias is ${adminName}...`);
-
-    const systemAdminUserDef = {
-      Email: adminEmailAddress,
-      Username: adminEmailAddress,
-      LastName: adminName,
-      LocaleSidKey: 'en_US',
-      EmailEncodingKey: 'UTF-8',
-      LanguageLocaleKey: 'en_US',
-      profileName: 'System Administrator',
-      generatePassword: false
-    };
-
-    const systemAdminUserDefPath = path.join(testSetup2.projectFolderPath!, 'config', 'system-admin-user-def.json');
-    fs.writeFileSync(systemAdminUserDefPath, JSON.stringify(systemAdminUserDef), 'utf8');
-
-    await utilities.createUser(systemAdminUserDefPath, testSetup1.scratchOrgAliasName);
-  });
-
-  xstep('Set the 2nd user as the default user', async () => {
-    const inputBox = await utilities.executeQuickPick('SFDX: Set a Default Org', utilities.Duration.seconds(10));
-    const scratchOrgQuickPickItemWasFound = await utilities.findQuickPickItem(inputBox, adminEmailAddress, false, true);
-    if (!scratchOrgQuickPickItemWasFound) {
-      throw new Error(`${adminEmailAddress} was not found in the the scratch org pick list`);
-    }
-
-    await utilities.pause(utilities.Duration.seconds(3));
-
-    // Look for the success notification.
-    const successNotificationWasFound = await utilities.notificationIsPresentWithTimeout(
-      /SFDX: Set a Default Org successfully ran/,
-      utilities.Duration.TEN_MINUTES
-    );
-    if (!successNotificationWasFound) {
-      throw new Error(
-        'In createDefaultScratchOrg(), the notification of "SFDX: Set a Default Org successfully ran" was not found'
-      );
-    }
-
-    // Look for adminEmailAddress in the list of status bar items.
-    const scratchOrgStatusBarItem = await utilities.getStatusBarItemWhichIncludes(adminEmailAddress);
-    if (!scratchOrgStatusBarItem) {
-      throw new Error(
-        'getStatusBarItemWhichIncludes() returned a scratchOrgStatusBarItem with a value of null (or undefined)'
-      );
-    }
   });
 
   // TODO: at this point write e2e tests for conflict detection

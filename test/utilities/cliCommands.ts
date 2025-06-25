@@ -120,6 +120,7 @@ export async function aliasList(): Promise<SfCommandRunResults> {
   return sfAliasListResult;
 }
 
+/** creates a scratch org and makes it the project default */
 export async function scratchOrgCreate(
   edition: OrgEdition,
   definitionFileOrNone: string | NONE,
@@ -135,6 +136,8 @@ export async function scratchOrgCreate(
     '--duration-days',
     durationDays.toString(),
     '--set-default',
+    '--wait',
+    '30',
     '--json',
     ...(definitionFileOrNone !== 'NONE' ? ['--definition-file', definitionFileOrNone] : [])
   ];
