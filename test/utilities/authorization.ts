@@ -13,7 +13,7 @@ import { expect } from 'chai';
 
 export async function setUpScratchOrg(testSetup: TestSetup) {
   await authorizeDevHub(testSetup);
-  await createDefaultScratchOrg();
+  await createDefaultScratchOrgViaCli(testSetup);
 }
 
 export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
@@ -83,6 +83,19 @@ const buildAlias = () => {
   const year = currentDate.getFullYear();
   const currentOsUserName = utilities.transformedUserName();
   return `TempScratchOrg_${year}_${month}_${day}_${currentOsUserName}_${ticks}_OrgAuth`;
+};
+
+export const createDefaultScratchOrgViaCli = async (testSetup: TestSetup): Promise<TestSetup> => {
+  const scratchOrgAliasName = buildAlias();
+  testSetup.scratchOrgAliasName = scratchOrgAliasName;
+  const orgCreateResult = await utilities.scratchOrgCreate('developer', 'NONE', testSetup.scratchOrgAliasName, 1);
+  if (orgCreateResult.exitCode > 0) {
+    throw new Error(
+      `Error: creating scratch org failed with exit code ${orgCreateResult.exitCode}\n stderr ${orgCreateResult.stderr}`
+    );
+  }
+  testSetup.scratchOrgId = JSON.parse(orgCreateResult.stdout).result.id;
+  return testSetup;
 };
 
 export async function createDefaultScratchOrg(): Promise<string> {
