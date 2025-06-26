@@ -25,7 +25,13 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
   log('getTextEditor() - File opened, getting editor view');
 
   const editorView = workbench.getEditorView();
-  const textEditor = (await editorView.openEditor(fileName)) as TextEditor;
+
+  // Add retry logic specifically around the openEditor call that fails
+  const textEditor = await retryOperation(async () => {
+    log('getTextEditor() - Attempting to open editor...');
+    return (await editorView.openEditor(fileName)) as TextEditor;
+  }, 3, 'Failed to open editor after retries') as TextEditor;
+
   return textEditor;
 }
 
