@@ -50,7 +50,7 @@ export const retryOperation = async <T>(
 ): Promise<T> => {
   const formatError = (error: unknown): string => {
     if (error instanceof Error) {
-      return error.message;
+      return `${error.message}${error.stack ? '\nStack trace:\n' + error.stack : ''}`;
     }
     if (typeof error === 'string') {
       return error;
