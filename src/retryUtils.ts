@@ -45,7 +45,7 @@ export const verifyNotificationWithRetry = async (
  */
 export const retryOperation = async <T>(
   operation: () => Promise<T>,
-  maxAttempts = 2,
+  maxAttempts = 3,
   errorMessage = 'Operation failed'
 ): Promise<T> => {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {

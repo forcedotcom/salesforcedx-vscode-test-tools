@@ -11,6 +11,7 @@ import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorV
 import { getWorkbench } from '../ui-interaction/workbench';
 import { retryOperation } from '../retryUtils';
 import { clickButtonOnModalDialog } from '../ui-interaction';
+import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
 
 /**
  * Creates a Lightning Web Component with the specified name
@@ -31,7 +32,7 @@ export async function createLwc(name: string): Promise<void> {
   // Set the name of the new component
   await retryOperation(async () => {
     await createComponentAndSetName(inputBox, name);
-  });
+  }, 3, 'Failed to set the name of the new component');
 
   log('createLwc() - Modify js content');
   // Modify js content
@@ -107,7 +108,10 @@ export async function createLwc(name: string): Promise<void> {
   await textEditor.toggleBreakpoint(25);
 }
 
-async function createComponentAndSetName(inputBox, name: string) {
+async function createComponentAndSetName(inputBox: InputBox | QuickOpenBox, name: string) {
+  log('createComponentAndSetName() - Setting the name of the new component');
+  await pause(Duration.seconds(2));
+  await inputBox.wait();
   await inputBox.setText(name);
   await pause(Duration.seconds(1));
   await inputBox.confirm();
