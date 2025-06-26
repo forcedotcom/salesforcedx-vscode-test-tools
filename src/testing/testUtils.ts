@@ -173,7 +173,12 @@ export async function continueDebugging(times: number, seconds = 5): Promise<voi
     // Continue with the debug session
     for (let i = 0; i < times; i++) {
       await retryOperation(async () => {
+        log('Waiting for debug toolbar to be ready...');
+        await pause(Duration.seconds(5));
+        await bar.wait();
+        log('Continuing debugging...');
         await bar.continue();
+        log('Continued debugging...');
       }, 3, 'Failed to continue debugging - continue button not found');
       await pause(Duration.seconds(seconds));
     }
