@@ -28,7 +28,7 @@ export const verifyNotificationWithRetry = async (
     }
     const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
     if (!notificationWasFound) {
-      log(`Notification ${notificationPattern} was not found, will retry...`);
+      log(`Notification ${notificationPattern} was not found`);
       await getWorkbench().openNotificationsCenter();
       throw new Error(`Notification ${notificationPattern} was not found`);
     }
