@@ -33,7 +33,7 @@ export const verifyNotificationWithRetry = async (
       throw new Error(`Notification ${notificationPattern} was not found`);
     }
     return notificationWasFound;
-  }, 3, `Failed to find notification ${notificationPattern}`);
+  }, 5, `Failed to find notification ${notificationPattern}`);
 };
 
 /**
