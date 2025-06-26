@@ -48,12 +48,26 @@ export const retryOperation = async <T>(
   maxAttempts = 3,
   errorMessage = 'Operation failed'
 ): Promise<T> => {
+  const formatError = (error: unknown): string => {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    if (typeof error === 'string') {
+      return error;
+    }
+    return JSON.stringify(error);
+  };
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await operation();
     } catch (error) {
-      if (attempt === maxAttempts) throw error;
-      log(`${errorMessage} ${JSON.stringify(error)}, trying again...`);
+      const formattedError = formatError(error);
+      if (attempt === maxAttempts) {
+        log(`${errorMessage} - Final attempt failed: ${formattedError} (after ${maxAttempts} attempts)`);
+        throw error;
+      }
+      log(`${errorMessage} - Attempt ${attempt}/${maxAttempts} failed: ${formattedError}, trying again...`);
     }
   }
   throw new Error(`${errorMessage} after ${maxAttempts} attempts`);
