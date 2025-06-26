@@ -167,7 +167,7 @@ export async function executeQuickPick(
   command: string,
   wait: Duration = Duration.seconds(1)
 ): Promise<InputBox | QuickOpenBox> {
-  debug(`executeQuickPick command: ${command}`);
+  log(`executeQuickPick command: ${command}`);
   try {
     const workbench = getWorkbench();
     const inputBox = await workbench.openCommandPrompt();
@@ -176,6 +176,7 @@ export async function executeQuickPick(
     await inputBox.setText(`>${command}`);
     await inputBox.selectQuickPick(command);
     await pause(wait);
+    log(`executeQuickPick command: ${command} - done`);
     return inputBox;
   } catch (error) {
     let errorMessage: string;

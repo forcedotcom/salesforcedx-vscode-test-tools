@@ -113,13 +113,13 @@ export async function getOperationTime(outputText: string): Promise<string> {
 }
 
 export async function clearOutputView(wait = Duration.seconds(1)) {
-  const outputView = await new BottomBarPanel().openOutputView();
   if (process.platform === 'linux') {
     // In Linux, clear the output by clicking the "Clear Output" button in the Output Tab
     // Use retry logic with longer wait for Linux due to timing issues
     log('clearOutputView() - Linux: Attempting to find and click clear button with retries');
     await retryOperation(async () => {
       log('clearOutputView() - Linux: Looking for clear button...');
+      const outputView = await new BottomBarPanel().openOutputView();
 
       // Wait a bit longer for UI to be ready on Linux
       await pause(Duration.seconds(2));

@@ -165,7 +165,11 @@ export async function verifyTestItemsInSideBar(
 }
 
 export async function continueDebugging(times: number, seconds = 5): Promise<void> {
-    const bar = await DebugToolbar.create();
+    const bar = await retryOperation(async () => {
+      log('Creating debug toolbar...');
+      return await DebugToolbar.create();
+    }, 3, 'Failed to create debug toolbar after retries');
+
     // Continue with the debug session
     for (let i = 0; i < times; i++) {
       await retryOperation(async () => {
