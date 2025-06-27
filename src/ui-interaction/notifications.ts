@@ -140,7 +140,12 @@ async function findNotification(
   const timeoutMessage = `Notification with message "${message}" ${shouldBePresent ? 'not found' : 'still present'} within the specified timeout of ${timeout.seconds} seconds.`;
 
   const getMatchingNotification = async (): Promise<Notification | null> => {
-    await workbench.openNotificationsCenter();
+    try {
+      await workbench.openNotificationsCenter();
+    } catch (error) {
+      log(`Error opening notifications center: ${error}`);
+      await executeQuickPick('Notifications: Show Notifications');
+    }
     const notifications = await workbench.getNotifications();
     for (const notification of notifications) {
       const notificationMessage = await notification.getMessage();
