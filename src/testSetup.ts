@@ -67,6 +67,7 @@ export class TestSetup {
       await reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
     testSetup.setWorkbenchHoverDelay();
+    testSetup.setMaximumWindowSize();
     core.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
     return testSetup;
   }
@@ -292,5 +293,24 @@ export class TestSetup {
 
     fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
     core.log(`${this.testSuiteSuffixName} - Set 'workbench.hover.delay' to '300000' in ${vscodeSettingsPath}`);
+  }
+
+  private setMaximumWindowSize(): void {
+    const vscodeSettingsPath = path.join(this.projectFolderPath!, '.vscode', 'settings.json');
+
+    if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
+      fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
+    }
+
+    let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
+
+    // Update settings to set window.newWindowDimensions
+    settings = {
+      ...settings,
+      'window.newWindowDimensions': 'maximized'
+    };
+
+    fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    core.log(`${this.testSuiteSuffixName} - Set 'window.newWindowDimensions' to 'maximized' in ${vscodeSettingsPath}`);
   }
 }
