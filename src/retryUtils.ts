@@ -6,7 +6,7 @@
  */
 import { Duration, log } from './core';
 import {
-  getWorkbench,
+  executeQuickPick,
   notificationIsPresentWithTimeout
 } from './ui-interaction';
 
@@ -29,7 +29,7 @@ export const verifyNotificationWithRetry = async (
     const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
     if (!notificationWasFound) {
       log(`Notification ${notificationPattern} was not found`);
-      await getWorkbench().openNotificationsCenter();
+      await executeQuickPick('Notifications: Show Notifications');
       throw new Error(`Notification ${notificationPattern} was not found`);
     }
     return notificationWasFound;
