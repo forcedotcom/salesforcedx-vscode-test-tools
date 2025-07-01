@@ -188,21 +188,21 @@ export async function scratchOrgCreate(
     ...(definitionFileOrNone !== 'NONE' ? ['--definition-file', definitionFileOrNone] : [])
   ];
 
-  const sfOrgCreateResult: SfCommandRunResults = await retryOperation(async () => {
-    return await runCliCommand('org:create:scratch', ...args);
+  return await retryOperation(async () => {
+    const sfOrgCreateResult: SfCommandRunResults = await runCliCommand('org:create:scratch', ...args);
+
+    if (sfOrgCreateResult.exitCode > 0) {
+      log(
+        `create scratch org failed. Exit code: ${sfOrgCreateResult.exitCode}. \ncreate scratch org failed. Raw stderr: ${sfOrgCreateResult.stderr} \ncreate scratch org failed. Raw stdout: ${sfOrgCreateResult.stdout}`
+      );
+      throw new Error(sfOrgCreateResult.stderr);
+    }
+
+    log(`..."sf org:create:scratch" finished`);
+    debug(`scratchOrgCreate results ${JSON.stringify(sfOrgCreateResult)}`);
+
+    return sfOrgCreateResult;
   });
-
-  if (sfOrgCreateResult.exitCode > 0) {
-    log(
-      `create scratch org failed. Exit code: ${sfOrgCreateResult.exitCode}. \ncreate scratch org failed. Raw stderr: ${sfOrgCreateResult.stderr}`
-    );
-    throw new Error(sfOrgCreateResult.stderr);
-  }
-
-  log(`..."sf org:create:scratch" finished`);
-  debug(`scratchOrgCreate results ${JSON.stringify(sfOrgCreateResult)}`);
-
-  return sfOrgCreateResult;
 }
 
 /**
