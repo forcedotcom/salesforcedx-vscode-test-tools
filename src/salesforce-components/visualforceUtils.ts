@@ -7,7 +7,7 @@
 
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
-import { getTextEditor } from '../ui-interaction/textEditorView';
+import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
 import { getWorkbench } from '../ui-interaction/workbench';
 
 /**
@@ -40,7 +40,6 @@ export async function createVisualforcePage(): Promise<void> {
     `\t</apex:form>`,
     `</apex:page>`
   ].join('\n');
-  await textEditor.setText(pageText);
-  await textEditor.save();
+  await overrideTextInFile(textEditor, pageText);
   await pause(Duration.seconds(1));
 }
