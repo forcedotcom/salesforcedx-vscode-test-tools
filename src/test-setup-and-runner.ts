@@ -347,7 +347,7 @@ exec "${chromeExePath}" \\
     }
 
     // Try to pass additional launch arguments for Ubuntu
-    const runOptions: any = { resources };
+    const runOptions: { resources: string[]; launchArgs?: string[] } = { resources };
     if (isLinux) {
       runOptions.launchArgs = [
         '--disable-web-security',

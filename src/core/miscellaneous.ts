@@ -71,7 +71,10 @@ export function currentOsUserName(): string {
     process.env.LNAME ||
     process.env.USERNAME;
 
-  return userName!;
+  if (!userName) {
+    throw new Error('Unable to determine current OS username');
+  }
+  return userName;
 }
 
 /**

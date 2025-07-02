@@ -39,7 +39,9 @@ export class TestSetup {
   public scratchOrgId: string | undefined;
   private configuredExtensions: ExtensionConfig[] = [];
 
-  private constructor() { }
+  private constructor() {
+    // Private constructor to prevent direct instantiation - use TestSetup.setUp() instead
+  }
 
   public get tempProjectName(): string {
     return 'TempProject-' + this.testSuiteSuffixName;
@@ -233,12 +235,16 @@ export class TestSetup {
 
     if ([ProjectShapeOption.NAMED, ProjectShapeOption.NEW].includes(projectConfig.projectShape)) {
       core.log(`Project folder to open: ${this.projectFolderPath}`);
-      await core.openFolder(this.projectFolderPath!);
-      // Verify the project was loaded.
-      await retryOperation(async () => {
-        await verifyProjectLoaded(projectName ?? this.tempProjectName);
-      });
-    }
+        // Verify the project was loaded.
+        await retryOperation(async () => {
+         if (this.projectFolderPath) {
+            await core.openFolder(this.projectFolderPath);
+            await verifyProjectLoaded(projectName ?? this.tempProjectName);
+          } else {
+            this.throwError('Project folder path is not set');
+          }
+        });
+      }
   }
 
   private throwError(message: string) {
@@ -248,7 +254,11 @@ export class TestSetup {
 
   public updateScratchOrgDefWithEdition(scratchOrgEdition: core.OrgEdition) {
     if (scratchOrgEdition === 'enterprise') {
-      const projectScratchDefPath = path.join(this.projectFolderPath!, 'config', 'project-scratch-def.json');
+      if (!this.projectFolderPath) {
+        this.throwError('Project folder path is not set');
+        return; // This line will never be reached, but helps TypeScript understand
+      }
+      const projectScratchDefPath = path.join(this.projectFolderPath, 'config', 'project-scratch-def.json');
       let projectScratchDef = fs.readFileSync(projectScratchDefPath, 'utf8');
       projectScratchDef = projectScratchDef.replace(`"edition": "Developer"`, `"edition": "Enterprise"`);
       fs.writeFileSync(projectScratchDefPath, projectScratchDef, 'utf8');
@@ -256,7 +266,11 @@ export class TestSetup {
   }
 
   private setJavaHomeConfigEntry(): void {
-    const vscodeSettingsPath = path.join(this.projectFolderPath!, '.vscode', 'settings.json');
+    if (!this.projectFolderPath) {
+      this.throwError('Project folder path is not set');
+      return; // This line will never be reached, but helps TypeScript understand
+    }
+    const vscodeSettingsPath = path.join(this.projectFolderPath, '.vscode', 'settings.json');
     if (!Env.getInstance().javaHome) {
       return;
     }
@@ -277,7 +291,11 @@ export class TestSetup {
   }
 
   private setWorkbenchHoverDelay(): void {
-    const vscodeSettingsPath = path.join(this.projectFolderPath!, '.vscode', 'settings.json');
+    if (!this.projectFolderPath) {
+      this.throwError('Project folder path is not set');
+      return; // This line will never be reached, but helps TypeScript understand
+    }
+    const vscodeSettingsPath = path.join(this.projectFolderPath, '.vscode', 'settings.json');
 
     if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
       fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
@@ -296,7 +314,10 @@ export class TestSetup {
   }
 
   private setMaximumWindowSize(): void {
-    const vscodeSettingsPath = path.join(this.projectFolderPath!, '.vscode', 'settings.json');
+    if (!this.projectFolderPath) {
+      return;
+    }
+    const vscodeSettingsPath = path.join(this.projectFolderPath, '.vscode', 'settings.json');
 
     if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
       fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });

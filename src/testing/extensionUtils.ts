@@ -243,8 +243,12 @@ export async function findExtensionsInRunningExtensionsList(extensionIds: string
     let hasBug;
     try {
       await parent.findElement(By.css('span.codicon-bug error'));
-    } catch (error: any) {
-      hasBug = error.message.startsWith('no such element') ? false : true;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        hasBug = error.message.startsWith('no such element') ? false : true;
+      } else {
+        hasBug = true;
+      }
     }
     runningExtensions.push({
       extensionId,

@@ -53,14 +53,14 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
 /**
  * Opens the workspace settings editor
  */
-export async function inWorkspaceSettings<T>(): Promise<void> {
+export async function inWorkspaceSettings(): Promise<void> {
   await executeQuickPick('Preferences: Open Workspace Settings', Duration.seconds(5));
 }
 
 /**
  * Opens the user settings editor
  */
-export async function inUserSettings<T>(): Promise<void> {
+export async function inUserSettings(): Promise<void> {
   await executeQuickPick('Preferences: Open User Settings', Duration.seconds(5));
 }
 

@@ -46,7 +46,10 @@ export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
   }
 
   // This is essentially the "SFDX: Authorize a Dev Hub" command, but using the CLI and an auth file instead of the UI.
-  const authFilePath = path.join(testSetup.projectFolderPath!, 'authFile.json');
+  if (!testSetup.projectFolderPath) {
+    throw new Error('Project folder path is not set');
+  }
+  const authFilePath = path.join(testSetup.projectFolderPath, 'authFile.json');
   log(`${testSetup.testSuiteSuffixName} - calling sf org:display...`);
   const sfOrgDisplayResult = await orgDisplay(Env.getInstance().devHubUserName);
 
