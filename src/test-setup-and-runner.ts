@@ -49,6 +49,9 @@ process.env.CHROMIUM_FLAGS = '--no-sandbox --disable-dev-shm-usage --disable-gpu
 process.env.CHROME_BIN = '/usr/bin/google-chrome';
 process.env.CHROMIUM_BIN = '/usr/bin/google-chrome';
 
+// Skip Husky installation during test setup
+process.env.HUSKY_SKIP_INSTALL = '1';
+
 // For Ubuntu CI environments
 if (process.platform === 'linux') {
   // Set up virtual display for headless operation
