@@ -280,6 +280,7 @@ export async function openFolder(path: string) {
   const projectName = path.substring(path.lastIndexOf('/') + 1);
   await prompt.selectQuickPick(projectName);
   await clickFilePathOkButton();
+  await pause(Duration.seconds(2));
 }
 
 /**

@@ -174,7 +174,6 @@ export async function executeQuickPick(
     await pause(Duration.seconds(2));
     await inputBox.wait();
     await inputBox.setText(`>${command}`);
-    await waitForQuickPick(inputBox, command, { timeout: Duration.seconds(10) });
     await inputBox.selectQuickPick(command);
     await pause(wait);
     log(`executeQuickPick command: ${command} - done`);
