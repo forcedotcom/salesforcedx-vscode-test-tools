@@ -72,7 +72,7 @@ export async function attemptToFindOutputPanelText(
   attempts = 10
 ): Promise<string | undefined> {
   log(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
-  await retryOperation(async () => {
+  return await retryOperation(async () => {
     const outputViewText = await getOutputViewText(outputChannelName);
     log(`outputViewText: ${outputViewText}`);
     if (outputViewText.includes(searchString)) {
@@ -81,8 +81,6 @@ export async function attemptToFindOutputPanelText(
 
     await pause(Duration.seconds(2));
   }, attempts, 'Failed to find output panel text');
-
-  return undefined;
 }
 
 export async function getOperationTime(outputText: string): Promise<string> {
