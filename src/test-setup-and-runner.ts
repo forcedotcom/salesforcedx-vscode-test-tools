@@ -387,39 +387,32 @@ exec "${chromeExePath}" \\
 
     // Check for already installed extensions
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
-      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
-    );
-    const foundInstalledExtensions = await Promise.all(
-      extensionsDirEntries
-        .filter(async entry => {
-          try {
-            const stats = await fs.stat(entry);
-            return stats.isDirectory();
-          } catch (e) {
-            log(`stat failed for file ${entry}`);
-            return false;
-          }
+    const extensionsDirEntries = await fs.readdir(vsixToInstallDir, { withFileTypes: true });
+
+    // Filter to only directories and get their full paths
+    const directoryEntries = extensionsDirEntries
+      .filter(entry => entry.isDirectory())
+      .map(entry => path.resolve(normalizePath(path.join(vsixToInstallDir, entry.name))));
+
+    const foundInstalledExtensions = directoryEntries
+      .map(entry => {
+        const match = path.basename(entry).match(extensionPattern);
+        if (match?.groups) {
+          return {
+            publisher: match.groups.publisher,
+            extensionId: match.groups.extensionId,
+            version: match.groups.version,
+            path: entry
+          };
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .filter(ext =>
+        extensions.find(refExt => {
+          return refExt.extensionId === ext?.extensionId;
         })
-        .map(entry => {
-          const match = path.basename(entry).match(extensionPattern);
-          if (match?.groups) {
-            return {
-              publisher: match.groups.publisher,
-              extensionId: match.groups.extensionId,
-              version: match.groups.version,
-              path: entry
-            };
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .filter(ext =>
-          extensions.find(refExt => {
-            return refExt.extensionId === ext?.extensionId;
-          })
-        )
-    );
+      );
 
     if (
       foundInstalledExtensions.length > 0 &&
