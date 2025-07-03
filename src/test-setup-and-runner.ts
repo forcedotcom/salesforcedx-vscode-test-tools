@@ -52,6 +52,9 @@ process.env.CHROMIUM_BIN = '/usr/bin/google-chrome';
 // Skip Husky installation during test setup
 process.env.HUSKY_SKIP_INSTALL = '1';
 
+// Set NPM to use legacy peer dependencies
+process.env.NPM_CONFIG_LEGACY_PEER_DEPS = 'true';
+
 // For Ubuntu CI environments
 if (process.platform === 'linux') {
   // Set up virtual display for headless operation
@@ -149,7 +152,7 @@ class TestSetupAndRunner extends ExTester {
       '--no-zygote'
     ].join(' ');
 
-            // Set the environment variable for vscode-extension-tester to pick up
+    // Set the environment variable for vscode-extension-tester to pick up
     process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
 
     // Also try other possible environment variables
@@ -387,32 +390,39 @@ exec "${chromeExePath}" \\
 
     // Check for already installed extensions
     const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = await fs.readdir(vsixToInstallDir, { withFileTypes: true });
-
-    // Filter to only directories and get their full paths
-    const directoryEntries = extensionsDirEntries
-      .filter(entry => entry.isDirectory())
-      .map(entry => path.resolve(normalizePath(path.join(vsixToInstallDir, entry.name))));
-
-    const foundInstalledExtensions = directoryEntries
-      .map(entry => {
-        const match = path.basename(entry).match(extensionPattern);
-        if (match?.groups) {
-          return {
-            publisher: match.groups.publisher,
-            extensionId: match.groups.extensionId,
-            version: match.groups.version,
-            path: entry
-          };
-        }
-        return null;
-      })
-      .filter(Boolean)
-      .filter(ext =>
-        extensions.find(refExt => {
-          return refExt.extensionId === ext?.extensionId;
+    const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
+      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
+    );
+    const foundInstalledExtensions = await Promise.all(
+      extensionsDirEntries
+        .filter(async entry => {
+          try {
+            const stats = await fs.stat(entry);
+            return stats.isDirectory();
+          } catch (e) {
+            log(`stat failed for file ${entry}`);
+            return false;
+          }
         })
-      );
+        .map(entry => {
+          const match = path.basename(entry).match(extensionPattern);
+          if (match?.groups) {
+            return {
+              publisher: match.groups.publisher,
+              extensionId: match.groups.extensionId,
+              version: match.groups.version,
+              path: entry
+            };
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .filter(ext =>
+          extensions.find(refExt => {
+            return refExt.extensionId === ext?.extensionId;
+          })
+        )
+    );
 
     if (
       foundInstalledExtensions.length > 0 &&
