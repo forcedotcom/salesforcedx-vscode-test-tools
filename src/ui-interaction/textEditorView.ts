@@ -179,8 +179,7 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 }
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string) {
-  const inputarea = await textEditor.findElement(By.css('.monaco-editor textarea'));
-  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
+  await textEditor.clearText();
   await pause(Duration.seconds(3));
   await textEditor.setText(classText);
   await pause(Duration.seconds(1));
