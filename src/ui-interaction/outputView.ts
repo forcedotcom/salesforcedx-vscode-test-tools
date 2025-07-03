@@ -69,18 +69,18 @@ export async function verifyOutputPanelText(outputPanelText: string, expectedTex
 export async function attemptToFindOutputPanelText(
   outputChannelName: string,
   searchString: string,
-  attempts: number
+  attempts = 10
 ): Promise<string | undefined> {
-  debug(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
-  while (attempts > 0) {
+  log(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
+  await retryOperation(async () => {
     const outputViewText = await getOutputViewText(outputChannelName);
+    log(`outputViewText: ${outputViewText}`);
     if (outputViewText.includes(searchString)) {
       return outputViewText;
     }
 
-    await pause(Duration.seconds(1));
-    attempts--;
-  }
+    await pause(Duration.seconds(2));
+  }, attempts, 'Failed to find output panel text');
 
   return undefined;
 }
