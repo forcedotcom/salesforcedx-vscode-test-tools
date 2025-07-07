@@ -7,7 +7,7 @@
 
 import { By, Setting, SettingsEditor } from 'vscode-extension-tester';
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
-import { debug, Duration, findElementByText, pause } from '../core/miscellaneous';
+import { Duration, findElementByText, log, pause } from '../core/miscellaneous';
 import { getBrowser } from '../ui-interaction/workbench';
 
 /**
@@ -18,8 +18,9 @@ import { getBrowser } from '../ui-interaction/workbench';
  * @private
  */
 async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; checkButtonValue: string | null }> {
-  debug(`enter findAndCheckSetting for id: ${id}`);
+  log(`enter findAndCheckSetting for id: ${id}`);
   await executeQuickPick('Preferences: Clear Settings Search Results', Duration.seconds(2));
+  try {
   const input = await getBrowser().findElement(By.css('div.suggest-input-container'));
   await input.click();
   const textArea = await getBrowser().findElement(By.css('textarea.inputarea.monaco-mouse-cursor-text'));
@@ -33,7 +34,7 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
       checkButton = (await findElementByText('div', 'aria-label', id)) as Setting;
       if (checkButton) {
         checkButtonValue = await checkButton.getAttribute('aria-checked');
-        debug(`found setting checkbox with value "${checkButtonValue}"`);
+        log(`found setting checkbox with value "${checkButtonValue}"`);
         return true;
       }
       return false;
@@ -46,8 +47,16 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
     throw new Error(`Could not find setting with name: ${id}`);
   }
 
-  debug(`findAndCheckSetting result for ${id} found ${!!checkButton} value: ${checkButtonValue}`);
-  return { checkButton, checkButtonValue };
+    log(`findAndCheckSetting result for ${id} found ${!!checkButton} value: ${checkButtonValue}`);
+    return { checkButton, checkButtonValue };
+  } catch (error) {
+    log(`error in findAndCheckSetting for ${id}: ${error}`);
+    log(`trying to find setting by id: ${id}`);
+    const settingsEditor = new SettingsEditor();
+    const setting = await settingsEditor.findSettingByID(id);
+    log(`found setting by id: ${id} ${setting}`);
+    return { checkButton: setting, checkButtonValue: await setting?.getAttribute('aria-checked') };
+  }
 }
 
 /**
@@ -101,7 +110,7 @@ export async function enableBooleanSetting(
   id: string,
   settingsType: 'user' | 'workspace' = 'workspace'
 ): Promise<boolean> {
-  debug(`enableBooleanSetting ${id}`);
+  log(`enableBooleanSetting ${id}`);
   return toggleBooleanSetting(id, true, settingsType);
 }
 
@@ -115,7 +124,7 @@ export async function disableBooleanSetting(
   id: string,
   settingsType: 'user' | 'workspace' = 'workspace'
 ): Promise<boolean> {
-  debug(`disableBooleanSetting ${id}`);
+  log(`disableBooleanSetting ${id}`);
   return toggleBooleanSetting(id, false, settingsType);
 }
 
