@@ -179,10 +179,16 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 }
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
-  await textEditor.clearText();
-  await pause(Duration.seconds(3));
-  await textEditor.setText(classText);
-  await pause(Duration.seconds(1));
+  await retryOperation(async () => {
+    await textEditor.clearText();
+    await pause(Duration.seconds(3));
+    await textEditor.setText(classText);
+    await pause(Duration.seconds(1));
+    const text = await textEditor.getText();
+    if (text != classText) {
+      throw new Error(`Text editor text does not match expected text: ${text} != ${classText}`);
+    }
+  }, 3, 'Failed to override text in file');
   if (save) {
     await textEditor.save();
     await pause(Duration.seconds(1));
