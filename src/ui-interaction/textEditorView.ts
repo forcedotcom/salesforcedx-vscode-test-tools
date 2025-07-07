@@ -178,13 +178,15 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
   return await editor.getText();
 }
 
-export async function overrideTextInFile(textEditor: TextEditor, classText: string) {
+export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
   await textEditor.clearText();
   await pause(Duration.seconds(3));
   await textEditor.setText(classText);
   await pause(Duration.seconds(1));
-  await textEditor.save();
-  await pause(Duration.seconds(1));
+  if (save) {
+    await textEditor.save();
+    await pause(Duration.seconds(1));
+  }
 }
 
 export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
