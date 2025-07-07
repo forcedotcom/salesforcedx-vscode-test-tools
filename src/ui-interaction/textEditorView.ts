@@ -181,11 +181,55 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
   await retryOperation(async () => {
-    await textEditor.clearText();
-    await pause(Duration.seconds(3));
-    await textEditor.setText(classText);
+    log('overrideTextInFile() - Starting text replacement');
+
+    // Ensure the text editor is focused and ready
+    await textEditor.click();
     await pause(Duration.seconds(1));
+
+    // Get the correct modifier key for the platform
+    const modifierKey = process.platform === 'darwin' ? Key.META : Key.CONTROL;
+
+    // Select all text first, then clear it
+    await textEditor.sendKeys(Key.chord(modifierKey, 'a')); // Select all
+    await pause(Duration.seconds(1));
+
+    // Clear the text using multiple methods for reliability
+    await textEditor.clearText();
+    await pause(Duration.seconds(1));
+
+    // Try using sendKeys to ensure all text is deleted
+    await textEditor.sendKeys(Key.chord(modifierKey, 'a')); // Select all
+    await pause(Duration.milliseconds(500));
+    await textEditor.sendKeys(Key.DELETE); // Delete selected text
+    await pause(Duration.seconds(1));
+
+    // Verify the text is actually cleared
+    let currentText = await textEditor.getText();
+    let attempts = 0;
+    while (currentText.trim() !== '' && attempts < 5) {
+      log(`overrideTextInFile() - Text not cleared, attempt ${attempts + 1}. Current text: "${currentText}"`);
+      await textEditor.sendKeys(Key.chord(modifierKey, 'a')); // Select all
+      await pause(Duration.milliseconds(500));
+      await textEditor.sendKeys(Key.DELETE);
+      await pause(Duration.seconds(1));
+      currentText = await textEditor.getText();
+      attempts++;
+    }
+
+    if (currentText.trim() !== '') {
+      throw new Error(`Failed to clear text after ${attempts} attempts. Current text: "${currentText}"`);
+    }
+
+    log('overrideTextInFile() - Text cleared successfully, setting new text');
+
+    // Set the new text
+    await textEditor.setText(classText);
+    await pause(Duration.seconds(2));
+
+    // Verify the text was set correctly
     const text = await textEditor.getText();
+    log(`overrideTextInFile() - Text set. Length: ${text.length}, Expected length: ${classText.length}`);
 
     // Normalize whitespace for comparison - remove all whitespace and compare
     const normalizeText = (str: string) => str.replace(/\s+/g, '');
@@ -193,10 +237,15 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
     const normalizedClassText = normalizeText(classText);
 
     if (normalizedText !== normalizedClassText) {
+      log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
       throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
     }
+
+    log('overrideTextInFile() - Text replacement successful');
   }, 3, 'Failed to override text in file');
+
   if (save) {
+    log('overrideTextInFile() - Saving file');
     await textEditor.save();
     await pause(Duration.seconds(1));
   }
