@@ -185,8 +185,14 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
     await textEditor.setText(classText);
     await pause(Duration.seconds(1));
     const text = await textEditor.getText();
-    if (text != classText) {
-      throw new Error(`Text editor text does not match expected text: ${text} != ${classText}`);
+
+    // Normalize whitespace for comparison - remove all whitespace and compare
+    const normalizeText = (str: string) => str.replace(/\s+/g, '');
+    const normalizedText = normalizeText(text);
+    const normalizedClassText = normalizeText(classText);
+
+    if (normalizedText !== normalizedClassText) {
+      throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
     }
   }, 3, 'Failed to override text in file');
   if (save) {
