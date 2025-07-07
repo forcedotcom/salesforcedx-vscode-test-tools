@@ -70,7 +70,7 @@ export async function attemptToFindOutputPanelText(
   outputChannelName: string,
   searchString: string,
   attempts = 10
-): Promise<string | undefined> {
+): Promise<string> {
   log(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
   return await retryOperation(async () => {
     const outputViewText = await getOutputViewText(outputChannelName);
