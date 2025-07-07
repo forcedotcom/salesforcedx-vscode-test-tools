@@ -1,4 +1,4 @@
-import { CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
+import { By, CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
@@ -215,6 +215,16 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
     await textEditor.save();
     await pause(Duration.seconds(1));
   }
+}
+
+export async function overrideTextInFile2(textEditor: TextEditor, classText: string) {
+  const inputarea = await textEditor.findElement(By.css('textarea'));
+  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
+  await pause(Duration.seconds(3));
+  await textEditor.setText(classText);
+  await pause(Duration.seconds(1));
+  await textEditor.save();
+  await pause(Duration.seconds(1));
 }
 
 export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
