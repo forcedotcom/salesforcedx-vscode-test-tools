@@ -74,12 +74,13 @@ export async function attemptToFindOutputPanelText(
   log(`attemptToFindOutputPanelText in channel "${outputChannelName}: with string "${searchString}"`);
   return await retryOperation(async () => {
     const outputViewText = await getOutputViewText(outputChannelName);
-    log(`outputViewText: ${outputViewText}`);
+    log(`outputViewText:\n ${outputViewText}`);
     if (outputViewText.includes(searchString)) {
       return outputViewText;
     }
 
     await pause(Duration.seconds(2));
+    throw new Error(`Failed to find output panel text: ${searchString} in ${outputChannelName} on attempt ${attempts}`);
   }, attempts, 'Failed to find output panel text');
 }
 
