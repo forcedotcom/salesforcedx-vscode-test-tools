@@ -1,4 +1,4 @@
-import { By, CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
+import { CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';

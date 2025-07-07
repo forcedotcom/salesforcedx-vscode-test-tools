@@ -55,7 +55,7 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
     const settingsEditor = new SettingsEditor();
     const setting = await settingsEditor.findSettingByID(id);
     log(`found setting by id: ${id} ${setting}`);
-    return { checkButton: setting, checkButtonValue: await setting?.getAttribute('aria-checked') };
+    return { checkButton: setting, checkButtonValue: String(await setting.getValue()) };
   }
 }
 
