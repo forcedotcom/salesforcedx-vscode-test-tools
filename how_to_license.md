@@ -8,7 +8,7 @@ All source files should include the appropriate license header. For this project
 
 ```javascript
 /*
- * Copyright (c) 2024, Salesforce Platform
+ * Copyright (c) 2025, Salesforce Platform
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
