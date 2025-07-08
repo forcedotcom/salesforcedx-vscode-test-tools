@@ -16,7 +16,8 @@ import {
   gitRepoExists,
   getRepoNameFromUrl,
   getFolderName,
-  gitClone
+  gitClone,
+  setSettingValue
 } from './system-operations';
 import {
   verifyExtensionsAreRunning,
@@ -245,6 +246,7 @@ export class TestSetup {
           }
         });
       }
+      await setSettingValue("window.dialogStyle", "custom", false);
   }
 
   private throwError(message: string) {
