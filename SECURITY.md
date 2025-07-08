@@ -8,7 +8,7 @@ If you believe you have found a security vulnerability, please report it to us a
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please report them via email to security@salesforce.com.
+Instead, please report them via email to [security@salesforce.com](mailto:security@salesforce.com).
 
 You should receive a response within 48 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
 
