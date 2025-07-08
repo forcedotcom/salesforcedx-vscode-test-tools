@@ -51,8 +51,6 @@ export async function createApexClass(name: string, classText: string, breakpoin
   await overrideTextInFile(textEditor, classText);
   log(`Done setting text for Apex Class ${name}`);
   await pause(Duration.seconds(1));
-  await textEditor.save();
-  await pause(Duration.seconds(1));
   if (breakpoint) {
     await textEditor.toggleBreakpoint(breakpoint);
   }

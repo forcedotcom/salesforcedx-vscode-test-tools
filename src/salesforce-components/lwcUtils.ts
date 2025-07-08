@@ -47,8 +47,6 @@ export async function createLwc(name: string): Promise<void> {
   ].join('\n');
   await overrideTextInFile(textEditor, jsText);
   await pause(Duration.seconds(1));
-  await textEditor.save();
-  await pause(Duration.seconds(1));
 
   log('createLwc() - Modify html content');
   log('');
@@ -63,8 +61,6 @@ export async function createLwc(name: string): Promise<void> {
     `</template>`
   ].join('\n');
   await overrideTextInFile(textEditor, htmlText);
-  await textEditor.save();
-  await pause(Duration.seconds(1));
 
   log('createLwc() - Modify test content');
   log('');
@@ -100,8 +96,6 @@ export async function createLwc(name: string): Promise<void> {
     `});`
   ].join('\n');
   await overrideTextInFile(textEditor, testText);
-  await textEditor.save();
-  await pause(Duration.seconds(1));
 
   // Set breakpoints
   await textEditor.toggleBreakpoint(17);
@@ -157,7 +151,5 @@ export async function createAura(name: string): Promise<void> {
     '</aura:component>'
   ].join('\n');
   await overrideTextInFile(textEditor, htmlText);
-  await pause(Duration.seconds(1));
-  await textEditor.save();
   await pause(Duration.seconds(1));
 }
