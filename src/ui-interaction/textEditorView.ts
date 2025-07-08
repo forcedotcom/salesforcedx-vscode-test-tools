@@ -1,8 +1,9 @@
-import { By, CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
+import { CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
 import { retryOperation } from '../retryUtils';
+import * as fs from 'fs';
 
 /**
  * Gets a text editor for a specific file
@@ -30,7 +31,7 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
   const textEditor = await retryOperation(async () => {
     log('getTextEditor() - Attempting to open editor...');
     return (await editorView.openEditor(fileName)) as TextEditor;
-  }, 3, 'Failed to open editor after retries') as TextEditor;
+  }, 3, 'Failed to open editor after retries');
 
   await pause(Duration.seconds(2));
   return textEditor;
@@ -180,51 +181,87 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 }
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
-  await retryOperation(async () => {
-    log('overrideTextInFile() - Starting text replacement');
+  try {
+    // First, try the UI-based approach
+    await retryOperation(async () => {
+      log('overrideTextInFile() - Starting UI-based text replacement');
 
-    await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
-    await textEditor.sendKeys(Key.DELETE);
+      await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
+      await textEditor.sendKeys(Key.DELETE);
 
-    await pause(Duration.seconds(1));
+      await pause(Duration.seconds(1));
 
-    log('overrideTextInFile() - Text cleared successfully, setting new text');
+      log('overrideTextInFile() - Text cleared successfully, setting new text');
 
-    await textEditor.setText(classText);
-    await pause(Duration.seconds(2));
+      await textEditor.setText(classText);
+      await pause(Duration.seconds(2));
 
-    // Verify the text was set correctly
-    const text = await textEditor.getText();
-    log(`overrideTextInFile() - Text set. Length: ${text.length}, Expected length: ${classText.length}`);
+      // Verify the text was set correctly
+      const text = await textEditor.getText();
+      log(`overrideTextInFile() - Text set. Length: ${text.length}, Expected length: ${classText.length}`);
 
-    // Normalize whitespace for comparison - remove all whitespace and compare
-    const normalizeText = (str: string) => str.replace(/\s+/g, '');
-    const normalizedText = normalizeText(text);
-    const normalizedClassText = normalizeText(classText);
+      // Normalize whitespace for comparison - remove all whitespace and compare
+      const normalizeText = (str: string) => str.replace(/\s+/g, '');
+      const normalizedText = normalizeText(text);
+      const normalizedClassText = normalizeText(classText);
 
-    if (normalizedText !== normalizedClassText) {
-      log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
-      throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
+      if (normalizedText !== normalizedClassText) {
+        log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
+        throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
+      }
+
+      log('overrideTextInFile() - UI-based text replacement successful');
+    }, 3, 'UI-based text replacement failed');
+
+    if (save) {
+      log('overrideTextInFile() - Saving file via UI');
+      await textEditor.save();
+      await pause(Duration.seconds(1));
     }
 
-    log('overrideTextInFile() - Text replacement successful');
-  }, 3, 'Failed to override text in file');
+  } catch (uiError) {
+    log(`overrideTextInFile() - UI approach failed: ${uiError}`);
 
-  if (save) {
-    log('overrideTextInFile() - Saving file');
-    await textEditor.save();
-    await pause(Duration.seconds(1));
+    const filePath = await textEditor.getFilePath();
+    // Try the file system fallback approach
+    log('overrideTextInFile() - Attempting file system fallback with provided path');
+    await overrideTextInFileWithFallback(filePath, classText);
   }
 }
 
-export async function overrideTextInFile2(textEditor: TextEditor, classText: string) {
-  const inputarea = await textEditor.findElement(By.css('textarea'));
-  await inputarea.sendKeys(Key.chord(TextEditor.ctlKey, 'a')); // Cmd+A on Mac
-  await pause(Duration.seconds(3));
-  await textEditor.setText(classText);
-  await pause(Duration.seconds(1));
-  await textEditor.save();
-  await pause(Duration.seconds(1));
+/**
+ * Fallback function that uses file system operations to override text content
+ * @param filePath - The full path to the file to modify
+ * @param classText - The new text content to write
+ * @param save - Whether to save the file (not applicable for direct file system operations)
+ */
+async function overrideTextInFileWithFallback(filePath: string, classText: string): Promise<void> {
+  try {
+    log(`overrideTextInFileWithFallback() - Writing content to file: ${filePath}`);
+
+    // Write the new content to the file
+    await fs.promises.writeFile(filePath, classText, 'utf8');
+
+    log(`overrideTextInFileWithFallback() - Successfully wrote ${classText.length} characters to ${filePath}`);
+
+    // Verify the write was successful
+    const writtenContent = await fs.promises.readFile(filePath, 'utf8');
+
+    // Normalize whitespace for comparison
+    const normalizeText = (str: string) => str.replace(/\s+/g, '');
+    const normalizedWritten = normalizeText(writtenContent);
+    const normalizedExpected = normalizeText(classText);
+
+    if (normalizedWritten !== normalizedExpected) {
+      throw new Error(`File system write verification failed. Written content does not match expected content.`);
+    }
+
+    log('overrideTextInFileWithFallback() - File system fallback successful');
+
+  } catch (error) {
+    log(`overrideTextInFileWithFallback() - File system fallback failed: ${error}`);
+    throw new Error(`File system fallback failed: ${error}`);
+  }
 }
 
 export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
