@@ -161,7 +161,7 @@ export async function aliasList(): Promise<SfCommandRunResults> {
 }
 
 /**
- * Creates a scratch org
+ * Creates a scratch org and makes it the project default
  * @param edition - The org edition to use (developer or enterprise)
  * @param definitionFileOrNone - Path to the scratch org definition file or 'NONE'
  * @param scratchOrgAliasName - Alias to assign to the scratch org
@@ -184,6 +184,8 @@ export async function scratchOrgCreate(
     '--duration-days',
     durationDays.toString(),
     '--set-default',
+    '--wait',
+    '30',
     '--json',
     ...(definitionFileOrNone !== 'NONE' ? ['--definition-file', definitionFileOrNone] : [])
   ];
@@ -232,7 +234,7 @@ export async function installJestUTToolsForLwc(projectFolder: string | undefined
     throw new Error('cannot setup lwc tests without a project folder.');
   }
   const command =
-    'npm install @lwc/eslint-plugin-lwc@^2.0.0 --save-dev --legacy-peer-deps && npm install --legacy-peer-deps && npm uninstall husky --force && npm install eslint@^8 --save-dev && npm install @salesforce/sfdx-lwc-jest --save-dev';
+    'npm uninstall husky --force && npm install eslint@^8 @babel/eslint-parser@^7.0.0 webpack@^5.0.0 eslint-plugin-unicorn@^54.0.0 --save-dev --legacy-peer-deps && npm install @lwc/eslint-plugin-lwc@^2.0.0 --save-dev --legacy-peer-deps && npm install --legacy-peer-deps && npm install @salesforce/sfdx-lwc-jest --save-dev --legacy-peer-deps';
   return new Promise((resolve, reject) => {
     exec(command, { cwd: projectFolder }, (error, stdout, stderr) => {
       if (error) {
@@ -241,7 +243,8 @@ export async function installJestUTToolsForLwc(projectFolder: string | undefined
         return;
       }
       if (stderr) {
-        log(`Error output for ${command}`);
+        log(`Error stderr received for ${command}`);
+        log(`stderr: ${stderr}`);
       }
       log(stdout);
       log(`...SetUp - Finished Install @salesforce/sfdx-lwc-jest Node module`);
