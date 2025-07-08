@@ -6,7 +6,8 @@
  */
 
 import { ModalDialog } from 'vscode-extension-tester';
-import { log } from '../core';
+import { retryOperation } from '../retryUtils';
+import { log, pause, Duration } from '../core';
 
 /**
  * Clicks a button on a modal dialog with the specified button text.
@@ -17,9 +18,10 @@ import { log } from '../core';
  */
 export const clickButtonOnModalDialog = async (buttonText: string): Promise<void> => {
   const modalDialog = new ModalDialog();
-  try {
+  await retryOperation(async () => {
+    log(`clickButtonOnModalDialog() - Waiting for modal dialog to appear`);
+    await pause(Duration.seconds(2));
+    log(`clickButtonOnModalDialog() - Pushing button ${buttonText}`);
     await modalDialog.pushButton(buttonText);
-  } catch (error) {
-    log(`clickButtonOnModalDialog() - Error pushing button ${buttonText}: ${error}`);
-  }
-}
+  }, 3, 'clickButtonOnModalDialog() - Error pushing button');
+};
