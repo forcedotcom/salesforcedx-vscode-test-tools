@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as fs from 'fs';
+import fs from 'fs';
 import { join } from 'path';
 import { LOG_LEVELS, LogLevel } from './core/constants';
 

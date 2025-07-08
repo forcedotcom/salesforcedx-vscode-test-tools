@@ -3,7 +3,7 @@ import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
 import { retryOperation } from '../retryUtils';
-import * as fs from 'fs';
+import fs from 'fs';
 
 /**
  * Gets a text editor for a specific file
@@ -211,7 +211,7 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
       }
 
       log('overrideTextInFile() - UI-based text replacement successful');
-    }, 3, 'UI-based text replacement failed');
+    }, 1, 'UI-based text replacement failed');
 
     if (save) {
       log('overrideTextInFile() - Saving file via UI');

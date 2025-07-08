@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as path from 'path';
-import * as fs from 'fs';
+import fs from 'fs';
 import { EnvironmentSettings as Env } from './environmentSettings';
 import * as core from './core/index';
 import { ProjectConfig, ProjectShapeOption, ExtensionConfig } from './core/types';
