@@ -6,6 +6,7 @@
  */
 
 import { Duration, log, pause } from '../core/miscellaneous';
+import { retryOperation } from '../retryUtils';
 import { getBrowser, getWorkbench } from './workbench';
 import { By, InputBox, Key, QuickOpenBox, Workbench } from 'vscode-extension-tester';
 
@@ -168,33 +169,20 @@ export async function executeQuickPick(
   wait: Duration = Duration.seconds(1)
 ): Promise<InputBox | QuickOpenBox> {
   log(`executeQuickPick command: ${command}`);
-  try {
-    const workbench = getWorkbench();
-    const inputBox = await workbench.openCommandPrompt();
-    await pause(Duration.seconds(2));
-    await inputBox.wait();
-    await inputBox.setText(`>${command}`);
-    await inputBox.selectQuickPick(command);
-    await pause(wait);
-    log(`executeQuickPick command: ${command} - done`);
-    return inputBox;
-  } catch (error) {
-    let errorMessage: string;
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else if (typeof error === 'string') {
-      errorMessage = error;
-    } else {
-      throw new Error(`Unknown error: ${error}`);
-    }
-
-    if (errorMessage.includes('Command not found')) {
-      throw new Error(`Command not found: ${command}`);
-    } else {
-      throw error;
-    }
-  }
+  return await retryOperation(async () => {
+      const workbench = getWorkbench();
+      const inputBox = await workbench.openCommandPrompt();
+      await pause(Duration.seconds(2));
+      await inputBox.wait();
+      await inputBox.setText(`>${command}`);
+      await inputBox.selectQuickPick(command);
+      await pause(wait);
+      log(`executeQuickPick command: ${command} - done`);
+      return inputBox;
+    },
+    3,
+    `executeQuickPick command: ${command} - failed`
+  );
 }
 
 /**

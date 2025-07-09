@@ -273,14 +273,17 @@ export async function sleep(duration: number): Promise<void> {
  * VSCode will be working on the new workspace, and the previous one is closed.
  */
 export async function openFolder(path: string) {
-  const prompt = await executeQuickPick('File: Open Folder...'); // use this cmd palette to open
-  // Set the location of the project
-  await prompt.setText(path);
-  await pause(Duration.seconds(2));
-  const projectName = path.substring(path.lastIndexOf('/') + 1);
-  await prompt.selectQuickPick(projectName);
-  await clickFilePathOkButton();
-  await pause(Duration.seconds(2));
+  await retryOperation(async () => {
+    const prompt = await executeQuickPick('File: Open Folder...'); // use this cmd palette to open
+    await pause(Duration.seconds(2));
+    // Set the location of the project
+    await prompt.setText(path);
+    await pause(Duration.seconds(2));
+    const projectName = path.substring(path.lastIndexOf('/') + 1);
+    await prompt.selectQuickPick(projectName);
+    await clickFilePathOkButton();
+    await pause(Duration.seconds(2));
+  });
 }
 
 /**
