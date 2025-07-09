@@ -23,7 +23,8 @@ import { clickButtonOnModalDialog } from '../ui-interaction';
  * @param duration - The amount of time to pause; defaults to 1 second
  */
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {
-  await sleep(duration.milliseconds);
+  const throttleFactor = EnvironmentSettings.getInstance().throttleFactor;
+  await sleep(duration.milliseconds * throttleFactor);
 }
 
 /**

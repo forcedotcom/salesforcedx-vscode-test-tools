@@ -105,6 +105,10 @@ class TestSetupAndRunner extends ExTester {
     if (chromeDriverArgs) {
       log(`- ChromeDriver Arguments: ${chromeDriverArgs}`);
     }
+
+    // Log the throttle factor
+    const throttleFactor = EnvironmentSettings.getInstance().throttleFactor;
+    log(`- Throttle Factor: ${throttleFactor}`);
   }
 
   /**
