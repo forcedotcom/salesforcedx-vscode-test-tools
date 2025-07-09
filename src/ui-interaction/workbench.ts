@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
+import { ActivityBar, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { debug, Duration, isDuration, log, pause } from '../core/miscellaneous';
 import { PredicateWithTimeout } from '../testing/predicates';
