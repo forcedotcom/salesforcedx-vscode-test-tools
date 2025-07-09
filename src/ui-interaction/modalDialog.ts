@@ -19,14 +19,19 @@ import { log, pause, Duration } from '../core';
 export const clickButtonOnModalDialog = async (buttonText: string, failOnError = true): Promise<void> => {
   const modalDialog = new ModalDialog();
   await pause(Duration.seconds(2));
-  if (failOnError) {
-  await retryOperation(async () => {
-    log(`clickButtonOnModalDialog() - Waiting for modal dialog to appear`);
-    await pause(Duration.seconds(2));
+
+  const pushButton = async () => {
     log(`clickButtonOnModalDialog() - Pushing button ${buttonText}`);
     await modalDialog.pushButton(buttonText);
-    }, 3, 'clickButtonOnModalDialog() - Error pushing button');
+  };
+
+  if (failOnError) {
+    await retryOperation(pushButton, 3, 'clickButtonOnModalDialog() - Error pushing button');
   } else {
-    await modalDialog.pushButton(buttonText);
+    try {
+      await pushButton();
+    } catch (error) {
+      log(`clickButtonOnModalDialog() - Error pushing button ${buttonText}: ${error}`);
+    }
   }
 };
