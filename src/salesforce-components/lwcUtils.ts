@@ -98,8 +98,13 @@ export async function createLwc(name: string): Promise<void> {
   await overrideTextInFile(textEditor, testText);
 
   // Set breakpoints
+  log('createLwc() - Setting breakpoints 17 and 25');
+  await pause(Duration.seconds(5)); // wait for file to be saved and loaded
+  log('createLwc() - Set breakpoints 17');
   await textEditor.toggleBreakpoint(17);
+  log('createLwc() - Set breakpoints 25');
   await textEditor.toggleBreakpoint(25);
+  log('createLwc() - Set breakpoints 17 and 25 done');
 }
 
 async function createComponentAndSetName(inputBox: InputBox | QuickOpenBox, name: string) {

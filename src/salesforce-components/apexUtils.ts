@@ -52,6 +52,9 @@ export async function createApexClass(name: string, classText: string, breakpoin
   log(`Done setting text for Apex Class ${name}`);
   await pause(Duration.seconds(1));
   if (breakpoint) {
+    log('createApexClass() - Setting breakpoints');
+    await pause(Duration.seconds(5)); // wait for file to be saved and loaded
+    log(`createApexClass() - Set breakpoint ${breakpoint}`);
     await textEditor.toggleBreakpoint(breakpoint);
   }
   await pause(Duration.seconds(1));
