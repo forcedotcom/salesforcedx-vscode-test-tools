@@ -21,31 +21,31 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
   log(`enter findAndCheckSetting for id: ${id}`);
   await executeQuickPick('Preferences: Clear Settings Search Results', Duration.seconds(2));
   try {
-  const input = await getBrowser().findElement(By.css('div.suggest-input-container'));
-  await input.click();
-  const textArea = await getBrowser().findElement(By.css('textarea.inputarea.monaco-mouse-cursor-text'));
-  await textArea.sendKeys(id);
-  await pause(Duration.seconds(2));
-  let checkButton: Setting | null = null;
-  let checkButtonValue: string | null = null;
+    const input = await getBrowser().findElement(By.css('div.suggest-input-container'));
+    await input.click();
+    const textArea = await getBrowser().findElement(By.css('textarea.inputarea.monaco-mouse-cursor-text'));
+    await textArea.sendKeys(id);
+    await pause(Duration.seconds(2));
+    let checkButton: Setting | null = null;
+    let checkButtonValue: string | null = null;
 
-  await getBrowser().wait(
-    async () => {
-      checkButton = (await findElementByText('div', 'aria-label', id)) as Setting;
-      if (checkButton) {
-        checkButtonValue = await checkButton.getAttribute('aria-checked');
-        log(`found setting checkbox with value "${checkButtonValue}"`);
-        return true;
-      }
-      return false;
-    },
-    5000,
-    `Could not find setting with name: ${id}`
-  );
+    await getBrowser().wait(
+      async () => {
+        checkButton = (await findElementByText('div', 'aria-label', id)) as Setting;
+        if (checkButton) {
+          checkButtonValue = await checkButton.getAttribute('aria-checked');
+          log(`found setting checkbox with value "${checkButtonValue}"`);
+          return true;
+        }
+        return false;
+      },
+      5000,
+      `Could not find setting with name: ${id}`
+    );
 
-  if (!checkButton) {
-    throw new Error(`Could not find setting with name: ${id}`);
-  }
+    if (!checkButton) {
+      throw new Error(`Could not find setting with name: ${id}`);
+    }
 
     log(`findAndCheckSetting result for ${id} found ${!!checkButton} value: ${checkButtonValue}`);
     return { checkButton, checkButtonValue };
@@ -62,14 +62,14 @@ async function findAndCheckSetting(id: string): Promise<{ checkButton: Setting; 
 /**
  * Opens the workspace settings editor
  */
-export async function inWorkspaceSettings(): Promise<void> {
+async function inWorkspaceSettings(): Promise<void> {
   await executeQuickPick('Preferences: Open Workspace Settings', Duration.seconds(5));
 }
 
 /**
  * Opens the user settings editor
  */
-export async function inUserSettings(): Promise<void> {
+async function inUserSettings(): Promise<void> {
   await executeQuickPick('Preferences: Open User Settings', Duration.seconds(5));
 }
 
