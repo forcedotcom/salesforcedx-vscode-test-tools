@@ -21,7 +21,8 @@ export const clickButtonOnModalDialog = async (buttonText: string, failOnError =
   await pause(Duration.seconds(2));
 
   const pushButton = async () => {
-    log(`clickButtonOnModalDialog() - Pushing button ${buttonText}`);
+    log(`clickButtonOnModalDialog() - Pushing button with text: "${buttonText}"`);
+    await pause(Duration.seconds(2)); // wait for the modal dialog to be visible
     await modalDialog.pushButton(buttonText);
   };
 
