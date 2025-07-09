@@ -37,3 +37,5 @@ yarn-error.log*
 .wireit
 /salesforcedx-vscode
 /.cursor
+
+authFile.txt
