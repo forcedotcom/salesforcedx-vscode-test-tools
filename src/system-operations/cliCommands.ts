@@ -234,9 +234,17 @@ export async function installJestUTToolsForLwc(projectFolder: string | undefined
     throw new Error('cannot setup lwc tests without a project folder.');
   }
   const command =
-    'npm uninstall husky --force && npm install eslint@^8 @babel/eslint-parser@^7.0.0 webpack@^5.0.0 eslint-plugin-unicorn@^54.0.0 --save-dev --legacy-peer-deps && npm install @lwc/eslint-plugin-lwc@^2.0.0 --save-dev --legacy-peer-deps && npm install --legacy-peer-deps && npm install @salesforce/sfdx-lwc-jest --save-dev --legacy-peer-deps';
+    'npm install @lwc/eslint-plugin-lwc@^2.0.0 --save-dev --ignore-scripts && npm install --ignore-scripts && npm uninstall husky --force && npm install eslint@^8 --save-dev --ignore-scripts && npm install --save-dev --ignore-scripts && npm install @salesforce/sfdx-lwc-jest --save-dev --ignore-scripts';
   return new Promise((resolve, reject) => {
-    exec(command, { cwd: projectFolder }, (error, stdout, stderr) => {
+    exec(command,
+      {
+        cwd: projectFolder,
+        env: {
+          ...process.env,
+          HUSKY_SKIP_INSTALL: '1',
+          NPM_CONFIG_LEGACY_PEER_DEPS: 'true'
+        }
+      }, (error, stdout, stderr) => {
       if (error) {
         log(`Error with ${command}`);
         reject(error);
