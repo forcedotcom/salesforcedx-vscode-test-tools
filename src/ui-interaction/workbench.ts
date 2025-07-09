@@ -98,13 +98,6 @@ export async function zoomReset(wait: Duration = Duration.seconds(1)): Promise<v
 }
 
 /**
- * Opens a new terminal in the bottom panel
- */
-export async function openNewTerminal(): Promise<void> {
-  await new BottomBarPanel().openTerminalView();
-}
-
-/**
  * Handles either waiting for a specified duration or until a predicate resolves
  * @param predicateOrWait - Either a duration to wait or a predicate with timeout
  * @param prompt - The prompt to pass to the predicate
