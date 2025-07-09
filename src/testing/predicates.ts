@@ -25,9 +25,7 @@ export const standardPredicates = {
    * @param selector - The locator for the element to wait for
    * @returns true when the element is displayed
    */
-  waitForElement: async (selector: Locator) => {
-    return await getBrowser().findElement(selector).isDisplayed();
-  },
+  waitForElement: async (selector: Locator) => await getBrowser().findElement(selector).isDisplayed(),
 
   /**
    * Polls until a condition is true
