@@ -144,7 +144,7 @@ export async function createCommand(
     await inputBox.setText(name);
     await inputBox.confirm();
     await pause(Duration.seconds(1));
-    await clickButtonOnModalDialog('Overwrite');
+    await clickButtonOnModalDialog('Overwrite', false);
     await pause(Duration.seconds(1));
   });
 

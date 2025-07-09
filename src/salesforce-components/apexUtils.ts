@@ -36,7 +36,7 @@ export async function createApexClass(name: string, classText: string, breakpoin
     await pause(Duration.seconds(1));
     await inputBox.confirm();
     await pause(Duration.seconds(1));
-    await clickButtonOnModalDialog('Overwrite');
+    await clickButtonOnModalDialog('Overwrite', false);
     await pause(Duration.seconds(1));
   });
 
