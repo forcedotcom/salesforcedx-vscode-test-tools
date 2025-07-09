@@ -1,3 +1,9 @@
+# Salesforce DX VS Code Automation Tests (RedHat)
+
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE.txt)
+[![Contributing](https://img.shields.io/badge/Contributing-Guidelines-blue.svg)](CONTRIBUTING.md)
+[![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-v1.4-blue.svg)](CODE_OF_CONDUCT.md)
+
 ## Introduction
 
 This repository contains the source code for the automation tests for the Salesforce Extensions for VS Code.
@@ -69,3 +75,23 @@ After the dependencies have been installed, the vsixes downloaded and stored in 
 Note: At this point you should already have authorized `vscodeOrg` which will be used as your target DevHub, so don't forget to comment out `await this.setupAndAuthorizeOrg();` in setup() method from [test-setup-and-runner](test/test-setup-and-runner.ts) so you don't run into errors during setup while running E2E Tests locally.
 
 Note: if no changes are made to `_specFiles` property in [environmentSettings](test/environmentSettings.ts) class, then all tests will be run. If you want to run only some, comment out `'./test/specs/**/*.e2e.ts'` line in that file and uncomment the tests you want to run.
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## Code of Conduct
+
+Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+If you discover any security-related issues, please email security@salesforce.com instead of using the issue tracker.
+
+## License
+
+This project is licensed under the BSD 3-Clause License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Support
+
+For support, please open an issue in this repository or contact the Salesforce Platform Engineering team.
