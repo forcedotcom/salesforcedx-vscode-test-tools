@@ -13,7 +13,7 @@ import { TerminalView, Workbench } from 'vscode-extension-tester';
  * @param workbench - The VSCode workbench instance
  * @returns A promise that resolves to the terminal view
  */
-export async function getTerminalView(workbench: Workbench): Promise<TerminalView> {
+async function getTerminalView(workbench: Workbench): Promise<TerminalView> {
   const bottomBar = await workbench.getBottomBar().wait();
   const terminalView = await (await bottomBar.openTerminalView()).wait();
 
