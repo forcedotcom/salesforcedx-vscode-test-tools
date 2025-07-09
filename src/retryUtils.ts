@@ -5,10 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { Duration, log } from './core';
-import {
-  executeQuickPick,
-  notificationIsPresentWithTimeout
-} from './ui-interaction';
+import { executeQuickPick, notificationIsPresentWithTimeout } from './ui-interaction';
 
 /**
  * Retry a notification check
@@ -21,20 +18,23 @@ export const verifyNotificationWithRetry = async (
   notificationPattern: RegExp,
   wait = Duration.minutes(3),
   methodToRunForEachTry?: () => Promise<void>
-) => {
-  return await retryOperation(async () => {
-    if (methodToRunForEachTry) {
-      await methodToRunForEachTry();
-    }
-    const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
-    if (!notificationWasFound) {
-      log(`Notification ${notificationPattern} was not found`);
-      await executeQuickPick('Notifications: Show Notifications');
-      throw new Error(`Notification ${notificationPattern} was not found`);
-    }
-    return notificationWasFound;
-  }, 5, `Failed to find notification ${notificationPattern}`);
-};
+) =>
+  await retryOperation(
+    async () => {
+      if (methodToRunForEachTry) {
+        await methodToRunForEachTry();
+      }
+      const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
+      if (!notificationWasFound) {
+        log(`Notification ${notificationPattern} was not found`);
+        await executeQuickPick('Notifications: Show Notifications');
+        throw new Error(`Notification ${notificationPattern} was not found`);
+      }
+      return notificationWasFound;
+    },
+    5,
+    `Failed to find notification ${notificationPattern}`
+  );
 
 /**
  * Retry an operation

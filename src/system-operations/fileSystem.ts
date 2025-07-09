@@ -4,27 +4,11 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import fs from 'fs';
 import path from 'path';
-import fs from 'fs-extra';
 import { TestSetup } from '../testSetup';
 import { log } from '../core/miscellaneous';
 import FastGlob from 'fast-glob';
-
-/**
- * Creates a directory at the specified path
- * @param folderPath - The file system path where the folder should be created
- */
-export function createFolder(folderPath: string): void {
-  fs.mkdirSync(folderPath, { recursive: true });
-}
-
-/**
- * Removes a directory and all its contents at the specified path
- * @param folderPath - The file system path of the folder to be removed
- */
-export function removeFolder(folderPath: string): void {
-  fs.rmdirSync(folderPath, { recursive: true });
-}
 
 /**
  * Creates custom Salesforce objects in the project's force-app directory
@@ -32,7 +16,7 @@ export function removeFolder(folderPath: string): void {
  * @param testSetup - The test setup object containing project paths
  * @throws Error if copying fails or paths are undefined
  */
-export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
+export const createCustomObjects = async (testSetup: TestSetup): Promise<void> => {
   const projectPath = testSetup.projectFolderPath;
   const testDataFolderPath = testSetup.testDataFolderPath;
   if (!testDataFolderPath) {
@@ -48,19 +32,8 @@ export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
   // Ensure the project path has been created
   fs.mkdirSync(path.dirname(destination), { recursive: true });
 
-  const copyRecursive = (src: string, dest: string) => {
-    if (fs.statSync(src).isDirectory()) {
-      fs.mkdirSync(dest, { recursive: true });
-      fs.readdirSync(src).forEach(child => {
-        copyRecursive(path.join(src, child), path.join(dest, child));
-      });
-    } else {
-      fs.copyFileSync(src, dest);
-    }
-  };
-
   try {
-    copyRecursive(source, destination);
+    await fs.promises.cp(source, destination, { recursive: true });
   } catch (error) {
     if (error instanceof Error) {
       log(`Failed in copying custom objects ${error.message}`);
@@ -70,14 +43,14 @@ export async function createCustomObjects(testSetup: TestSetup): Promise<void> {
     await testSetup?.tearDown();
     throw error;
   }
-}
+};
 
 /**
  * Creates a global Apex code snippets file in the project's .vscode directory
  * @param testSetup - The test setup object containing project paths
  * @throws Error if file creation fails or paths are undefined
  */
-export async function createGlobalSnippetsFile(testSetup: TestSetup): Promise<void> {
+export const createGlobalSnippetsFile = async (testSetup: TestSetup): Promise<void> => {
   const projectPath = testSetup.projectFolderPath;
   if (!projectPath) {
     throw new Error('projectPath is undefined');
@@ -96,7 +69,7 @@ export async function createGlobalSnippetsFile(testSetup: TestSetup): Promise<vo
   ].join('\n');
 
   try {
-    fs.writeFileSync(destination, apexSnippet);
+    fs.writeFileSync(destination, apexSnippet, 'utf8');
   } catch (error) {
     if (error instanceof Error) {
       log(`Failed in creating apex snippets file ${error.message}`);
@@ -105,22 +78,22 @@ export async function createGlobalSnippetsFile(testSetup: TestSetup): Promise<vo
     await testSetup?.tearDown();
     throw error;
   }
-}
+};
+
 /**
  * Scans the directory for vsix files and returns the full path to each file
  * @param vsixDir
  * @returns
  */
-export function getVsixFilesFromDir(vsixDir: string): string[] {
-  return FastGlob.sync('**/*.vsix', { cwd: vsixDir }).map(vsixFile => path.join(vsixDir, vsixFile));
-}
+export const getVsixFilesFromDir = (vsixDir: string): string[] =>
+  FastGlob.sync('**/*.vsix', { cwd: vsixDir }).map(vsixFile => path.join(vsixDir, vsixFile));
 
 /**
  * Return folder name if given path is a directory, otherwise return null
  * @param folderPath
  * @returns folder name
  */
-export function getFolderName(folderPath: string): string | null {
+export const getFolderName = (folderPath: string): string | null => {
   try {
     // Check if the given path exists and if it is a directory
     const stats = fs.statSync(folderPath);
@@ -134,4 +107,4 @@ export function getFolderName(folderPath: string): string | null {
     console.error('Error checking path:', err);
     return null; // The path doesn't exist or isn't accessible
   }
-}
+};

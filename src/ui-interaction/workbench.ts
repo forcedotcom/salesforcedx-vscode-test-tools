@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
+import { ActivityBar, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { debug, Duration, isDuration, log, pause } from '../core/miscellaneous';
 import { PredicateWithTimeout } from '../testing/predicates';
@@ -95,13 +95,6 @@ export async function zoom(
  */
 export async function zoomReset(wait: Duration = Duration.seconds(1)): Promise<void> {
   await executeQuickPick('View: Reset Zoom', wait);
-}
-
-/**
- * Opens a new terminal in the bottom panel
- */
-export async function openNewTerminal(): Promise<void> {
-  await new BottomBarPanel().openTerminalView();
 }
 
 /**

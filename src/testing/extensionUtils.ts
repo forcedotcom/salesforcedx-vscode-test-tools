@@ -133,15 +133,9 @@ export async function reloadAndEnableExtensions(): Promise<void> {
  * @param {(ext: ExtensionType) => boolean} predicate - Optional filter function to apply to the extensions
  * @returns {ExtensionType[]} Array of extensions that should be verified as active
  */
-export function getExtensionsToVerifyActive(
+export const getExtensionsToVerifyActive = (
   predicate: (ext: ExtensionType) => boolean = ext => !!ext
-): ExtensionType[] {
-  return extensions
-    .filter(ext => {
-      return ext.shouldVerifyActivation;
-    })
-    .filter(predicate);
-}
+): ExtensionType[] => extensions.filter(ext => ext.shouldVerifyActivation).filter(predicate);
 
 /**
  * Verifies that specified extensions are running in VS Code

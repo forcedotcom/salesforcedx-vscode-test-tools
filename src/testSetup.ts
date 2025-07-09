@@ -11,7 +11,6 @@ import * as core from './core/index';
 import { ProjectConfig, ProjectShapeOption, ExtensionConfig } from './core/types';
 import {
   deleteScratchOrg,
-  createFolder,
   generateSfProject,
   gitRepoExists,
   getRepoNameFromUrl,
@@ -19,12 +18,7 @@ import {
   gitClone,
   setSettingValue
 } from './system-operations';
-import {
-  verifyExtensionsAreRunning,
-  reloadAndEnableExtensions,
-  checkForUncaughtErrors,
-  extensions,
-} from './testing';
+import { verifyExtensionsAreRunning, reloadAndEnableExtensions, checkForUncaughtErrors, extensions } from './testing';
 import { executeQuickPick, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 import { retryOperation } from './retryUtils';
@@ -161,9 +155,7 @@ export class TestSetup {
   }
 
   private async initializeNewSfProject() {
-    if (!fs.existsSync(this.tempFolderPath)) {
-      createFolder(this.tempFolderPath);
-    }
+    await fs.promises.mkdir(this.tempFolderPath, { recursive: true });
     await generateSfProject(this.tempProjectName, this.tempFolderPath); // generate a sf project for 'new'
     this.projectFolderPath = path.join(this.tempFolderPath, this.tempProjectName);
   }
@@ -225,9 +217,7 @@ export class TestSetup {
         // NONE: no project open in the workspace by default
         /* create the e2e-temp folder to benefit further testing */
         this.projectFolderPath = path.join(this.tempFolderPath, this.tempProjectName);
-        if (!fs.existsSync(this.tempFolderPath)) {
-          createFolder(this.tempFolderPath);
-        }
+        await fs.promises.mkdir(this.tempFolderPath, { recursive: true });
         break;
 
       default:
@@ -236,17 +226,17 @@ export class TestSetup {
 
     if ([ProjectShapeOption.NAMED, ProjectShapeOption.NEW].includes(projectConfig.projectShape)) {
       core.log(`Project folder to open: ${this.projectFolderPath}`);
-        // Verify the project was loaded.
-        await retryOperation(async () => {
-         if (this.projectFolderPath) {
-            await core.openFolder(this.projectFolderPath);
-            await verifyProjectLoaded(projectName ?? this.tempProjectName);
-          } else {
-            this.throwError('Project folder path is not set');
-          }
-        });
-      }
-      await setSettingValue("window.dialogStyle", "custom", false);
+      // Verify the project was loaded.
+      await retryOperation(async () => {
+        if (this.projectFolderPath) {
+          await core.openFolder(this.projectFolderPath);
+          await verifyProjectLoaded(projectName ?? this.tempProjectName);
+        } else {
+          this.throwError('Project folder path is not set');
+        }
+      });
+    }
+    await setSettingValue('window.dialogStyle', 'custom', false);
   }
 
   private throwError(message: string) {

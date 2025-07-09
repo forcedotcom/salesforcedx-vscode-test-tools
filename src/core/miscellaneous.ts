@@ -9,7 +9,7 @@ import os from 'os';
 import { EnvironmentSettings } from '../environmentSettings';
 import { attemptToFindOutputPanelText, clearOutputView } from '../ui-interaction/outputView';
 import { clickFilePathOkButton, executeQuickPick, findQuickPickItem } from '../ui-interaction/commandPrompt';
-import * as DurationKit from '@salesforce/kit';
+import * as kit from '@salesforce/kit';
 import path from 'path';
 import { PredicateWithTimeout } from '../testing/predicates';
 import { By, WebElement } from 'vscode-extension-tester';
@@ -24,7 +24,7 @@ import { clickButtonOnModalDialog } from '../ui-interaction';
  */
 export async function pause(duration: Duration = Duration.seconds(1)): Promise<void> {
   const throttleFactor = EnvironmentSettings.getInstance().throttleFactor;
-  await sleep(duration.milliseconds * throttleFactor);
+  await kit.sleep(duration.milliseconds * throttleFactor);
 }
 
 /**
@@ -152,10 +152,7 @@ export async function createCommand(
   // Select the default directory (press Enter/Return).
   await inputBox.confirm();
 
-  await verifyNotificationWithRetry(
-    new RegExp(`SFDX: Create ${type} successfully ran`),
-    Duration.minutes(10)
-  );
+  await verifyNotificationWithRetry(new RegExp(`SFDX: Create ${type} successfully ran`), Duration.minutes(10));
 
   const outputPanelText = await attemptToFindOutputPanelText(`Salesforce CLI`, `Finished SFDX: Create ${type}`, 10);
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -186,19 +183,10 @@ export function isDuration(predicateOrWait: PredicateWithTimeout | Duration): pr
   return (predicateOrWait as Duration).milliseconds !== undefined;
 }
 
-export enum Unit {
-  MINUTES = DurationKit.Duration.Unit.MINUTES,
-  MILLISECONDS = DurationKit.Duration.Unit.MILLISECONDS,
-  SECONDS = DurationKit.Duration.Unit.SECONDS,
-  HOURS = DurationKit.Duration.Unit.HOURS,
-  DAYS = DurationKit.Duration.Unit.DAYS,
-  WEEKS = DurationKit.Duration.Unit.WEEKS
-}
-
-export class Duration extends DurationKit.Duration {
+export class Duration extends kit.Duration {
   private scaleFactor: number;
 
-  constructor(quantity: number, unit: Unit, scaleFactor?: number) {
+  constructor(quantity: number, unit: kit.Duration.Unit, scaleFactor?: number) {
     super(quantity, unit);
     if (scaleFactor !== undefined) {
       this.scaleFactor = scaleFactor;
@@ -237,37 +225,28 @@ export class Duration extends DurationKit.Duration {
 
   // Static methods for creating new instances without specifying scaleFactor
   public static milliseconds(quantity: number): Duration {
-    return new Duration(quantity, Unit.MILLISECONDS);
+    return new Duration(quantity, Duration.Unit.MILLISECONDS);
   }
 
   public static seconds(quantity: number): Duration {
-    return new Duration(quantity, Unit.SECONDS);
+    return new Duration(quantity, Duration.Unit.SECONDS);
   }
 
   public static minutes(quantity: number): Duration {
-    return new Duration(quantity, Unit.MINUTES);
+    return new Duration(quantity, Duration.Unit.MINUTES);
   }
 
   public static hours(quantity: number): Duration {
-    return new Duration(quantity, Unit.HOURS);
+    return new Duration(quantity, Duration.Unit.HOURS);
   }
 
   public static days(quantity: number): Duration {
-    return new Duration(quantity, Unit.DAYS);
+    return new Duration(quantity, Duration.Unit.DAYS);
   }
 
   public static weeks(quantity: number): Duration {
-    return new Duration(quantity, Unit.WEEKS);
+    return new Duration(quantity, Duration.Unit.WEEKS);
   }
-}
-
-/**
- * Pauses execution for a specified number of milliseconds
- * @param duration - The number of milliseconds to sleep
- * @returns A promise that resolves after the specified duration
- */
-export async function sleep(duration: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, duration));
 }
 
 /*

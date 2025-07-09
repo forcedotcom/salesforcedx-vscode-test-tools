@@ -7,7 +7,12 @@
 
 import { fail } from 'assert';
 import { log } from 'console';
-import { executeQuickPick, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText } from '../ui-interaction';
+import {
+  executeQuickPick,
+  attemptToFindOutputPanelText,
+  getOperationTime,
+  verifyOutputPanelText
+} from '../ui-interaction';
 import { Duration } from '../core/miscellaneous';
 import { verifyNotificationWithRetry } from '../retryUtils';
 
@@ -49,7 +54,6 @@ export const validateCommand = async (
     Duration.minutes(10)
   );
 
-
   // Verify Output tab
   const outputPanelText = await attemptToFindOutputPanelText(
     'Salesforce CLI',
@@ -87,7 +91,7 @@ export const validateCommand = async (
  * @param currentFileName - The full name of the current file that is used to calculate the size of the spacer
  * @returns - A string of spaces to align the output text
  */
-export const calculateSpacer = (longestFullName: string, currentFileName: string): string => {
+const calculateSpacer = (longestFullName: string, currentFileName: string): string => {
   let numberOfSpaces = 2;
   if (longestFullName.length < 'FULL_NAME'.length) {
     numberOfSpaces += 'FULL_NAME'.length - currentFileName.length;
