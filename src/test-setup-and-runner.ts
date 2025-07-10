@@ -13,6 +13,7 @@ import { getVsixFilesFromDir } from './system-operations';
 import { TestConfig } from './core/types';
 import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
 import { verifyAliasAndUserName } from './salesforce-components/authorization';
+import { retryOperation } from './retryUtils';
 
 // Set Ubuntu Chrome arguments immediately when module loads
 if (process.platform === 'linux') {
@@ -214,6 +215,89 @@ class TestSetupAndRunner extends ExTester {
   }
 
   /**
+   * Kills existing VS Code processes on Windows to prevent file locking issues during extension installation
+   */
+  private async killExistingVSCodeProcesses(): Promise<void> {
+    if (process.platform !== 'win32') {
+      return;
+    }
+
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+
+      log('Attempting to kill existing VS Code processes on Windows...');
+
+      // Kill VS Code processes on Windows
+      const commands = [
+        'taskkill /f /im Code.exe',
+        'taskkill /f /im code.exe',
+        'taskkill /f /im VSCode.exe',
+        'taskkill /f /im electron.exe /fi "WINDOWTITLE eq Visual Studio Code*"',
+        'taskkill /f /im node.exe /fi "COMMANDLINE eq *vscode*"'
+      ];
+
+      for (const command of commands) {
+        try {
+          await execAsync(command);
+          log(`Executed: ${command}`);
+        } catch (error) {
+          // It's normal for taskkill to exit with code 1 if no processes are found
+          log(`Command ${command} completed (processes may not have been running)`);
+        }
+      }
+
+      // Wait a moment for processes to fully terminate and release file locks
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      log('VS Code process cleanup completed');
+
+    } catch (error) {
+      log(`Warning: Could not kill VS Code processes: ${error}`);
+    }
+  }
+
+  /**
+   * Cleans up Windows VS Code extension temporary files that may cause locking issues
+   */
+  private async cleanupWindowsExtensionTempFiles(): Promise<void> {
+    if (process.platform !== 'win32') {
+      return;
+    }
+
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+
+      log('Cleaning up Windows VS Code extension temporary files...');
+
+      // Clean up VS Code extension temporary files
+      const cleanupCommands = [
+        'del /f /q "%USERPROFILE%\\.vscode\\extensions\\*.vsctmp" 2>nul',
+        'del /f /q "%USERPROFILE%\\.vscode\\extensions\\*.tmp" 2>nul',
+        'rmdir /s /q "%TEMP%\\vscode-*" 2>nul',
+        'rmdir /s /q "%TEMP%\\Code-*" 2>nul'
+      ];
+
+      for (const command of cleanupCommands) {
+        try {
+          await execAsync(command);
+          log(`Executed cleanup: ${command}`);
+        } catch (error) {
+          // It's normal for cleanup commands to fail if files don't exist
+          log(`Cleanup command completed: ${command}`);
+        }
+      }
+
+      log('Windows extension temp file cleanup completed');
+
+    } catch (error) {
+      log(`Warning: Could not cleanup Windows extension temp files: ${error}`);
+    }
+  }
+
+  /**
    * Creates a Chrome wrapper script that forces Ubuntu-specific arguments
    */
   private async createChromeWrapper(): Promise<void> {
@@ -326,6 +410,12 @@ exec "${chromeExePath}" \\
     // Create Chrome wrapper script for Ubuntu
     if (process.platform === 'linux') {
       await this.createChromeWrapper();
+    }
+
+    // Kill any existing VS Code processes on Windows before installing extensions
+    if (process.platform === 'win32') {
+      await this.killExistingVSCodeProcesses();
+      await this.cleanupWindowsExtensionTempFiles();
     }
 
     try {
@@ -491,7 +581,20 @@ exec "${chromeExePath}" \\
         }
       }
 
-      await this.installExtension(vsixPath);
+      // Use retry logic for Windows to handle file locking issues
+      if (process.platform === 'win32') {
+        await retryOperation(
+          async () => {
+            // Add a small delay before each retry attempt to allow file handles to be released
+            await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
+            await this.installExtension(vsixPath);
+          },
+          TestSetupAndRunner.MAX_RETRIES,
+          `Failed to install extension ${path.basename(vsixPath)} after retries due to Windows file locking issues`
+        );
+      } else {
+        await this.installExtension(vsixPath);
+      }
     }
   }
 

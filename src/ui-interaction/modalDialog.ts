@@ -17,11 +17,11 @@ import { log, pause, Duration } from '../core';
  * @throws Will throw an error if the modal dialog is undefined.
  */
 export const clickButtonOnModalDialog = async (buttonText: string, failOnError = true): Promise<void> => {
-  const modalDialog = new ModalDialog();
   await pause(Duration.seconds(2));
 
   const pushButton = async () => {
     log(`clickButtonOnModalDialog() - Pushing button with text: "${buttonText}"`);
+    const modalDialog = new ModalDialog();
     await pause(Duration.seconds(2)); // wait for the modal dialog to be visible
     await modalDialog.pushButton(buttonText);
   };
