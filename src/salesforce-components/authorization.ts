@@ -57,9 +57,18 @@ export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
   fs.writeFileSync(authFilePath, sfOrgDisplayResult.stdout);
   log(`${testSetup.testSuiteSuffixName} - finished writing the file...`);
 
+  let authUrl = '';
+  try {
+    const authFile = fs.readFileSync(authFilePath, 'utf8');
+    const authFileJson = JSON.parse(authFile);
+    authUrl = authFileJson.result.sfdxAuthUrl;
+  } catch (error) {
+    log(`${testSetup.testSuiteSuffixName} - error reading auth file: ${error}`);
+  }
+
   // Call org:login:sfdx-url and read in the JSON that was just created.
   log(`${testSetup.testSuiteSuffixName} - calling sf org:login:sfdx-url...`);
-  await orgLoginSfdxUrl(authFilePath);
+  await orgLoginSfdxUrl(authUrl);
 
   log(`${testSetup.testSuiteSuffixName} - ...finished authorizeDevHub()`);
   log('');

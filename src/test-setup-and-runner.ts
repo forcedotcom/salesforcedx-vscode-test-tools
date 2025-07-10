@@ -531,13 +531,9 @@ exec "${chromeExePath}" \\
     // and we have an SFDX_AUTH_URL to use
     log('Authenticating using SFDX_AUTH_URL...');
     const sfdxAuthUrl = String(SFDX_AUTH_URL);
-    const authFilePath = 'authFile.txt';
-
-    // Create and write the SFDX Auth URL in a text file
-    await fs.writeFile(authFilePath, sfdxAuthUrl);
 
     // Step 1: Authorize to Testing Org
-    const authorizeOrg = await orgLoginSfdxUrl(authFilePath);
+    const authorizeOrg = await orgLoginSfdxUrl(sfdxAuthUrl);
     expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName}`);
     log(`Successfully authorized ${devHubUserName}`);
 

@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path';
-import fs from 'fs-extra';
+import fs from 'fs';
 import { TestSetup } from '../testSetup';
 import { log } from '../core/miscellaneous';
 import FastGlob from 'fast-glob';
