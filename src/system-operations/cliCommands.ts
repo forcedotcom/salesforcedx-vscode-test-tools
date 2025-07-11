@@ -1,29 +1,34 @@
-import spawn from 'cross-spawn';
-import { exec, SpawnOptionsWithoutStdio } from 'child_process';
-import { debug, log } from '../core/miscellaneous';
-import { OrgEdition, SfCommandRunResults } from '../core/types';
+import { SpawnOptionsWithoutStdio, spawn, exec } from 'child_process';
+import { log, debug } from '../core';
 import { EnvironmentSettings } from '../environmentSettings';
 import { retryOperation } from '../retryUtils';
 
-/**
- * Type alias for 'NONE' representing the absence of a definition file
- */
+export type OrgEdition = 'developer' | 'enterprise';
 export type NONE = 'NONE';
 
+export interface SfCommandRunResults {
+  stdout: string;
+  stderr: string;
+  exitCode: number;
+}
+
+export interface SfCommandOptions extends SpawnOptionsWithoutStdio {
+  stdin?: string;
+}
+
 /**
- * Runs a Salesforce CLI command
- * @param command - The CLI command to run (without the 'sf' prefix)
+ * Runs a Salesforce CLI command with optional stdin input
+ * @param command - The SF CLI command to run
  * @param args - Command arguments and options
- * @returns A promise that resolves to the command execution results
- * @throws Error if the process fails to start
+ * @returns Promise resolving to command results
  */
 export async function runCliCommand(
   command: string,
-  ...args: (string | SpawnOptionsWithoutStdio)[]
+  ...args: (string | SfCommandOptions)[]
 ): Promise<SfCommandRunResults> {
   const commandArgs = args.filter(arg => typeof arg === 'string');
   const hadJsonFlag = commandArgs.some(arg => arg === '--json');
-  let options = args.find(arg => typeof arg !== 'string') as SpawnOptionsWithoutStdio;
+  const options = args.find(arg => typeof arg !== 'string') as SfCommandOptions;
   let message = `running CLI command ${command} ${commandArgs.join(' ')}`;
   if (options) {
     message += `\nspawn options: ${JSON.stringify(options)}`;
@@ -31,8 +36,12 @@ export async function runCliCommand(
   const logLevel = EnvironmentSettings.getInstance().logLevel;
 
   log(message);
-  // add NODE_ENV=production
-  options = {
+
+  // Extract stdin data if provided
+  const stdinData = options?.stdin;
+
+  // add NODE_ENV=production and remove stdin from spawn options
+  const spawnOptions = {
     ...(options ?? {}),
     env: {
       ...process.env, // Ensure existing environment variables are included
@@ -41,9 +50,10 @@ export async function runCliCommand(
       ...(options?.env ?? {}) // Ensure any additional env vars in options are included
     }
   };
+  delete spawnOptions.stdin;
 
   return new Promise((resolve, reject) => {
-    const sfProcess = spawn('sf', [command, ...commandArgs] as string[], options);
+    const sfProcess = spawn('sf', [command, ...commandArgs] as string[], spawnOptions);
 
     let stdout = '';
     let stderr = '';
@@ -69,6 +79,16 @@ export async function runCliCommand(
     sfProcess.on('error', err => {
       reject(new Error(`Failed to start process: ${err.message}`));
     });
+
+    // Handle stdin input if provided
+    if (stdinData) {
+      if (sfProcess.stdin) {
+        sfProcess.stdin.write(stdinData);
+        sfProcess.stdin.end();
+      } else {
+        reject(new Error('Failed to write to stdin'));
+      }
+    }
   });
 }
 
@@ -95,7 +115,12 @@ export async function deleteScratchOrg(orgAliasName: string | undefined): Promis
  * @throws Error if login fails
  */
 export async function orgLoginSfdxUrl(): Promise<SfCommandRunResults> {
-  const sfSfdxUrlStoreResult = await runCliCommand('echo $SFDX_AUTH_URL | sf org login sfdx-url', '-d', '-u');
+  const sfdxAuthUrl = process.env.SFDX_AUTH_URL;
+  if (!sfdxAuthUrl) {
+    throw new Error('SFDX_AUTH_URL environment variable is not set');
+  }
+
+  const sfSfdxUrlStoreResult = await runCliCommand('org:login:sfdx-url', '--sfdx-url-stdin', { stdin: sfdxAuthUrl });
   if (sfSfdxUrlStoreResult.exitCode > 0) {
     debug('sfSfdxUrlStoreResult.exitCode = ' + sfSfdxUrlStoreResult.exitCode);
     debug('sfSfdxUrlStoreResult.stdout = ' + sfSfdxUrlStoreResult.stdout);
