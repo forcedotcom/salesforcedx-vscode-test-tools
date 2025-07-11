@@ -632,11 +632,10 @@ exec "${chromeExePath}" \\
 
     // At this point, neither alias nor username matched an existing org,
     // and we have an SFDX_AUTH_URL to use
-    log('Authenticating using SFDX_AUTH_URL...');
-    const sfdxAuthUrl = String(SFDX_AUTH_URL);
+    log('Authenticating using SFDX_AUTH_URL from environment variable...');
 
     // Step 1: Authorize to Testing Org
-    const authorizeOrg = await orgLoginSfdxUrl(sfdxAuthUrl);
+    const authorizeOrg = await orgLoginSfdxUrl();
     expect(authorizeOrg.stdout).to.contain(`Successfully authorized ${devHubUserName}`);
     log(`Successfully authorized ${devHubUserName}`);
 

@@ -4,8 +4,6 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import path from 'path';
-import fs from 'fs';
 import { EnvironmentSettings as Env } from '../../src/environmentSettings';
 import { TestSetup } from '../../src/testSetup';
 import { log, pause, Duration, transformedUserName } from '../core/miscellaneous';
@@ -49,26 +47,10 @@ export async function authorizeDevHub(testSetup: TestSetup): Promise<void> {
   if (!testSetup.projectFolderPath) {
     throw new Error('Project folder path is not set');
   }
-  const authFilePath = path.join(testSetup.projectFolderPath, 'authFile.json');
-  log(`${testSetup.testSuiteSuffixName} - calling sf org:display...`);
-  const sfOrgDisplayResult = await orgDisplay(Env.getInstance().devHubUserName);
-
-  // Now write the file.
-  fs.writeFileSync(authFilePath, sfOrgDisplayResult.stdout);
-  log(`${testSetup.testSuiteSuffixName} - finished writing the file...`);
-
-  let authUrl = '';
-  try {
-    const authFile = fs.readFileSync(authFilePath, 'utf8');
-    const authFileJson = JSON.parse(authFile);
-    authUrl = authFileJson.result.sfdxAuthUrl;
-  } catch (error) {
-    log(`${testSetup.testSuiteSuffixName} - error reading auth file: ${error}`);
-  }
 
   // Call org:login:sfdx-url and read in the JSON that was just created.
   log(`${testSetup.testSuiteSuffixName} - calling sf org:login:sfdx-url...`);
-  await orgLoginSfdxUrl(authUrl);
+  await orgLoginSfdxUrl();
 
   log(`${testSetup.testSuiteSuffixName} - ...finished authorizeDevHub()`);
   log('');

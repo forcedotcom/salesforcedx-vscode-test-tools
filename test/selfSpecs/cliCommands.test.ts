@@ -5,7 +5,6 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import fs from 'fs';
 import { step } from 'mocha-steps';
 import { EnvironmentSettings } from '../../src/environmentSettings';
 import { expect } from 'chai';
@@ -22,22 +21,15 @@ describe('CLI Commands', () => {
   const environmentSettings = EnvironmentSettings.getInstance();
   const devHubUserName = environmentSettings.devHubUserName;
   const devHubAliasName = environmentSettings.devHubAliasName;
-  const SFDX_AUTH_URL = environmentSettings.sfdxAuthUrl;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let scratchOrg: any;
 
   step('Authorize to Testing Org', async () => {
-    const sfdxAuthUrl = String(SFDX_AUTH_URL);
-    const authFilePath = 'authFile.txt';
-
     if (!devHubUserName) {
       throw new Error('No DEV_HUB_USER_NAME provided');
     }
 
-    // create and write in a text file
-    fs.writeFileSync(authFilePath, sfdxAuthUrl);
-
-    const authorizeOrg = await orgLoginSfdxUrl(authFilePath);
+    const authorizeOrg = await orgLoginSfdxUrl();
     expect(authorizeOrg.stdout).to.include(`Successfully authorized ${devHubUserName}`);
 
     const setAliasResult = await setAlias(devHubAliasName, devHubUserName);
