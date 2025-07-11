@@ -40,7 +40,9 @@ export async function runCliCommand(
       NODE_ENV: 'production',
       SF_LOG_LEVEL: logLevel,
       ...(options?.env ?? {}) // Ensure any additional env vars in options are included
-    }
+    },
+    // On Windows, use shell to resolve executable extensions (.exe, .cmd, .bat)
+    shell: process.platform === 'win32'
   };
   delete spawnOptions.stdin;
 
