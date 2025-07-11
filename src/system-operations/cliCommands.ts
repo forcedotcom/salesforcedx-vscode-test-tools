@@ -112,7 +112,7 @@ export async function orgLoginSfdxUrl(): Promise<SfCommandRunResults> {
     throw new Error('SFDX_AUTH_URL environment variable is not set');
   }
 
-  const sfSfdxUrlStoreResult = await runCliCommand('org:login:sfdx-url', '--sfdx-url-stdin', { stdin: sfdxAuthUrl });
+  const sfSfdxUrlStoreResult = await runCliCommand('org:login:sfdx-url', '-d', '--sfdx-url-stdin', { stdin: sfdxAuthUrl });
   if (sfSfdxUrlStoreResult.exitCode > 0) {
     debug('sfSfdxUrlStoreResult.exitCode = ' + sfSfdxUrlStoreResult.exitCode);
     debug('sfSfdxUrlStoreResult.stdout = ' + sfSfdxUrlStoreResult.stdout);
