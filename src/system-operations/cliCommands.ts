@@ -94,8 +94,8 @@ export async function deleteScratchOrg(orgAliasName: string | undefined): Promis
  * @returns Results of the login command
  * @throws Error if login fails
  */
-export async function orgLoginSfdxUrl(authUrl: string): Promise<SfCommandRunResults> {
-  const sfSfdxUrlStoreResult = await runCliCommand('org:login:sfdx-url', '-d', '-u', authUrl);
+export async function orgLoginSfdxUrl(): Promise<SfCommandRunResults> {
+  const sfSfdxUrlStoreResult = await runCliCommand('echo $SFDX_AUTH_URL | sf org login sfdx-url --set-default --sfdx-url-stdin');
   if (sfSfdxUrlStoreResult.exitCode > 0) {
     debug('sfSfdxUrlStoreResult.exitCode = ' + sfSfdxUrlStoreResult.exitCode);
     debug('sfSfdxUrlStoreResult.stdout = ' + sfSfdxUrlStoreResult.stdout);
