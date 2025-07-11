@@ -1,17 +1,9 @@
 import { SpawnOptionsWithoutStdio, spawn, exec } from 'child_process';
-import { log, debug } from '../core';
+import { log, debug, SfCommandRunResults, OrgEdition } from '../core';
 import { EnvironmentSettings } from '../environmentSettings';
 import { retryOperation } from '../retryUtils';
 
-export type OrgEdition = 'developer' | 'enterprise';
 export type NONE = 'NONE';
-
-export interface SfCommandRunResults {
-  stdout: string;
-  stderr: string;
-  exitCode: number;
-}
-
 export interface SfCommandOptions extends SpawnOptionsWithoutStdio {
   stdin?: string;
 }
