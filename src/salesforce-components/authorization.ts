@@ -9,7 +9,6 @@ import { TestSetup } from '../../src/testSetup';
 import { log, pause, Duration, transformedUserName } from '../core/miscellaneous';
 import { getStatusBarItemWhichIncludes } from '../ui-interaction/statusBar';
 import {
-  orgDisplay,
   orgList,
   orgLoginSfdxUrl,
   runCliCommand,
