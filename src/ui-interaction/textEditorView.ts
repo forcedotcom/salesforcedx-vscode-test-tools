@@ -1,4 +1,4 @@
-import { CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
+import { By, CodeLens, EditorView, Key, TextEditor, Workbench } from 'vscode-extension-tester';
 import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
@@ -276,3 +276,103 @@ export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName
     return lens;
   }, 3);
 }
+
+
+/**
+ * Wrapper function for moveCursor with fallback mechanism using inputarea monaco-mouse-cursor-text selector
+ * @param textEditor - The text editor instance
+ * @param line - The line number to move to
+ * @param column - The column number to move to
+ */
+export const moveCursorWithFallback = async (textEditor: TextEditor, line: number, column: number) => {
+  try {
+    // First try the original moveCursor approach
+    await textEditor.moveCursor(line, column);
+    log(`moveCursorWithFallback() - Successfully moved cursor to line ${line}, column ${column} using original method`);
+  } catch (error) {
+    // Fallback when moveCursor fails due to .native-edit-context selector issues
+    log(`moveCursorWithFallback() - Original moveCursor failed, trying fallback approach: ${String(error)}`);
+
+    try {
+      // Find the editor element using the fallback selector
+      const browser = getBrowser();
+      const editorElement = await browser.findElement(By.css('.inputarea.monaco-mouse-cursor-text'));
+
+      if (!editorElement) {
+        throw new Error('Could not find editor element using fallback selector .inputarea.monaco-mouse-cursor-text');
+      }
+
+      log('moveCursorWithFallback() - Found editor element using fallback selector');
+
+      // Get current coordinates (fallback method)
+      const getCurrentCoordinates = async () => {
+        try {
+          return await textEditor.getCoordinates();
+        } catch (coordError) {
+          log(`moveCursorWithFallback() - getCoordinates() failed: ${String(coordError)}`);
+          // Return a default position if coordinates can't be retrieved
+          return [1, 1];
+        }
+      };
+
+      // Check if we're at the target line
+      const isAtLine = async (targetLine: number) => {
+        try {
+          const coords = await getCurrentCoordinates();
+          return coords[0] === targetLine;
+        } catch {
+          return false;
+        }
+      };
+
+      // Check if we're at the target column
+      const isAtColumn = async (targetColumn: number) => {
+        try {
+          const coords = await getCurrentCoordinates();
+          return coords[1] === targetColumn;
+        } catch {
+          return false;
+        }
+      };
+
+      // Move to target line (mimic moveCursorToLine)
+      const coordinates = await getCurrentCoordinates();
+      const lineGap = coordinates[0] - line;
+      const lineKey = lineGap >= 0 ? Key.UP : Key.DOWN;
+
+      for (let i = 0; i < Math.abs(lineGap); i++) {
+        if (await isAtLine(line)) {
+          break;
+        }
+        await editorElement.sendKeys(lineKey);
+        await pause(Duration.milliseconds(50));
+      }
+
+      log(`moveCursorWithFallback() - Successfully moved cursor to line ${line} using fallback method`);
+
+      // Move to target column (mimic moveCursorToColumn)
+      const currentCoords = await getCurrentCoordinates();
+      const columnGap = currentCoords[1] - column;
+      const columnKey = columnGap >= 0 ? Key.LEFT : Key.RIGHT;
+
+      for (let i = 0; i < Math.abs(columnGap); i++) {
+        if (await isAtColumn(column)) {
+          break;
+        }
+        await editorElement.sendKeys(columnKey);
+        await pause(Duration.milliseconds(50));
+
+        // Check if we moved to a different line (mimic original error handling)
+        const newCoords = await getCurrentCoordinates();
+        if (newCoords[0] !== currentCoords[0]) {
+          throw new Error(`Column number ${column} is not accessible on line ${currentCoords[0]}`);
+        }
+      }
+
+      log(`moveCursorWithFallback() - Successfully moved cursor to column ${column} using fallback method`);
+    } catch (fallbackError) {
+      log(`moveCursorWithFallback() - Fallback approach also failed: ${String(fallbackError)}`);
+      throw new Error(`Failed to move cursor using both original and fallback methods: ${String(fallbackError)}`);
+    }
+  }
+};
