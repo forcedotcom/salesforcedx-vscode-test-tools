@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { By, Setting, SettingsEditor } from 'vscode-extension-tester';
+import { By, Setting, SettingsEditor, WebElement } from 'vscode-extension-tester';
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, findElementByText, log, pause } from '../core/miscellaneous';
 import { getBrowser } from '../ui-interaction/workbench';
@@ -145,8 +145,7 @@ export async function isBooleanSettingEnabled(
 }
 
 /**
- * Sets the value of a specific setting in the settings editor.
- *
+ * Sets the value of a specified setting in VSCode.
  * @param id - The unique identifier of the setting to be updated.
  * @param value - The new value to set for the specified setting.
  * @param isWorkspace - True if the setting is a workspace setting; false if it's a user setting.
@@ -154,7 +153,72 @@ export async function isBooleanSettingEnabled(
  */
 export const setSettingValue = async (id: string, value: string | boolean, isWorkspace: boolean): Promise<void> => {
   await (isWorkspace ? inWorkspaceSettings() : inUserSettings());
-  const settingsEditor = new SettingsEditor();
-  const logLevelSetting = await settingsEditor.findSettingByID(id);
-  await logLevelSetting?.setValue(value);
+  try {
+    // Try the original implementation using RedHat page objects
+    const settingsEditor = new SettingsEditor();
+    const logLevelSetting = await settingsEditor.findSettingByID(id);
+    await logLevelSetting?.setValue(value);
+  } catch (error) {
+    // Fallback for VS Code 1.90.0+ where .native-edit-context selector doesn't exist
+    log(`Primary findSettingByID failed, using fallback implementation for VS Code 1.90.0+: ${error}`);
+
+    try {
+      const browser = getBrowser();
+
+      // Alternative selectors for the search input in newer VS Code versions
+      const searchSelectors = [
+        '.inputarea.monaco-mouse-cursor-text',
+        'input[placeholder*="Search settings"]',
+      ];
+
+      let searchInput: WebElement | undefined;
+      for (const selector of searchSelectors) {
+        try {
+          searchInput = await browser.findElement(By.css(selector));
+          break;
+        } catch {
+          // Try next selector
+        }
+      }
+
+      if (!searchInput) {
+        throw new Error('Could not find settings search input with any known selector');
+      }
+
+      // Clear and search for the setting
+      await searchInput.clear();
+      await searchInput.sendKeys(id);
+      await pause(Duration.seconds(1));
+
+      // Find the setting by its title (last part of the ID)
+      const title = id.split('.').pop();
+      const settingElement = await findElementByText('div', 'textContent', title);
+
+      if (!settingElement) {
+        throw new Error(`Could not find setting element for: ${title}`);
+      }
+
+      // Find the input/control within the setting element and set the value
+      const parent = await settingElement.findElement(By.xpath('..'));
+      const settingContainer = await parent.findElement(By.xpath('..'));
+
+      if (typeof value === 'boolean') {
+        const checkbox = await settingContainer.findElement(By.css('input[type="checkbox"]'));
+        const isChecked = await checkbox.isSelected();
+        if (isChecked !== value) {
+          await checkbox.click();
+        }
+      } else {
+        const textInput = await settingContainer.findElement(By.css('input[type="text"], textarea'));
+        await textInput.clear();
+        await textInput.sendKeys(value.toString());
+      }
+
+      log(`Successfully set setting ${id} to ${value} using fallback implementation`);
+
+    } catch (fallbackError) {
+      log(`Both primary and fallback implementations failed: ${fallbackError}`);
+      throw new Error(`Failed to set setting ${id}: ${fallbackError}`);
+    }
+  }
 };

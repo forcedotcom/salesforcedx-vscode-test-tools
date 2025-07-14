@@ -823,9 +823,16 @@ const argv = yargs(hideBin(process.argv))
     description: 'Path to workspace directory',
     demandOption: false
   })
+  .option('vscode-version', {
+    alias: 'v',
+    type: 'string',
+    description: 'VS Code version to use (e.g., latest, stable, 1.85.0)',
+    demandOption: false
+  })
   .help().argv as {
   spec: string | string[] | undefined;
   workspacePath?: string;
+  vscodeVersion?: string;
 };
 
 // Create test config from command line arguments
@@ -834,6 +841,10 @@ const testConfig: Partial<TestConfig> = {};
 if (argv.workspacePath) {
   testConfig.workspacePath = argv.workspacePath;
   testConfig.extensionsPath = path.join(argv.workspacePath, 'extensions');
+}
+
+if (argv.vscodeVersion) {
+  testConfig.codeVersion = argv.vscodeVersion;
 }
 
 if (argv.spec) {
