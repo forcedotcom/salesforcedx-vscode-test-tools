@@ -190,9 +190,75 @@ export const setSettingValue = async (id: string, value: string | boolean, isWor
       await searchInput.sendKeys(id);
       await pause(Duration.seconds(1));
 
-      // Find the setting by its title (last part of the ID)
+      // Find the setting by its title (last part of the ID) using robust approach
       const title = id.split('.').pop();
-      const settingElement = await findElementByText('div', 'textContent', title);
+      let settingElement: WebElement | undefined;
+
+      // Wait for settings to load and stabilize
+      await pause(Duration.seconds(1));
+
+      // Try to find setting items using multiple selector approaches
+      const itemSelectors = [
+        '.setting-item',
+        '.settings-row-inner-container',
+        '.setting-list-item',
+        '[data-key]'
+      ];
+
+      let items: WebElement[] = [];
+      for (const selector of itemSelectors) {
+        try {
+          items = await browser.findElements(By.css(selector));
+          if (items.length > 0) break;
+        } catch {
+          // Try next selector
+        }
+      }
+
+      if (items.length === 0) {
+        throw new Error('Could not find any setting items with known selectors');
+      }
+
+      // Search through items to find the matching setting
+      for (const item of items) {
+        try {
+          // Try to find the setting label/title within the item
+          const labelSelectors = [
+            '.setting-item-label',
+            '.setting-item-title',
+            '.label-name',
+            '.setting-key-label',
+            '.monaco-label'
+          ];
+
+          let itemTitle = '';
+          for (const labelSelector of labelSelectors) {
+            try {
+              const labelElement = await item.findElement(By.css(labelSelector));
+              itemTitle = await labelElement.getText();
+              if (itemTitle) break;
+            } catch {
+              // Try next selector
+            }
+          }
+
+          // If no label found, try getting text content directly
+          if (!itemTitle) {
+            itemTitle = await item.getText();
+          }
+
+          // Normalize text comparison like SettingsEditor.js does
+          const normalizedTitle = title?.toLowerCase().replace(/\s/g, '').trim() || '';
+          const normalizedItemTitle = itemTitle.toLowerCase().replace(/\s/g, '').trim();
+
+          if (normalizedItemTitle.includes(normalizedTitle) || normalizedTitle.includes(normalizedItemTitle)) {
+            settingElement = item;
+            break;
+          }
+        } catch (err) {
+          // Continue to next item
+        }
+      }
 
       if (!settingElement) {
         throw new Error(`Could not find setting element for: ${title}`);
@@ -209,9 +275,88 @@ export const setSettingValue = async (id: string, value: string | boolean, isWor
           await checkbox.click();
         }
       } else {
-        const textInput = await settingContainer.findElement(By.css('input[type="text"], textarea'));
-        await textInput.clear();
-        await textInput.sendKeys(value.toString());
+        // Try to find and handle different input types
+        let inputHandled = false;
+
+        // First, try to find a select element (dropdown)
+        try {
+          const selectElement = await settingContainer.findElement(By.css('select'));
+          // For select elements, we need to find the option with the desired value
+          const options = await selectElement.findElements(By.css('option'));
+
+          for (const option of options) {
+            const optionValue = await option.getAttribute('value');
+            const optionText = await option.getText();
+
+            // Match by value or text content
+            if (optionValue === value.toString() || optionText === value.toString()) {
+              await option.click();
+              inputHandled = true;
+              break;
+            }
+          }
+
+          if (!inputHandled) {
+            // If no exact match found, try partial matching
+            for (const option of options) {
+              const optionValue = await option.getAttribute('value');
+              const optionText = await option.getText();
+
+              if (optionValue.toLowerCase().includes(value.toString().toLowerCase()) ||
+                  optionText.toLowerCase().includes(value.toString().toLowerCase())) {
+                await option.click();
+                inputHandled = true;
+                break;
+              }
+            }
+          }
+        } catch {
+          // Select element not found, continue to text input
+        }
+
+        // If no select element found or handled, try text input
+        if (!inputHandled) {
+          try {
+            const textInput = await settingContainer.findElement(By.css('input[type="text"], textarea'));
+            await textInput.clear();
+            await textInput.sendKeys(value.toString());
+            inputHandled = true;
+          } catch {
+            // Text input not found
+          }
+        }
+
+        // If still not handled, try more input types
+        if (!inputHandled) {
+          try {
+            const input = await settingContainer.findElement(By.css('input, textarea, select'));
+            const inputType = await input.getTagName();
+
+            if (inputType === 'select') {
+              // Handle select that wasn't caught above
+              const options = await input.findElements(By.css('option'));
+              for (const option of options) {
+                const optionText = await option.getText();
+                if (optionText === value.toString()) {
+                  await option.click();
+                  inputHandled = true;
+                  break;
+                }
+              }
+            } else {
+              // Handle other input types
+              await input.clear();
+              await input.sendKeys(value.toString());
+              inputHandled = true;
+            }
+          } catch {
+            // No input found
+          }
+        }
+
+        if (!inputHandled) {
+          throw new Error(`Could not find or handle input control for setting: ${title}`);
+        }
       }
 
       log(`Successfully set setting ${id} to ${value} using fallback implementation`);
