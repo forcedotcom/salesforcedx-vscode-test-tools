@@ -8,7 +8,7 @@
 import { Duration, log, pause } from '../core/miscellaneous';
 import { dismissAllNotifications } from './notifications';
 import { executeQuickPick } from './commandPrompt';
-import { BottomBarPanel, By, OutputView } from 'vscode-extension-tester';
+import { BottomBarPanel, By, Key, OutputView } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { retryOperation } from '../retryUtils';
 
@@ -34,7 +34,43 @@ export async function getOutputViewText(outputChannelName = ''): Promise<string>
   // Set focus to the contents in the Output panel.
   await executeQuickPick('Output: Focus on Output View', Duration.seconds(2));
 
-  return await outputView.getText();
+  try {
+    return await outputView.getText();
+  } catch (error) {
+      // Fallback when outputView.getText() fails
+      log(`outputView.getText() failed, trying fallback selector: ${(error as Error).message}`);
+
+      const clipboard = (await import('clipboardy')).default;
+
+      let originalClipboard = '';
+      try {
+          originalClipboard = clipboard.readSync();
+      } catch (clipboardError) {
+          // workaround issue when clipboard is empty
+      }
+
+      try {
+          // Try to find the textarea using the fallback selector
+          const textarea = await outputView.findElement(By.css('.inputarea.monaco-mouse-cursor-text, .inputarea textarea, .monaco-editor textarea'));
+
+          // Select all text and copy to clipboard
+          await textarea.sendKeys(Key.chord(process.platform === 'darwin' ? Key.META : Key.CONTROL, 'a'));
+          await textarea.sendKeys(Key.chord(process.platform === 'darwin' ? Key.META : Key.CONTROL, 'c'));
+
+          const text = clipboard.readSync();
+
+          // Restore original clipboard content
+          if (originalClipboard.length > 0) {
+              clipboard.writeSync(originalClipboard);
+          }
+
+          return text;
+      } catch (fallbackError) {
+          log(`Fallback getText also failed: ${(fallbackError as Error).message}`);
+          // If fallback also fails, rethrow the original error
+          throw error;
+      }
+  }
 }
 
 /**
