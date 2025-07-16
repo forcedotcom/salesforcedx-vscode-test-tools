@@ -190,8 +190,9 @@ export async function verifyProjectLoaded(projectName: string) {
 
   // Reload the VS Code window
   await pause(Duration.seconds(5));
-  const workbench = getWorkbench();
   await reloadWindow(Duration.seconds(10));
+
+  const workbench = getWorkbench();
   await showExplorerView();
 
   const sidebar = await workbench.getSideBar().wait();
