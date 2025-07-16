@@ -61,8 +61,8 @@ export const extensions: ExtensionType[] = [
     extensionId: 'salesforcedx-vscode-apex-debugger',
     name: 'Apex Interactive Debugger',
     vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
+    shouldInstall: 'never',
+    shouldVerifyActivation: false
   },
   {
     extensionId: 'salesforcedx-vscode-apex-replay-debugger',

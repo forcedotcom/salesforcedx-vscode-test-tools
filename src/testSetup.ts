@@ -211,7 +211,7 @@ export class TestSetup {
         break;
 
       case ProjectShapeOption.ANY:
-        // ANY: workspace is designated to open when wdio is initialized
+        // ANY: workspace is designated to open when redhat vscode-extension-tester is initialized
         if (projectConfig.folderPath) {
           this.projectFolderPath = projectConfig.folderPath;
           projectName = getFolderName(projectConfig.folderPath);
@@ -236,17 +236,17 @@ export class TestSetup {
 
     if ([ProjectShapeOption.NAMED, ProjectShapeOption.NEW].includes(projectConfig.projectShape)) {
       core.log(`Project folder to open: ${this.projectFolderPath}`);
-        // Verify the project was loaded.
-        await retryOperation(async () => {
-         if (this.projectFolderPath) {
-            await core.openFolder(this.projectFolderPath);
-            await verifyProjectLoaded(projectName ?? this.tempProjectName);
-          } else {
-            this.throwError('Project folder path is not set');
-          }
-        });
-      }
-      await setSettingValue("window.dialogStyle", "custom", false);
+      // Verify the project was loaded.
+      await retryOperation(async () => {
+        if (this.projectFolderPath) {
+          await core.openFolder(this.projectFolderPath);
+          await verifyProjectLoaded(projectName ?? this.tempProjectName);
+        } else {
+          this.throwError('Project folder path is not set');
+        }
+      });
+    }
+    await setSettingValue("window.dialogStyle", "custom", false);
   }
 
   private throwError(message: string) {
