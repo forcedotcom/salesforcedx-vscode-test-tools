@@ -20,7 +20,7 @@ export class EnvironmentSettings {
 
   /**
    * VSCode version to use in tests
-   * @env CODE_VERSION - VSCode version identifier (vscode-extension-tester standard)
+   * @env VSCODE_VERSION - VSCode version identifier (vscode-extension-tester standard)
    * @default 'latest'
    */
   private _codeVersion = 'latest';

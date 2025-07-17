@@ -209,8 +209,9 @@ export async function scratchOrgCreate(
     ...(definitionFileOrNone !== 'NONE' ? ['--definition-file', definitionFileOrNone] : [])
   ];
 
-  return await retryOperation(async () => {
-    const sfOrgCreateResult: SfCommandRunResults = await runCliCommand('org:create:scratch', ...args);
+  const sfOrgCreateResult: SfCommandRunResults = await retryOperation(async () => {
+    return await runCliCommand('org:create:scratch', ...args);
+  });
 
     if (sfOrgCreateResult.exitCode > 0) {
       log(
@@ -222,8 +223,7 @@ export async function scratchOrgCreate(
     log(`..."sf org:create:scratch" finished`);
     debug(`scratchOrgCreate results ${JSON.stringify(sfOrgCreateResult)}`);
 
-    return sfOrgCreateResult;
-  });
+  return sfOrgCreateResult;
 }
 
 /**

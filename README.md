@@ -91,21 +91,7 @@ This project is based on ExTester, available at https://github.com/redhat-develo
 
 If you are interested in contributing, please take a look at the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
-After cloning this repo, you will also need to have a folder called `salesforcedx-vscode` residing side-by-side in the same parent location, and have the vsixes you want to test in `salesforcedx-vscode/extensions` directory. e.g:
-
-```
-.
-├── ...
-├── salesforcedx-vscode-automation-tests-redhat    # E2E Tests repo
-├── salesforcedx-vscode
-│   └── extensions                          # Directory containing the salesforce extensions
-│       ├── salesforcedx-vscode-core-63.0.0.vsix
-│       ├── salesforcedx-vscode-apex-63.0.0.vsix
-│       └── ...
-└── ...
-```
-
-To install the test dependencies, run `npm install`. You do not need to compile - when running the e2e automation tests, the code is dynamically compiled.
+This repository is published and used as an npm module, currently imported by `salesforcedx-vscode`. You can follow the same repository to see how this is utilized.
 
 ### Environment Variables
 
@@ -113,11 +99,11 @@ The following environment variables can be used to configure the automation test
 
 | Environment Variable                  | Description                                                                                           | Default Value                                |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `CODE_VERSION`                        | VSCode version to use in tests                                                                        | `'latest'`                                   |
+| `VSCODE_VERSION`                      | VSCode version to use in tests                                                                        | `'latest'`                                   |
 | `SPEC_FILES`                          | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                                         |
 | `VSIX_TO_INSTALL`                     | Path to directory containing VSIX files to install                                                    | `undefined`                                  |
 | `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                |
-| `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | `'svcideebot@salesforce.com'`                |
+| `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | -                                            |
 | `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  |
 | `EXTENSION_PATH`                      | Path to extensions directory                                                                          | `{cwd}/../../salesforcedx-vscode/extensions` |
 | `SALESFORCEDX_VSCODE_EXTENSIONS_PATH` | Alternative path to extensions (takes precedence over EXTENSION_PATH)                                 | -                                            |
@@ -132,7 +118,7 @@ The following environment variables can be used to configure the automation test
 
 - **EXTENSION_PATH**: If your folder structure does not match the standard folder structure shown in the Getting Started section, `EXTENSION_PATH` will need to be set to the correct relative path to 'salesforcedx-vscode/extensions'
 
-- **SFDX_AUTH_URL**: To obtain this URL, run `sf org display -o vscodeOrg --verbose --json` in your terminal and extract the value from the `sfdxAuthUrl` property
+- **SFDX_AUTH_URL**: To obtain this URL, run `sf org display -o <myDevHub> --verbose --json` in your terminal and extract the value from the `sfdxAuthUrl` property
 
 - **USE_EXISTING_PROJECT_PATH**: If specified, must point to a valid existing project directory. The test framework will use this project instead of creating a new one
 
@@ -153,20 +139,6 @@ THROTTLE_FACTOR=2 npm test
 # Run tests with increased logging
 E2E_LOG_LEVEL=debug npm test
 ```
-
-### Dev Hub
-
-A requirement of this project is for a Dev Hub to have been enabled on the user's machine. The default Dev Hub name is "vscodeOrg" and the default username is "svcideebot@salesforce.com", though this can be configured with the `DEV_HUB_ALIAS_NAME` and `DEV_HUB_USER_NAME` environment variables.
-Run Task: `Authorize DevHub - E2E Testing Org` through command palette (Cmd+shift+P).
-Once you are connected to the org with `DEV_HUB_ALIAS_NAME` and `DEV_HUB_USER_NAME`, you can run a single or all end-to-end test suites.
-
-### Run the tests
-
-After the dependencies have been installed, the vsixes downloaded and stored in the right folder, and the environment variables have been set, open `salesforcedx-vscode-automation-tests-redhat` repo in Visual Studio Code, then debug using the `Debug Automation Test from env var SPEC_FILES` configuration in RUN AND DEBUG section in the left sidebar.
-
-Note: At this point you should already have authorized `vscodeOrg` which will be used as your target DevHub, so don't forget to comment out `await this.setupAndAuthorizeOrg();` in setup() method from [test-setup-and-runner](test/test-setup-and-runner.ts) so you don't run into errors during setup while running E2E Tests locally.
-
-Note: if no changes are made to `_specFiles` property in [environmentSettings](test/environmentSettings.ts) class, then all tests will be run. If you want to run only some, comment out `'./test/specs/**/*.e2e.ts'` line in that file and uncomment the tests you want to run.
 
 ## Test Configuration
 
