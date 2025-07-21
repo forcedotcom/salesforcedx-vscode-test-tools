@@ -21,7 +21,6 @@ import { clickButtonOnModalDialog } from '../ui-interaction';
  */
 export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
-  // Using the Command palette, run SFDX: Create Apex Class to create the main class
   let inputBox: InputBox | QuickOpenBox;
   await retryOperation(async () => {
     // Using the Command palette, run SFDX: Create Apex Class to create the main class
