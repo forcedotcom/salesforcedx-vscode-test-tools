@@ -15,6 +15,7 @@ jobs:
   getDistTag:
     outputs:
       tag: ${{ steps.distTag.outputs.tag }}
+      branch: ${{ steps.getBranch.outputs.branch }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,12 +23,30 @@ jobs:
           ref: ${{ github.event.release.tag_name || inputs.tag  }}
       - uses: salesforcecli/github-workflows/.github/actions/getPreReleaseTag@main
         id: distTag
+      - name: Determine branch
+        id: getBranch
+        run: |
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            # For release events, use the target branch of the release
+            BRANCH="${{ github.event.release.target_commitish }}"
+          else
+            # For workflow_dispatch, use the current branch
+            BRANCH="${{ github.ref_name }}"
+          fi
+
+          # Use main if triggered from main, otherwise use prerelease/dev
+          if [[ "$BRANCH" == "main" ]]; then
+            echo "branch=main" >> $GITHUB_OUTPUT
+          else
+            echo "branch=prerelease/dev" >> $GITHUB_OUTPUT
+          fi
+          echo "Detected branch: $BRANCH, using: $(cat $GITHUB_OUTPUT | grep branch | cut -d'=' -f2)"
 
   npm-publish:
     if: ${{ needs.getDistTag.outputs.tag != '' }}
     uses: ./.github/workflows/npm-publish.yml
     needs: [getDistTag]
     with:
-      branch: 'prerelease/dev'
+      branch: ${{ needs.getDistTag.outputs.branch }}
       nodeVersion: 'lts/*'
     secrets: inherit

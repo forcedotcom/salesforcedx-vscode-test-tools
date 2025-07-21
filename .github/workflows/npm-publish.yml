@@ -40,7 +40,24 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Determine npm dist-tag
+        id: distTag
+        run: |
+          # Extract version from package.json
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Version: $VERSION"
+
+          # Check if version contains prerelease identifiers
+          if [[ "$VERSION" =~ -([a-zA-Z]+) ]]; then
+            DIST_TAG="${BASH_REMATCH[1]}"
+            echo "Detected prerelease tag: $DIST_TAG"
+            echo "tag=$DIST_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "Detected stable release, using 'latest' tag"
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --access public --tag ${{ steps.distTag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
