@@ -1,4 +1,6 @@
 {
-  "timeout": 300000,
-  "reporter": "./lib/custom-summary-reporter.js"
+  "timeout": 720000,
+  "reporter": "spec",
+  "screenshotOnFail": true,
+  "screenshotPath": "./test-screenshots/"
 }
