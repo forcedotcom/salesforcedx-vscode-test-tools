@@ -3,7 +3,7 @@ import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
 import { retryOperation } from '../retryUtils';
-import fs from 'fs';
+import * as fs from 'node:fs/promises';
 
 /**
  * Gets a text editor for a specific file
@@ -240,12 +240,12 @@ async function overrideTextInFileWithFallback(filePath: string, classText: strin
     log(`overrideTextInFileWithFallback() - Writing content to file: ${filePath}`);
 
     // Write the new content to the file
-    await fs.promises.writeFile(filePath, classText, 'utf8');
+    await fs.writeFile(filePath, classText, 'utf8');
 
     log(`overrideTextInFileWithFallback() - Successfully wrote ${classText.length} characters to ${filePath}`);
 
     // Verify the write was successful
-    const writtenContent = await fs.promises.readFile(filePath, 'utf8');
+    const writtenContent = await fs.readFile(filePath, 'utf8');
 
     // Normalize whitespace for comparison
     const normalizeText = (str: string) => str.replace(/\s+/g, '');
@@ -376,3 +376,18 @@ export const moveCursorWithFallback = async (textEditor: TextEditor, line: numbe
     }
   }
 };
+
+/** Replace a specific line in a file using fs operations
+ * @param filePath - The path to the file to modify
+ * @param lineNumber - The line number to replace (1-based index)
+ * @param newContent - The new content to write
+*/
+export async function replaceLineInFile(filePath: string, lineNumber: number, newContent: string): Promise<void> {
+  const fileContent = await fs.readFile(filePath, 'utf8');
+  const lines = fileContent.split('\n');
+
+  // Replace the specific line (1-based to 0-based index)
+  lines[lineNumber - 1] = newContent;
+
+  await fs.writeFile(filePath, lines.join('\n'), 'utf8');
+}
