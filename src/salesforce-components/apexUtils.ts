@@ -150,20 +150,22 @@ export async function createApexClassWithBugs(): Promise<void> {
  */
 export async function createAnonymousApexFile(): Promise<void> {
   log(`calling createAnonymousApexFile()`);
-  const workbench = getWorkbench();
 
-  // Using the Command palette, run File: New File...
-  const inputBox = await executeQuickPick('Create: New File...', Duration.seconds(1));
-
-  // Set the name of the new Anonymous Apex file
-  await inputBox.setText('Anonymous.apex');
-  await inputBox.confirm();
-  await inputBox.confirm();
-
-  const textEditor = await getTextEditor(workbench, 'Anonymous.apex');
+  // Define the file content
   const fileContent = ["System.debug('¡Hola mundo!');", ''].join('\n');
-  await textEditor.setText(fileContent);
-  await textEditor.save();
+
+  // Create the file path in the project root
+  const filePath = join(process.cwd(), 'Anonymous.apex');
+
+  try {
+    // Write the Anonymous Apex file using fs.writeFile
+    await fs.writeFile(filePath, fileContent, 'utf8');
+    log(`Anonymous Apex file created successfully at ${filePath}`);
+  } catch (error) {
+    log(`Error creating Anonymous Apex file: ${error}`);
+    throw error;
+  }
+
   await pause(Duration.seconds(1));
 }
 
