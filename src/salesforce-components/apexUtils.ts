@@ -19,7 +19,7 @@ import { clickButtonOnModalDialog } from '../ui-interaction';
  * @param classText - The content of the Apex class
  * @param breakpoint - Optional line number where a breakpoint should be set
  */
-export async function createApexClass(name: string, classText: string, breakpoint?: number): Promise<void> {
+export async function createApexClass(name: string, classText?: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
   let inputBox: InputBox | QuickOpenBox;
   await retryOperation(async () => {
@@ -39,7 +39,12 @@ export async function createApexClass(name: string, classText: string, breakpoin
     await pause(Duration.seconds(1));
   });
 
-  log(`Blank Apex Class ${name} created successfully.`);
+  log(`Default Apex Class ${name} created successfully.`);
+  if (!classText) {
+    // If no class text is provided, just use the default class text
+    return;
+  }
+
   // Modify class content
   const workbench = getWorkbench();
   log('Getting text editor for the new Apex Class');
