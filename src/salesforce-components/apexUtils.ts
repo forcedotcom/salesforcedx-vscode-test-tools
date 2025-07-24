@@ -5,13 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import fs from 'fs/promises';
+import { join } from 'path';
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
-import { getTextEditor, overrideTextInFile } from '../ui-interaction/textEditorView';
-import { InputBox, QuickOpenBox } from 'vscode-extension-tester';
-import { retryOperation } from '../retryUtils';
-import { clickButtonOnModalDialog } from '../ui-interaction';
+import { getTextEditor } from '../ui-interaction/textEditorView';
 
 /**
  * Creates an Apex class with the specified name and content
@@ -21,46 +20,53 @@ import { clickButtonOnModalDialog } from '../ui-interaction';
  */
 export async function createApexClass(name: string, classText?: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
-  let inputBox: InputBox | QuickOpenBox;
-  await retryOperation(async () => {
-    // Using the Command palette, run SFDX: Create Apex Class to create the main class
-    inputBox = await executeQuickPick('SFDX: Create Apex Class', Duration.seconds(2));
-  });
 
-  // Set the name of the new Apex Class
-  await retryOperation(async () => {
-    await inputBox.setText(name);
-    await pause(Duration.seconds(1));
-    await inputBox.confirm();
-    await pause(Duration.seconds(1));
-    await inputBox.confirm();
-    await pause(Duration.seconds(1));
-    await clickButtonOnModalDialog('Overwrite', false);
-    await pause(Duration.seconds(1));
-  });
+  // Use provided classText or default template
+  const content = classText || [
+    `public with sharing class ${name} {`,
+    `\tpublic ${name}() {`,
+    ``,
+    `\t}`,
+    `}`
+  ].join('\n');
 
-  log(`Default Apex Class ${name} created successfully.`);
-  if (!classText) {
-    // If no class text is provided, just use the default class text
-    return;
+  // Define metadata content
+  const metaContent = [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">`,
+    `    <apiVersion>64.0</apiVersion>`,
+    `    <status>Active</status>`,
+    `</ApexClass>`
+  ].join('\n');
+
+  // Create the file paths (assuming we're in a Salesforce project structure)
+  const filePath = join(process.cwd(), 'force-app', 'main', 'default', 'classes', `${name}.cls`);
+  const metaFilePath = join(process.cwd(), 'force-app', 'main', 'default', 'classes', `${name}.cls-meta.xml`);
+
+  try {
+    // Write the Apex class file using fs.writeFile
+    await fs.writeFile(filePath, content, 'utf8');
+    log(`Apex Class ${name} created successfully at ${filePath}`);
+
+    // Write the metadata file using fs.writeFile
+    await fs.writeFile(metaFilePath, metaContent, 'utf8');
+    log(`Apex Class metadata ${name}.cls-meta.xml created successfully at ${metaFilePath}`);
+  } catch (error) {
+    log(`Error creating Apex Class ${name}: ${error}`);
+    throw error;
   }
 
-  // Modify class content
-  const workbench = getWorkbench();
-  log('Getting text editor for the new Apex Class');
-  const textEditor = await getTextEditor(workbench, name + '.cls');
-  log('Done getting text editor for the new Apex Class');
-  await pause(Duration.seconds(1));
-  log(`Setting text for Apex Class ${name}`);
-  await overrideTextInFile(textEditor, classText);
-  log(`Done setting text for Apex Class ${name}`);
-  await pause(Duration.seconds(1));
+  // Handle breakpoint if specified
   if (breakpoint) {
     log('createApexClass() - Setting breakpoints');
     await pause(Duration.seconds(5)); // wait for file to be saved and loaded
+
+    const workbench = getWorkbench();
+    const textEditor = await getTextEditor(workbench, name + '.cls');
     log(`createApexClass() - Set breakpoint ${breakpoint}`);
     await textEditor.toggleBreakpoint(breakpoint);
   }
+
   await pause(Duration.seconds(1));
   log(`Apex Class ${name} modified successfully.`);
 }
