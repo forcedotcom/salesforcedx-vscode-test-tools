@@ -47,6 +47,9 @@ export async function createVisualforcePage(folder: string): Promise<void> {
   const metaFilePath = join(folder, 'FooPage.page-meta.xml');
 
   try {
+    // Ensure the folder exists before writing files
+    await fs.mkdir(folder, { recursive: true });
+
     // Write the Visualforce page file using fs.writeFile
     await fs.writeFile(filePath, pageText, 'utf8');
     log(`Visualforce page FooPage.page created successfully at ${filePath}`);

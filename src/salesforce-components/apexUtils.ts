@@ -43,6 +43,9 @@ export async function createApexClass(name: string, folder: string, classText?: 
   const metaFilePath = join(folder, `${name}.cls-meta.xml`);
 
   try {
+    // Ensure the folder exists before writing files
+    await fs.mkdir(folder, { recursive: true });
+
     // Write the Apex class file using fs.writeFile
     await fs.writeFile(filePath, content, 'utf8');
     log(`Apex Class ${name} created successfully at ${filePath}`);
