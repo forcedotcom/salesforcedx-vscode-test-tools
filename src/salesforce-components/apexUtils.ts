@@ -7,7 +7,6 @@
 
 import fs from 'fs/promises';
 import { join } from 'path';
-import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
 import { getTextEditor } from '../ui-interaction/textEditorView';
@@ -18,7 +17,7 @@ import { getTextEditor } from '../ui-interaction/textEditorView';
  * @param classText - The content of the Apex class
  * @param breakpoint - Optional line number where a breakpoint should be set
  */
-export async function createApexClass(name: string, classText?: string, breakpoint?: number): Promise<void> {
+export async function createApexClass(name: string, folder: string, classText?: string, breakpoint?: number): Promise<void> {
   log(`calling createApexClass(${name})`);
 
   // Use provided classText or default template
@@ -40,8 +39,8 @@ export async function createApexClass(name: string, classText?: string, breakpoi
   ].join('\n');
 
   // Create the file paths (assuming we're in a Salesforce project structure)
-  const filePath = join(process.cwd(), 'force-app', 'main', 'default', 'classes', `${name}.cls`);
-  const metaFilePath = join(process.cwd(), 'force-app', 'main', 'default', 'classes', `${name}.cls-meta.xml`);
+  const filePath = join(folder, `${name}.cls`);
+  const metaFilePath = join(folder, `${name}.cls-meta.xml`);
 
   try {
     // Write the Apex class file using fs.writeFile
@@ -75,7 +74,7 @@ export async function createApexClass(name: string, classText?: string, breakpoi
  * Creates an Apex class and its corresponding test class
  * @param name - The name of the Apex class (test class will be named [name]Test)
  */
-export async function createApexClassWithTest(name: string): Promise<void> {
+export async function createApexClassWithTest(name: string, folder: string): Promise<void> {
   log(`calling createApexClassWithTest()`);
   const classText = [
     `public with sharing class ${name} {`,
@@ -84,7 +83,7 @@ export async function createApexClassWithTest(name: string): Promise<void> {
     `\t}`,
     `}`
   ].join('\n');
-  await createApexClass(name, classText, 3);
+  await createApexClass(name, folder, classText, 3);
 
   const testText = [
     `@IsTest`,
@@ -98,14 +97,14 @@ export async function createApexClassWithTest(name: string): Promise<void> {
     `\t}`,
     `}`
   ].join('\n');
-  await createApexClass(name + 'Test', testText, 6);
+  await createApexClass(name + 'Test', folder, testText, 6);
 }
 
 /**
  * Creates an Account service Apex class with a bug and its corresponding test class
  * The bug is that the TickerSymbol is set to accountNumber instead of tickerSymbol
  */
-export async function createApexClassWithBugs(): Promise<void> {
+export async function createApexClassWithBugs(folder: string): Promise<void> {
   log(`calling createApexClassWithBugs()`);
   const classText = [
     `public with sharing class AccountService {`,
@@ -119,7 +118,7 @@ export async function createApexClassWithBugs(): Promise<void> {
     `\t}`,
     `}`
   ].join('\n');
-  await createApexClass('AccountService', classText);
+  await createApexClass('AccountService', folder, classText);
 
   const testText = [
     `@IsTest`,
@@ -142,7 +141,7 @@ export async function createApexClassWithBugs(): Promise<void> {
     `\t}`,
     `}`
   ].join('\n');
-  await createApexClass('AccountServiceTest', testText);
+  await createApexClass('AccountServiceTest', folder, testText);
 }
 
 /**
@@ -172,7 +171,7 @@ export async function createAnonymousApexFile(): Promise<void> {
 /**
  * Creates an Apex controller class for Visualforce pages
  */
-export async function createApexController(): Promise<void> {
+export async function createApexController(folder: string): Promise<void> {
   log(`calling createApexController()`);
   const classText = [
     `public class MyController {`,
@@ -190,5 +189,5 @@ export async function createApexController(): Promise<void> {
     `\t}`,
     `}`
   ].join('\n');
-  await createApexClass('MyController', classText);
+  await createApexClass('MyController', folder, classText);
 }
