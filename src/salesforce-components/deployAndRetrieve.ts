@@ -124,7 +124,7 @@ const constructExpectedTexts = (
 
   const metadataPaths: Record<string, string> = {
     ApexClass: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}classes`,
-    ExternalServiceRsegistration: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations`,
+    ExternalServiceRegistration: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}externalServiceRegistrations`,
     CustomObject: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`,
     CustomField: `force-app${pathSeparator}main${pathSeparator}default${pathSeparator}objects`
   };
