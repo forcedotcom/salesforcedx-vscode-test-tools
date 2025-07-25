@@ -55,13 +55,16 @@ export async function createApexClass(name: string, folder: string, classText?: 
     throw error;
   }
 
+  // Open the file in the text editor
+  await pause(Duration.seconds(1));
+  const workbench = getWorkbench();
+  const textEditor = await getTextEditor(workbench, name + '.cls');
+
   // Handle breakpoint if specified
   if (breakpoint) {
     log('createApexClass() - Setting breakpoints');
     await pause(Duration.seconds(5)); // wait for file to be saved and loaded
 
-    const workbench = getWorkbench();
-    const textEditor = await getTextEditor(workbench, name + '.cls');
     log(`createApexClass() - Set breakpoint ${breakpoint}`);
     await textEditor.toggleBreakpoint(breakpoint);
   }
