@@ -181,11 +181,10 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 }
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
-  const filePath = await textEditor.getFilePath();
-
   if (save) {
     // Use fs.writeFile() to write the new content to the file
     try {
+      const filePath = await textEditor.getFilePath();
       // Write new content to file
       log(`overrideTextInFile() - Writing content to file: ${filePath}`);
       await fs.writeFile(filePath, classText, 'utf8');
@@ -214,6 +213,7 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
     try {
       await retryOperation(async () => {
         log('overrideTextInFile() - Starting UI-based text replacement');
+        await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
 
         await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
         await textEditor.sendKeys(Key.DELETE);
