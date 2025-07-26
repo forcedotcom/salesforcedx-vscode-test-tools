@@ -182,56 +182,69 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
   const filePath = await textEditor.getFilePath();
-  let originalContent: string | null = null;
 
-  try {
-    // Read original content if we might need to restore it
-    if (!save) {
-      originalContent = await fs.readFile(filePath, 'utf8');
-      log(`overrideTextInFile() - Stored original content (${originalContent.length} chars) for potential restore`);
-    }
+  if (save) {
+    // Use fs.writeFile() to write the new content to the file
+    try {
+      // Write new content to file
+      log(`overrideTextInFile() - Writing content to file: ${filePath}`);
+      await fs.writeFile(filePath, classText, 'utf8');
+      log(`overrideTextInFile() - Successfully wrote ${classText.length} characters to ${filePath}`);
 
-    // Write new content to file
-    log(`overrideTextInFile() - Writing content to file: ${filePath}`);
-    await fs.writeFile(filePath, classText, 'utf8');
-    log(`overrideTextInFile() - Successfully wrote ${classText.length} characters to ${filePath}`);
+      // Give the editor time to detect the file change and reload
+      await pause(Duration.seconds(1));
 
-    // Give the editor time to detect the file change and reload
-    await pause(Duration.seconds(1));
+      // Verify the write was successful by reading it back
+      const writtenContent = await fs.readFile(filePath, 'utf8');
+      const normalizeText = (str: string) => str.replace(/\s+/g, '');
+      const normalizedWritten = normalizeText(writtenContent);
+      const normalizedExpected = normalizeText(classText);
 
-    // Verify the write was successful by reading it back
-    const writtenContent = await fs.readFile(filePath, 'utf8');
-    const normalizeText = (str: string) => str.replace(/\s+/g, '');
-    const normalizedWritten = normalizeText(writtenContent);
-    const normalizedExpected = normalizeText(classText);
-
-    if (normalizedWritten !== normalizedExpected) {
-      throw new Error(`File write verification failed. Written content does not match expected content.`);
-    }
-
-    log('overrideTextInFile() - File content verified successfully');
-
-    // If save=false, restore the original content to disk but leave editor showing new content
-    if (!save && originalContent !== null) {
-      log('overrideTextInFile() - save=false: Restoring original content to disk');
-      await fs.writeFile(filePath, originalContent, 'utf8');
-      log('overrideTextInFile() - Original content restored. Editor should show new content but file is unchanged.');
-    }
-
-  } catch (error) {
-    log(`overrideTextInFile() - File system operation failed: ${error}`);
-
-    // If we had stored original content and something failed, try to restore it
-    if (!save && originalContent !== null) {
-      try {
-        await fs.writeFile(filePath, originalContent, 'utf8');
-        log('overrideTextInFile() - Restored original content after error');
-      } catch (restoreError) {
-        log(`overrideTextInFile() - Failed to restore original content: ${restoreError}`);
+      if (normalizedWritten !== normalizedExpected) {
+        throw new Error(`File write verification failed. Written content does not match expected content.`);
       }
-    }
 
-    throw new Error(`File system text replacement failed: ${error}`);
+      log('overrideTextInFile() - File content verified successfully');
+    } catch (error) {
+      log(`overrideTextInFile() - File system operation failed: ${error}`);
+      throw new Error(`File system text replacement failed: ${error}`);
+    }
+  } else {
+    // fs.writeFile() does not work when the file should not be saved after writing, so we use the UI approach
+    try {
+      await retryOperation(async () => {
+        log('overrideTextInFile() - Starting UI-based text replacement');
+
+        await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
+        await textEditor.sendKeys(Key.DELETE);
+
+        await pause(Duration.seconds(1));
+
+        log('overrideTextInFile() - Text cleared successfully, setting new text');
+
+        await textEditor.setText(classText);
+        await pause(Duration.seconds(2));
+
+        // Verify the text was set correctly
+        const text = await textEditor.getText();
+        log(`overrideTextInFile() - Text set. Length: ${text.length}, Expected length: ${classText.length}`);
+
+        // Normalize whitespace for comparison - remove all whitespace and compare
+        const normalizeText = (str: string) => str.replace(/\s+/g, '');
+        const normalizedText = normalizeText(text);
+        const normalizedClassText = normalizeText(classText);
+
+        if (normalizedText !== normalizedClassText) {
+          log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
+          throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
+        }
+
+        log('overrideTextInFile() - UI-based text replacement successful');
+      }, 1, 'UI-based text replacement failed');
+    } catch (uiError) {
+      log(`overrideTextInFile() - UI approach failed: ${uiError}`);
+      throw new Error(`UI-based text replacement failed: ${uiError}`);
+    }
   }
 }
 
