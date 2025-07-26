@@ -214,17 +214,23 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
       await retryOperation(async () => {
         log('overrideTextInFile() - Starting UI-based text replacement');
         await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
+        log('A');
         await pause(Duration.seconds(2));
+        log('B');
 
         await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
+        log('C');
         await textEditor.sendKeys(Key.DELETE);
+        log('D');
 
         await pause(Duration.seconds(1));
 
         log('overrideTextInFile() - Text cleared successfully, setting new text');
 
         await textEditor.setText(classText);
+        log('E');
         await pause(Duration.seconds(2));
+        log('F');
 
         // Verify the text was set correctly
         const text = await textEditor.getText();
@@ -232,8 +238,11 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
 
         // Normalize whitespace for comparison - remove all whitespace and compare
         const normalizeText = (str: string) => str.replace(/\s+/g, '');
+        log('G');
         const normalizedText = normalizeText(text);
+        log('H');
         const normalizedClassText = normalizeText(classText);
+        log('I');
 
         if (normalizedText !== normalizedClassText) {
           log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
