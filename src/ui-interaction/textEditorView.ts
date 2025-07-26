@@ -180,6 +180,39 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
   return await editor.getText();
 }
 
+/**
+ * Helper function to send keys to text editor with fallback mechanism
+ * @param textEditor - The text editor instance
+ * @param keys - The keys to send
+ */
+async function sendKeysWithFallback(textEditor: TextEditor, keys: string): Promise<void> {
+  try {
+    // First try the original sendKeys approach
+    await textEditor.sendKeys(keys);
+    log('sendKeysWithFallback() - Successfully sent keys using original method');
+  } catch (error) {
+    // Fallback when sendKeys fails due to element not being interactable
+    log(`sendKeysWithFallback() - Original sendKeys failed, trying fallback approach: ${String(error)}`);
+
+    try {
+      // Find the editor element using the fallback selector (same pattern as moveCursorWithFallback)
+      const browser = getBrowser();
+      const editorElement = await browser.findElement(By.css('.inputarea.monaco-mouse-cursor-text'));
+
+      if (!editorElement) {
+        throw new Error('Could not find editor element using fallback selector .inputarea.monaco-mouse-cursor-text');
+      }
+
+      log('sendKeysWithFallback() - Found editor element using fallback selector');
+      await editorElement.sendKeys(keys);
+      log('sendKeysWithFallback() - Successfully sent keys using fallback method');
+    } catch (fallbackError) {
+      log(`sendKeysWithFallback() - Fallback approach also failed: ${String(fallbackError)}`);
+      throw new Error(`Failed to send keys using both original and fallback methods: ${String(fallbackError)}`);
+    }
+  }
+}
+
 export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
   if (save) {
     // Use fs.writeFile() to write the new content to the file
@@ -218,9 +251,10 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
         await pause(Duration.seconds(2));
         log('B');
 
-        await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
+        // Use the new fallback-enabled sendKeys function
+        await sendKeysWithFallback(textEditor, Key.chord(Key.CONTROL, 'a'));
         log('C');
-        await textEditor.sendKeys(Key.DELETE);
+        await sendKeysWithFallback(textEditor, Key.DELETE);
         log('D');
 
         await pause(Duration.seconds(1));
