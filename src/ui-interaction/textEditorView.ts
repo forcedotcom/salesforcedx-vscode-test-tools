@@ -195,17 +195,40 @@ async function sendKeysWithFallback(textEditor: TextEditor, keys: string): Promi
     log(`sendKeysWithFallback() - Original sendKeys failed, trying fallback approach: ${String(error)}`);
 
     try {
-      // Find the editor element using the fallback selector (same pattern as moveCursorWithFallback)
+      // Find the editor element using multiple fallback selectors (pattern from outputView.ts and settings.ts)
       const browser = getBrowser();
-      const editorElement = await browser.findElement(By.css('.inputarea.monaco-mouse-cursor-text'));
 
-      if (!editorElement) {
-        throw new Error('Could not find editor element using fallback selector .inputarea.monaco-mouse-cursor-text');
+      // Try multiple selectors in order of preference
+      const editorSelectors = [
+        '.inputarea.monaco-mouse-cursor-text',
+        '.inputarea textarea',
+        '.monaco-editor textarea',
+        '.monaco-editor .inputarea',
+        '.view-lines',
+        '.monaco-editor'
+      ];
+
+      let editorElement;
+      let usedSelector = '';
+
+      for (const selector of editorSelectors) {
+        try {
+          editorElement = await browser.findElement(By.css(selector));
+          usedSelector = selector;
+          log(`sendKeysWithFallback() - Found editor element using selector: ${selector}`);
+          break;
+        } catch {
+          // Try next selector
+          log(`sendKeysWithFallback() - Selector ${selector} not found, trying next...`);
+        }
       }
 
-      log('sendKeysWithFallback() - Found editor element using fallback selector');
+      if (!editorElement) {
+        throw new Error('Could not find editor element using any known selector');
+      }
+
       await editorElement.sendKeys(keys);
-      log('sendKeysWithFallback() - Successfully sent keys using fallback method');
+      log(`sendKeysWithFallback() - Successfully sent keys using fallback method with selector: ${usedSelector}`);
     } catch (fallbackError) {
       log(`sendKeysWithFallback() - Fallback approach also failed: ${String(fallbackError)}`);
       throw new Error(`Failed to send keys using both original and fallback methods: ${String(fallbackError)}`);
