@@ -214,6 +214,7 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
       await retryOperation(async () => {
         log('overrideTextInFile() - Starting UI-based text replacement');
         await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
+        await pause(Duration.seconds(2));
 
         await textEditor.sendKeys(Key.chord(Key.CONTROL, 'a'));
         await textEditor.sendKeys(Key.DELETE);
