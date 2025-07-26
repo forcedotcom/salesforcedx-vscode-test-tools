@@ -29,6 +29,7 @@ export const runAndValidateCommand = async (
   prefix?: string
 ): Promise<void> => {
   log(`runAndValidateCommand()`);
+  await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
   await executeQuickPick(`SFDX: ${operation} This Source ${fromTo} Org`, Duration.seconds(5));
 
   await validateCommand(operation, fromTo, operationType, metadataType, [fullName], prefix);
