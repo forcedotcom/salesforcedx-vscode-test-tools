@@ -216,6 +216,7 @@ async function sendKeysWithFallback(textEditor: TextEditor, keys: string): Promi
           editorElement = await browser.findElement(By.css(selector));
           usedSelector = selector;
           log(`sendKeysWithFallback() - Found editor element using selector: ${selector}`);
+          await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
           await pause(Duration.seconds(2));
           break;
         } catch {
