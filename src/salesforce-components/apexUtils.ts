@@ -171,6 +171,11 @@ export async function createAnonymousApexFile(folder: string): Promise<void> {
     throw error;
   }
 
+  // Open the file in the text editor
+  await pause(Duration.seconds(1));
+  const workbench = getWorkbench();
+  await getTextEditor(workbench, 'Anonymous.apex');
+
   await pause(Duration.seconds(1));
 }
 
