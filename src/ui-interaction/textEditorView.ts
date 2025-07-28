@@ -181,139 +181,37 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
 }
 
 /**
- * Helper function to send keys to text editor with fallback mechanism
- * @param textEditor - The text editor instance
- * @param keys - The keys to send
+ * Overwrites the entire content of a file using filesystem operations
+ * @param textEditor - The text editor instance containing the file to modify
+ * @param classText - The new content to write to the file
+ * @throws Error if file write operation fails or content verification fails
  */
-async function sendKeysWithFallback(textEditor: TextEditor, keys: string): Promise<void> {
+export async function overrideTextInFile(textEditor: TextEditor, classText: string) {
+  // Use fs.writeFile() to write the new content to the file
   try {
-    // First try the original sendKeys approach
-    await textEditor.sendKeys(keys);
-    log('sendKeysWithFallback() - Successfully sent keys using original method');
+    const filePath = await textEditor.getFilePath();
+    // Write new content to file
+    log(`overrideTextInFile() - Writing content to file: ${filePath}`);
+    await fs.writeFile(filePath, classText, 'utf8');
+    log(`overrideTextInFile() - Successfully wrote ${classText.length} characters to ${filePath}`);
+
+    // Give the editor time to detect the file change and reload
+    await pause(Duration.seconds(1));
+
+    // Verify the write was successful by reading it back
+    const writtenContent = await fs.readFile(filePath, 'utf8');
+    const normalizeText = (str: string) => str.replace(/\s+/g, '');
+    const normalizedWritten = normalizeText(writtenContent);
+    const normalizedExpected = normalizeText(classText);
+
+    if (normalizedWritten !== normalizedExpected) {
+      throw new Error(`File write verification failed. Written content does not match expected content.`);
+    }
+
+    log('overrideTextInFile() - File content verified successfully');
   } catch (error) {
-    // Fallback when sendKeys fails due to element not being interactable
-    log(`sendKeysWithFallback() - Original sendKeys failed, trying fallback approach: ${String(error)}`);
-
-    try {
-      // Find the editor element using multiple fallback selectors (pattern from outputView.ts and settings.ts)
-      const browser = getBrowser();
-
-      // Try multiple selectors in order of preference
-      const editorSelectors = [
-        '.inputarea.monaco-mouse-cursor-text',
-        '.inputarea textarea',
-        '.monaco-editor textarea',
-        '.monaco-editor .inputarea',
-        '.view-lines',
-        '.monaco-editor'
-      ];
-
-      let editorElement;
-      let usedSelector = '';
-
-      for (const selector of editorSelectors) {
-        try {
-          editorElement = await browser.findElement(By.css(selector));
-          usedSelector = selector;
-          log(`sendKeysWithFallback() - Found editor element using selector: ${selector}`);
-          await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
-          await pause(Duration.seconds(2));
-          break;
-        } catch {
-          // Try next selector
-          log(`sendKeysWithFallback() - Selector ${selector} not found, trying next...`);
-        }
-      }
-
-      if (!editorElement) {
-        throw new Error('Could not find editor element using any known selector');
-      }
-
-      await editorElement.sendKeys(keys);
-      log(`sendKeysWithFallback() - Successfully sent keys using fallback method with selector: ${usedSelector}`);
-    } catch (fallbackError) {
-      log(`sendKeysWithFallback() - Fallback approach also failed: ${String(fallbackError)}`);
-      throw new Error(`Failed to send keys using both original and fallback methods: ${String(fallbackError)}`);
-    }
-  }
-}
-
-export async function overrideTextInFile(textEditor: TextEditor, classText: string, save = true) {
-  if (save) {
-    // Use fs.writeFile() to write the new content to the file
-    try {
-      const filePath = await textEditor.getFilePath();
-      // Write new content to file
-      log(`overrideTextInFile() - Writing content to file: ${filePath}`);
-      await fs.writeFile(filePath, classText, 'utf8');
-      log(`overrideTextInFile() - Successfully wrote ${classText.length} characters to ${filePath}`);
-
-      // Give the editor time to detect the file change and reload
-      await pause(Duration.seconds(1));
-
-      // Verify the write was successful by reading it back
-      const writtenContent = await fs.readFile(filePath, 'utf8');
-      const normalizeText = (str: string) => str.replace(/\s+/g, '');
-      const normalizedWritten = normalizeText(writtenContent);
-      const normalizedExpected = normalizeText(classText);
-
-      if (normalizedWritten !== normalizedExpected) {
-        throw new Error(`File write verification failed. Written content does not match expected content.`);
-      }
-
-      log('overrideTextInFile() - File content verified successfully');
-    } catch (error) {
-      log(`overrideTextInFile() - File system operation failed: ${error}`);
-      throw new Error(`File system text replacement failed: ${error}`);
-    }
-  } else {
-    // fs.writeFile() does not work when the file should not be saved after writing, so we use the UI approach
-    try {
-      await retryOperation(async () => {
-        log('overrideTextInFile() - Starting UI-based text replacement');
-        await executeQuickPick('View: Focus Active Editor Group', Duration.seconds(1));
-        log('A');
-        await pause(Duration.seconds(2));
-        log('B');
-
-        // Use the new fallback-enabled sendKeys function
-        await sendKeysWithFallback(textEditor, Key.chord(Key.CONTROL, 'a'));
-        log('C');
-        await sendKeysWithFallback(textEditor, Key.DELETE);
-        log('D');
-
-        await pause(Duration.seconds(1));
-
-        log('overrideTextInFile() - Text cleared successfully, setting new text');
-
-        await textEditor.setText(classText);
-        log('E');
-        await pause(Duration.seconds(2));
-        log('F');
-
-        // Verify the text was set correctly
-        const text = await textEditor.getText();
-        log(`overrideTextInFile() - Text set. Length: ${text.length}, Expected length: ${classText.length}`);
-
-        // Normalize whitespace for comparison - remove all whitespace and compare
-        const normalizeText = (str: string) => str.replace(/\s+/g, '');
-        log('G');
-        const normalizedText = normalizeText(text);
-        log('H');
-        const normalizedClassText = normalizeText(classText);
-        log('I');
-
-        if (normalizedText !== normalizedClassText) {
-          log(`overrideTextInFile() - Text mismatch. Got: "${text.substring(0, 100)}..." Expected: "${classText.substring(0, 100)}..."`);
-          throw new Error(`Text editor text does not match expected text (ignoring whitespace): "${text}" != "${classText}"`);
-        }
-
-        log('overrideTextInFile() - UI-based text replacement successful');
-      }, 1, 'UI-based text replacement failed');
-    } catch (uiError) {
-      log(`overrideTextInFile() - UI approach failed: ${uiError}`);
-      throw new Error(`UI-based text replacement failed: ${uiError}`);
-    }
+    log(`overrideTextInFile() - File system operation failed: ${error}`);
+    throw new Error(`File system text replacement failed: ${error}`);
   }
 }
 
