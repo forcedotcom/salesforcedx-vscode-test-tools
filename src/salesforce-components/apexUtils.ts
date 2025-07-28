@@ -153,14 +153,14 @@ export async function createApexClassWithBugs(folder: string): Promise<void> {
 /**
  * Creates an anonymous Apex file with a simple debug statement
  */
-export async function createAnonymousApexFile(): Promise<void> {
+export async function createAnonymousApexFile(folder: string): Promise<void> {
   log(`calling createAnonymousApexFile()`);
 
   // Define the file content
   const fileContent = ["System.debug('¡Hola mundo!');", ''].join('\n');
 
   // Create the file path in the project root
-  const filePath = join(process.cwd(), 'Anonymous.apex');
+  const filePath = join(folder, 'Anonymous.apex');
 
   try {
     // Write the Anonymous Apex file using fs.writeFile
