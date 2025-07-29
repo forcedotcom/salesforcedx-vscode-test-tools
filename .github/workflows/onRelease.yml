@@ -26,7 +26,6 @@ jobs:
         id: distTag
 
   npm-publish:
-    if: ${{ needs.getDistTag.outputs.tag != '' }}
     uses: ./.github/workflows/npm-publish.yml
     needs: [getDistTag]
     with:
