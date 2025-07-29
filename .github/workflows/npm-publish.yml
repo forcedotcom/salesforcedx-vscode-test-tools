@@ -45,11 +45,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Determine npm dist-tag
-        uses: salesforcecli/github-workflows/.github/actions/getPreReleaseTag@main
-        id: distTag
-
       - name: Publish to npm
-        run: npm publish --access public --tag ${{ inputs.distTag || steps.distTag.outputs.tag }}
+        run: npm publish --access public --tag ${{ inputs.distTag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
