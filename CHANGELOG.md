@@ -1,3 +1,12 @@
+## [1.1.3](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.2...1.1.3) (2025-07-29)
+
+
+### Bug Fixes
+
+* remove docs step and condition so latest is also published ([f4a8a60](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/f4a8a60bb25ba010b39108350aae153775e7568a))
+
+
+
 ## [1.1.2](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.1...1.1.2) (2025-07-29)
 
 
