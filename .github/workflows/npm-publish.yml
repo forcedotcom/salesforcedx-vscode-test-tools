@@ -6,6 +6,11 @@ on:
       tag:
         required: true
         type: string
+        description: 'Git tag to checkout'
+      distTag:
+        required: false
+        type: string
+        description: 'NPM dist tag for publishing'
       nodeVersion:
         required: true
         type: string
@@ -45,6 +50,6 @@ jobs:
         id: distTag
 
       - name: Publish to npm
-        run: npm publish --access public --tag ${{ steps.distTag.outputs.tag }}
+        run: npm publish --access public --tag ${{ inputs.distTag || steps.distTag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

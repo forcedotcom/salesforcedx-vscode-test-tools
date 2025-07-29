@@ -16,6 +16,7 @@ jobs:
   getDistTag:
     outputs:
       tag: ${{ steps.distTag.outputs.tag }}
+      gitTag: ${{ github.event.release.tag_name || inputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,9 +26,11 @@ jobs:
         id: distTag
 
   npm-publish:
+    if: ${{ needs.getDistTag.outputs.tag != '' }}
     uses: ./.github/workflows/npm-publish.yml
     needs: [getDistTag]
     with:
-      tag: ${{ needs.getDistTag.outputs.tag || 'latest' }}
+      tag: ${{ needs.getDistTag.outputs.gitTag }}
+      distTag: ${{ needs.getDistTag.outputs.tag }}
       nodeVersion: 'lts/*'
     secrets: inherit
