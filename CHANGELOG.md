@@ -1,3 +1,12 @@
+## [1.1.2](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.1...1.1.2) (2025-07-29)
+
+
+### Bug Fixes
+
+* trigger release again ([#76](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/76)) ([0245a76](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/0245a76807db0ac53b1693532ecc5565beff9a6f))
+
+
+
 ## [1.1.1](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.0...1.1.1) (2025-07-29)
 
 
