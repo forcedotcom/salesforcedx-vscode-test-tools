@@ -7,7 +7,12 @@
 
 import { fail } from 'assert';
 import { log } from 'console';
-import { executeQuickPick, attemptToFindOutputPanelText, getOperationTime, verifyOutputPanelText } from '../ui-interaction';
+import {
+  executeQuickPick,
+  attemptToFindOutputPanelText,
+  getOperationTime,
+  verifyOutputPanelText
+} from '../ui-interaction';
 import { Duration } from '../core/miscellaneous';
 import { verifyNotificationWithRetry } from '../retryUtils';
 
@@ -48,7 +53,6 @@ export const validateCommand = async (
     new RegExp(`SFDX: ${operation} This Source ${fromTo} Org successfully ran`),
     Duration.minutes(10)
   );
-
 
   // Verify Output tab
   const outputPanelText = await attemptToFindOutputPanelText(
@@ -119,7 +123,7 @@ const constructExpectedTexts = (
 ): string[] => {
   const expectedTexts = [
     `${operation}ed Source`.replace('Retrieveed', 'Retrieved'),
-    `ended SFDX: ${operation} This Source ${fromTo} Org`
+    `Ended SFDX: ${operation} This Source ${fromTo} Org`
   ];
 
   const metadataPaths: Record<string, string> = {
