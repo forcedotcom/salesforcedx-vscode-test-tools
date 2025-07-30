@@ -52,7 +52,6 @@ export class TestSetup {
     testSetup.testSuiteSuffixName = testReqConfig.testSuiteSuffixName;
     core.log('');
     core.log(`${testSetup.testSuiteSuffixName} - Starting TestSetup.setUp()...`);
-    testSetup.setWindowDialogStyle();
 
     // Configure extensions based on test requirements
     testSetup.configureExtensions(testReqConfig);
@@ -69,6 +68,7 @@ export class TestSetup {
       }
       await reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
+    testSetup.setWindowDialogStyle();
     testSetup.setWorkbenchHoverDelay();
     testSetup.setMaximumWindowSize();
     core.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
