@@ -24,7 +24,7 @@ import {
   checkForUncaughtErrors,
   extensions,
 } from './testing';
-import { executeQuickPick, verifyProjectLoaded } from './ui-interaction';
+import { executeQuickPick, reloadWindow, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 import { retryOperation } from './retryUtils';
 
@@ -71,6 +71,9 @@ export class TestSetup {
     testSetup.setWindowDialogStyle();
     testSetup.setWorkbenchHoverDelay();
     testSetup.setMaximumWindowSize();
+
+    await reloadWindow(); // reload window to apply settings
+
     core.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
     return testSetup;
   }
