@@ -164,6 +164,8 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionConfig[], 
 
   let extensionsStatus: ExtensionActivation[] = [];
   let allActivated = false;
+  let loopCount = 0;
+  const maxLoops = 20; // Prevent infinite loops
 
   const timeoutPromise = new Promise<boolean>((_, reject) =>
     setTimeout(() => reject(new Error('findExtensionsInRunningExtensionsList timeout')), timeout.milliseconds)
@@ -173,7 +175,24 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionConfig[], 
     await Promise.race([
       (async () => {
         do {
-          extensionsStatus = await findExtensionsInRunningExtensionsList(extensionIDsToVerify);
+          loopCount++;
+          log(`Extension verification loop ${loopCount}/${maxLoops}`);
+
+          // Add delay between checks on Ubuntu to reduce DOM churn
+          if (process.platform === 'linux' && loopCount > 1) {
+            await pause(Duration.seconds(2));
+          }
+
+          try {
+            extensionsStatus = await findExtensionsInRunningExtensionsList(extensionIDsToVerify);
+          } catch (error) {
+            log(`Failed to get extensions list on attempt ${loopCount}: ${error}`);
+            if (loopCount >= maxLoops) {
+              throw error;
+            }
+            continue; // Try again
+          }
+
           extensions.map(e => {
             const found = extensionsStatus.find(es => es.extensionId === e.extensionId);
             if (found) {
@@ -189,6 +208,11 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionConfig[], 
               extensionsStatus.find(extensionStatus => extensionStatus.extensionId === extensionId)
                 ?.isActivationComplete
           );
+
+          if (loopCount >= maxLoops) {
+            log(`Maximum verification loops (${maxLoops}) reached`);
+            break;
+          }
         } while (!allActivated);
       })(),
       timeoutPromise
@@ -197,7 +221,12 @@ export async function verifyExtensionsAreRunning(extensions: ExtensionConfig[], 
     log(`Error while waiting for extensions to activate: ${error}`);
   }
 
-  await zoomReset();
+  try {
+    await zoomReset();
+  } catch (error) {
+    log(`Error during zoom reset: ${error}`);
+    // Don't fail the test for zoom reset issues
+  }
 
   log('... Finished verifyExtensionsAreRunning()');
   log('');
