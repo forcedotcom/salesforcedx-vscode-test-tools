@@ -17,7 +17,6 @@ import {
   getRepoNameFromUrl,
   getFolderName,
   gitClone,
-  setSettingValue
 } from './system-operations';
 import {
   verifyExtensionsAreRunning,
@@ -53,6 +52,7 @@ export class TestSetup {
     testSetup.testSuiteSuffixName = testReqConfig.testSuiteSuffixName;
     core.log('');
     core.log(`${testSetup.testSuiteSuffixName} - Starting TestSetup.setUp()...`);
+    testSetup.setWindowDialogStyle();
 
     // Configure extensions based on test requirements
     testSetup.configureExtensions(testReqConfig);
@@ -246,7 +246,6 @@ export class TestSetup {
         }
       });
     }
-    await setSettingValue("window.dialogStyle", "custom", false);
   }
 
   private throwError(message: string) {
@@ -335,5 +334,28 @@ export class TestSetup {
 
     fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
     core.log(`${this.testSuiteSuffixName} - Set 'window.newWindowDimensions' to 'maximized' in ${vscodeSettingsPath}`);
+  }
+
+  private setWindowDialogStyle(): void {
+    if (!this.projectFolderPath) {
+      this.throwError('Project folder path is not set');
+      return; // This line will never be reached, but helps TypeScript understand
+    }
+    const vscodeSettingsPath = path.join(this.projectFolderPath, '.vscode', 'settings.json');
+
+    if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
+      fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
+    }
+
+    let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
+
+    // Update settings to set window.dialogStyle
+    settings = {
+      ...settings,
+      'window.dialogStyle': 'custom'
+    };
+
+    fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    core.log(`${this.testSuiteSuffixName} - Set 'window.dialogStyle' to 'custom' in ${vscodeSettingsPath}`);
   }
 }
