@@ -77,11 +77,19 @@ export async function selectQuickPickItem(prompt: InputBox | QuickOpenBox | unde
   if (!prompt) {
     throw new Error('Prompt cannot be undefined');
   }
-  const quickPick = await prompt.findQuickPick(text);
-  if (!quickPick || (await quickPick.getLabel()) !== text) {
-    throw new Error(`Quick pick item ${text} was not found`);
-  }
-  await quickPick.select();
+
+  await retryOperation(
+    async () => {
+      const quickPick = await prompt.findQuickPick(text);
+      if (!quickPick || (await quickPick.getLabel()) !== text) {
+        throw new Error(`Quick pick item ${text} was not found`);
+      }
+      await quickPick.select();
+    },
+    3,
+    `selectQuickPickItem failed for ${text}`
+  );
+
   await pause(Duration.seconds(1));
 }
 
@@ -104,30 +112,49 @@ export async function findQuickPickItem(
   }
   // Type the text into the filter.  Do this in case the pick list is long and
   // the target item is not visible (and one needs to scroll down to see it).
-  await inputBox.setText(quickPickItemTitle);
+  await retryOperation(
+    async () => {
+      await inputBox.setText(quickPickItemTitle);
+    },
+    3,
+    'setText operation failed in findQuickPickItem'
+  );
+
   await pause(Duration.seconds(1));
 
-  let itemWasFound = false;
-  const quickPicks = await inputBox.getQuickPicks();
-  for (const quickPick of quickPicks) {
-    const label = await quickPick.getLabel();
-    if (useExactMatch && label === quickPickItemTitle) {
-      itemWasFound = true;
-    } else if (!useExactMatch && label.includes(quickPickItemTitle)) {
-      itemWasFound = true;
-    }
+  // Get quick picks and search for the item using retryOperation
+  return await retryOperation(
+    async () => {
+      let itemWasFound = false;
+      const quickPicks = await inputBox.getQuickPicks();
 
-    if (itemWasFound) {
-      if (selectTheQuickPickItem) {
-        await quickPick.select();
-        await pause(Duration.seconds(1));
+      for (const quickPick of quickPicks) {
+        const label = await quickPick.getLabel();
+        if (useExactMatch && label === quickPickItemTitle) {
+          itemWasFound = true;
+        } else if (!useExactMatch && label.includes(quickPickItemTitle)) {
+          itemWasFound = true;
+        }
+
+        if (itemWasFound) {
+          if (selectTheQuickPickItem) {
+            await retryOperation(
+              async () => {
+                await quickPick.select();
+              },
+              3,
+              'quickPick.select() failed'
+            );
+            await pause(Duration.seconds(1));
+          }
+          return true;
+        }
       }
-
-      return true;
-    }
-  }
-
-  return false;
+      return false;
+    },
+    3,
+    'getQuickPicks operation failed in findQuickPickItem'
+  );
 }
 
 /**
@@ -169,13 +196,33 @@ export async function executeQuickPick(
   wait: Duration = Duration.seconds(1)
 ): Promise<InputBox | QuickOpenBox> {
   log(`executeQuickPick command: ${command}`);
-  return await retryOperation(async () => {
+  return await retryOperation(
+    async () => {
       const workbench = getWorkbench();
       const inputBox = await workbench.openCommandPrompt();
       await pause(Duration.seconds(2));
       await inputBox.wait();
-      await inputBox.setText(`>${command}`);
-      await inputBox.selectQuickPick(command);
+
+      // Use retryOperation for stale element handling in text input
+      await retryOperation(
+        async () => {
+          await inputBox.setText(`>${command}`);
+        },
+        3,
+        'setText operation failed'
+      );
+
+      await pause(Duration.milliseconds(500)); // Small delay before selection
+
+      // Use retryOperation for stale element handling in selection
+      await retryOperation(
+        async () => {
+          await inputBox.selectQuickPick(command);
+        },
+        3,
+        'selectQuickPick operation failed'
+      );
+
       await pause(wait);
       log(`executeQuickPick command: ${command} - done`);
       return inputBox;

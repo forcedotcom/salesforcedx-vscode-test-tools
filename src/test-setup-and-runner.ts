@@ -34,7 +34,24 @@ if (process.platform === 'linux') {
     '--disable-field-trial-config',
     '--disable-ipc-flooding-protection',
     '--single-process',
-    '--no-zygote'
+    '--no-zygote',
+    // Additional stability flags for Ubuntu CI
+    '--disable-extensions-except=',
+    '--disable-component-extensions-with-background-pages',
+    '--disable-background-networking',
+    '--disable-sync',
+    '--disable-translate',
+    '--disable-default-apps',
+    '--disable-client-side-phishing-detection',
+    '--disable-component-update',
+    '--disable-domain-reliability',
+    '--disable-features=TranslateUI',
+    '--disable-hang-monitor',
+    '--disable-prompt-on-repost',
+    '--disable-web-resources',
+    '--force-device-scale-factor=1',
+    '--window-size=1280,720',
+    '--start-maximized'
   ].join(' ');
 
   process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS = ubuntuChromeArgs;
@@ -45,8 +62,12 @@ if (process.platform === 'linux') {
 }
 
 // Set Chrome-related environment variables early
-process.env.CHROME_OPTIONS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
-process.env.CHROMIUM_FLAGS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
+process.env.CHROME_OPTIONS =
+  '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' +
+  Date.now();
+process.env.CHROMIUM_FLAGS =
+  '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' +
+  Date.now();
 process.env.CHROME_BIN = '/usr/bin/google-chrome';
 process.env.CHROMIUM_BIN = '/usr/bin/google-chrome';
 
@@ -75,10 +96,7 @@ class TestSetupAndRunner extends ExTester {
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY = 5000;
 
-  constructor(
-    testConfig?: Partial<TestConfig>,
-    spec?: string | string[] | undefined
-  ) {
+  constructor(testConfig?: Partial<TestConfig>, spec?: string | string[] | undefined) {
     log(`Init testConfig with testConfig: ${JSON.stringify(testConfig)}`);
     log(`Init testConfig with spec: ${spec}`);
     // Create config with defaults and overrides
@@ -154,7 +172,24 @@ class TestSetupAndRunner extends ExTester {
       '--disable-field-trial-config',
       '--disable-ipc-flooding-protection',
       '--single-process',
-      '--no-zygote'
+      '--no-zygote',
+      // Additional stability flags for Ubuntu CI
+      '--disable-extensions-except=',
+      '--disable-component-extensions-with-background-pages',
+      '--disable-background-networking',
+      '--disable-sync',
+      '--disable-translate',
+      '--disable-default-apps',
+      '--disable-client-side-phishing-detection',
+      '--disable-component-update',
+      '--disable-domain-reliability',
+      '--disable-features=TranslateUI',
+      '--disable-hang-monitor',
+      '--disable-prompt-on-repost',
+      '--disable-web-resources',
+      '--force-device-scale-factor=1',
+      '--window-size=1280,720',
+      '--start-maximized'
     ].join(' ');
 
     // Set the environment variable for vscode-extension-tester to pick up
@@ -166,7 +201,9 @@ class TestSetupAndRunner extends ExTester {
     process.env.GOOGLE_CHROME_OPTS = ubuntuChromeArgs;
 
     log(`Set Ubuntu Chrome driver arguments: ${ubuntuChromeArgs}`);
-    log(`Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`);
+    log(
+      `Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`
+    );
 
     // Also try setting the user data dir in a more explicit way
     const userDataDir = tempDir;
@@ -208,7 +245,6 @@ class TestSetupAndRunner extends ExTester {
       // Wait a moment for processes to fully terminate
       await new Promise(resolve => setTimeout(resolve, 2000));
       log('Chrome process cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not kill Chrome processes: ${error}`);
     }
@@ -251,7 +287,6 @@ class TestSetupAndRunner extends ExTester {
       // Wait a moment for processes to fully terminate and release file locks
       await new Promise(resolve => setTimeout(resolve, 3000));
       log('VS Code process cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not kill VS Code processes: ${error}`);
     }
@@ -291,7 +326,6 @@ class TestSetupAndRunner extends ExTester {
       }
 
       log('Windows extension temp file cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not cleanup Windows extension temp files: ${error}`);
     }
@@ -363,12 +397,12 @@ exec "${chromeExePath}" \\
       await fs.writeFile(wrapperPath, wrapperScript);
       await execAsync(`chmod +x "${wrapperPath}"`);
 
-            // Override Chrome path in environment
+      // Override Chrome path in environment
       process.env.CHROME_BIN = wrapperPath;
       process.env.CHROMIUM_BIN = wrapperPath;
       process.env.GOOGLE_CHROME_BIN = wrapperPath;
 
-            // Create wrapper scripts for common Chrome names in our own directory
+      // Create wrapper scripts for common Chrome names in our own directory
       const wrapperDir = path.join(this.testConfig.testResources || 'test-resources', 'chrome-wrappers');
       await fs.mkdir(wrapperDir, { recursive: true });
 
@@ -386,13 +420,12 @@ exec "${chromeExePath}" \\
 
       log(`Created Chrome wrapper at: ${wrapperPath}`);
       log(`Set CHROME_BIN to: ${wrapperPath}`);
-
     } catch (error) {
       log(`Warning: Could not create Chrome wrapper: ${error}`);
     }
   }
 
-    public async setup(): Promise<void> {
+  public async setup(): Promise<void> {
     // Log the test environment configuration
     this.logTestEnvironment();
 
@@ -535,7 +568,9 @@ exec "${chromeExePath}" \\
       return; // Skip installation instead of throwing an error
     }
 
-    log(`VSIX files count: ${extensionsVsixs.length} were found in dir ${vsixToInstallDir}, skipping extension installation`);
+    log(
+      `VSIX files count: ${extensionsVsixs.length} were found in dir ${vsixToInstallDir}, skipping extension installation`
+    );
 
     const mergeExcluded = Array.from(
       new Set([
@@ -547,7 +582,7 @@ exec "${chromeExePath}" \\
     // Refactored part to use the extensions array
     extensionsVsixs.forEach(vsix => {
       const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
-      log(`Found extension: ${vsix} with match ${match}`)
+      log(`Found extension: ${vsix} with match ${match}`);
       if (match?.groups) {
         const { extension, version } = match.groups;
         const foundExtension = extensions.find(e => e.extensionId === extension);
@@ -659,7 +694,7 @@ exec "${chromeExePath}" \\
     return TestSetupAndRunner._exTestor;
   }
 
-    private async setupVirtualDisplay(): Promise<void> {
+  private async setupVirtualDisplay(): Promise<void> {
     if (process.platform !== 'linux') {
       return;
     }
@@ -672,16 +707,18 @@ exec "${chromeExePath}" \\
         console.log('Xvfb might already be running or not available');
       });
 
-      // Wait for display to be ready
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait for display to be ready - longer wait for Ubuntu CI stability
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
       // Verify display is working
       await this.execShellCommand('export DISPLAY=:99 && xdpyinfo > /dev/null 2>&1').catch(() => {
         console.log('Virtual display verification failed, continuing anyway');
       });
 
-      console.log('Virtual display setup completed');
+      // Additional stabilization wait for Ubuntu CI
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
+      console.log('Virtual display setup completed');
     } catch (error) {
       console.warn('Failed to setup virtual display:', error);
     }
@@ -764,7 +801,9 @@ exec "${chromeExePath}" \\
     }
 
     if (!foundTestFiles && exitCode === 0) {
-      throw new Error(`No E2E test files were found for the provided spec: ${JSON.stringify(specFiles)}. This likely indicates a configuration issue - tests should not pass when no test files exist.`);
+      throw new Error(
+        `No E2E test files were found for the provided spec: ${JSON.stringify(specFiles)}. This likely indicates a configuration issue - tests should not pass when no test files exist.`
+      );
     }
 
     log('Test execution validation completed - test files were found and executed');
@@ -795,13 +834,14 @@ exec "${chromeExePath}" \\
       }
 
       // Clean up any leftover user data directories and lock files
-      await this.execShellCommand('rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver').catch(() => {
+      await this.execShellCommand(
+        'rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver'
+      ).catch(() => {
         console.log('Failed to clean up leftover files, continuing anyway');
       });
 
       // Wait a moment for processes to fully terminate
       await new Promise(resolve => setTimeout(resolve, 3000));
-
     } catch (error) {
       console.warn('Failed to kill Chrome processes:', error);
     }

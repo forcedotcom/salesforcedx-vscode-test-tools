@@ -5,10 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { Duration, log } from './core';
-import {
-  executeQuickPick,
-  notificationIsPresentWithTimeout
-} from './ui-interaction';
+import { executeQuickPick, notificationIsPresentWithTimeout } from './ui-interaction';
 
 /**
  * Retry a notification check
@@ -22,18 +19,22 @@ export const verifyNotificationWithRetry = async (
   wait = Duration.minutes(3),
   methodToRunForEachTry?: () => Promise<void>
 ) => {
-  return await retryOperation(async () => {
-    if (methodToRunForEachTry) {
-      await methodToRunForEachTry();
-    }
-    const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
-    if (!notificationWasFound) {
-      log(`Notification ${notificationPattern} was not found`);
-      await executeQuickPick('Notifications: Show Notifications');
-      throw new Error(`Notification ${notificationPattern} was not found`);
-    }
-    return notificationWasFound;
-  }, 5, `Failed to find notification ${notificationPattern}`);
+  return await retryOperation(
+    async () => {
+      if (methodToRunForEachTry) {
+        await methodToRunForEachTry();
+      }
+      const notificationWasFound = await notificationIsPresentWithTimeout(notificationPattern, wait);
+      if (!notificationWasFound) {
+        log(`Notification ${notificationPattern} was not found`);
+        await executeQuickPick('Notifications: Show Notifications');
+        throw new Error(`Notification ${notificationPattern} was not found`);
+      }
+      return notificationWasFound;
+    },
+    5,
+    `Failed to find notification ${notificationPattern}`
+  );
 };
 
 /**
@@ -58,16 +59,37 @@ export const retryOperation = async <T>(
     return JSON.stringify(error);
   };
 
+  const isStaleElementError = (error: unknown): boolean => {
+    if (error instanceof Error) {
+      return (
+        error.message.includes('stale element') ||
+        error.message.includes('element not interactable') ||
+        error.message.includes('no such element')
+      );
+    }
+    return false;
+  };
+
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await operation();
     } catch (error) {
       const formattedError = formatError(error);
+
+      // Add longer wait for stale element errors on Ubuntu
+      if (isStaleElementError(error) && process.platform === 'linux') {
+        log(`${errorMessage} - Stale element detected on Ubuntu, waiting longer before retry...`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second wait for Ubuntu
+      }
+
       if (attempt === maxAttempts) {
         log(`${errorMessage} - Final attempt failed: ${formattedError} (after ${maxAttempts} attempts)`);
         throw error;
       }
       log(`${errorMessage} - Attempt ${attempt}/${maxAttempts} failed: ${formattedError}, trying again...`);
+
+      // Standard wait between retries
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
   throw new Error(`${errorMessage} after ${maxAttempts} attempts`);
