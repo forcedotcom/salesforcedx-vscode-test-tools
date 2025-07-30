@@ -1,4 +1,43 @@
-# 1.1.0 (2025-07-29)
+## [1.1.6](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.5...1.1.6) (2025-07-29)
+
+
+### Bug Fixes
+
+* remove redundant call and add fallback latest when no tag returned ([#78](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/78)) ([218d9c2](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/218d9c2db7e08a32abd5d2cfcdb2611710a2cf33))
+
+
+
+## [1.1.5](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.4...1.1.5) (2025-07-29)
+
+
+
+## [1.1.4](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.3...1.1.4) (2025-07-29)
+
+
+
+## [1.1.3](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.2...1.1.3) (2025-07-29)
+
+
+### Bug Fixes
+
+* remove docs step and condition so latest is also published ([f4a8a60](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/f4a8a60bb25ba010b39108350aae153775e7568a))
+
+
+
+## [1.1.2](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.1...1.1.2) (2025-07-29)
+
+
+### Bug Fixes
+
+* trigger release again ([#76](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/76)) ([0245a76](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/0245a76807db0ac53b1693532ecc5565beff9a6f))
+
+
+
+## [1.1.1](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.0...1.1.1) (2025-07-29)
+
+
+
+# [1.1.0](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/067530dd59e3d90338596f7b620754decbc5851b...1.1.0) (2025-07-29)
 
 
 ### Bug Fixes
