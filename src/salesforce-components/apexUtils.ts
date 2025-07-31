@@ -7,7 +7,7 @@
 
 import fs from 'fs/promises';
 import { join } from 'path';
-import { Duration, log, pause } from '../core/miscellaneous';
+import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
 import { getTextEditor } from '../ui-interaction/textEditorView';
 
@@ -60,11 +60,12 @@ export async function createApexClass(name: string, folder: string, classText?: 
 
   // Open the file in the text editor
   await pause(Duration.seconds(1));
-  const workbench = getWorkbench();
-  const textEditor = await getTextEditor(workbench, name + '.cls');
+  await openFile(filePath);
 
   // Handle breakpoint if specified
   if (breakpoint) {
+    const workbench = getWorkbench();
+    const textEditor = await getTextEditor(workbench, name + '.cls');
     log('createApexClass() - Setting breakpoints');
     await pause(Duration.seconds(5)); // wait for file to be saved and loaded
 
@@ -173,8 +174,7 @@ export async function createAnonymousApexFile(folder: string): Promise<void> {
 
   // Open the file in the text editor
   await pause(Duration.seconds(1));
-  const workbench = getWorkbench();
-  await getTextEditor(workbench, 'Anonymous.apex');
+  await openFile(filePath);
 
   await pause(Duration.seconds(1));
 }
