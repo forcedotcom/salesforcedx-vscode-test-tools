@@ -24,16 +24,5 @@
   "prettier.arrowParens": "avoid",
   "editor.rulers": [
     120
-  ],
-  "cSpell.words": [
-    "auradoc",
-    "inputarea",
-    "salesforcedx",
-    "SFDC",
-    "SFDX",
-    "slds",
-    "Sobject",
-    "SOQL",
-    "visualforce"
   ]
 }
