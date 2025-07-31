@@ -129,7 +129,7 @@ export async function createLwc(name: string, folder: string): Promise<void> {
 
 /**
  * Creates an Aura component with the specified name
- * Generates component markup with a simple contact form and all standard Aura files
+ * Generates component markup with a simple contact form
  *
  * @param name - The name of the Aura component to create
  * @param folder - The folder where the Aura component should be created
