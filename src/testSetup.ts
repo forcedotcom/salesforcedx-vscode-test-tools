@@ -17,7 +17,6 @@ import {
   getRepoNameFromUrl,
   getFolderName,
   gitClone,
-  setSettingValue
 } from './system-operations';
 import {
   verifyExtensionsAreRunning,
@@ -25,7 +24,7 @@ import {
   checkForUncaughtErrors,
   extensions,
 } from './testing';
-import { executeQuickPick, verifyProjectLoaded } from './ui-interaction';
+import { executeQuickPick, reloadWindow, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 import { retryOperation } from './retryUtils';
 
@@ -69,8 +68,12 @@ export class TestSetup {
       }
       await reloadAndEnableExtensions(); // This is necessary in order to update JAVA home path
     }
+    testSetup.setWindowDialogStyle();
     testSetup.setWorkbenchHoverDelay();
     testSetup.setMaximumWindowSize();
+
+    await reloadWindow(); // reload window to apply settings
+
     core.log(`${testSetup.testSuiteSuffixName} - ...finished TestSetup.setUp()`);
     return testSetup;
   }
@@ -246,7 +249,6 @@ export class TestSetup {
         }
       });
     }
-    await setSettingValue("window.dialogStyle", "custom", false);
   }
 
   private throwError(message: string) {
@@ -335,5 +337,28 @@ export class TestSetup {
 
     fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
     core.log(`${this.testSuiteSuffixName} - Set 'window.newWindowDimensions' to 'maximized' in ${vscodeSettingsPath}`);
+  }
+
+  private setWindowDialogStyle(): void {
+    if (!this.projectFolderPath) {
+      this.throwError('Project folder path is not set');
+      return; // This line will never be reached, but helps TypeScript understand
+    }
+    const vscodeSettingsPath = path.join(this.projectFolderPath, '.vscode', 'settings.json');
+
+    if (!fs.existsSync(path.dirname(vscodeSettingsPath))) {
+      fs.mkdirSync(path.dirname(vscodeSettingsPath), { recursive: true });
+    }
+
+    let settings = fs.existsSync(vscodeSettingsPath) ? JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf8')) : {};
+
+    // Update settings to set window.dialogStyle
+    settings = {
+      ...settings,
+      'window.dialogStyle': 'custom'
+    };
+
+    fs.writeFileSync(vscodeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    core.log(`${this.testSuiteSuffixName} - Set 'window.dialogStyle' to 'custom' in ${vscodeSettingsPath}`);
   }
 }

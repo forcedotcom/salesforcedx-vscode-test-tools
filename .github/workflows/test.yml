@@ -58,7 +58,7 @@ jobs:
           npm test
 
   windows-basic-tests:
-    needs: ubuntu-basic-tests
+    needs: package-lock-check
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
