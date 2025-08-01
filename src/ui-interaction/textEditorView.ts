@@ -4,6 +4,7 @@ import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
 import { retryOperation } from '../retryUtils';
 import * as fs from 'node:fs/promises';
+import { createOrOverwriteFile } from '../system-operations/fileSystem';
 
 /**
  * Gets a text editor for a specific file
@@ -187,12 +188,12 @@ export async function attemptToFindTextEditorText(filePath: string): Promise<str
  * @throws Error if file write operation fails or content verification fails
  */
 export async function overrideTextInFile(textEditor: TextEditor, classText: string) {
-  // Use fs.writeFile() to write the new content to the file
+  // Use fs.writeFileSync() to write the new content to the file
   try {
     const filePath = await textEditor.getFilePath();
     // Write new content to file
     log(`overrideTextInFile() - Writing content to file: ${filePath}`);
-    await fs.writeFile(filePath, classText, 'utf8');
+    createOrOverwriteFile(filePath, classText);
     log(`overrideTextInFile() - Successfully wrote ${classText.length} characters to ${filePath}`);
 
     // Give the editor time to detect the file change and reload
@@ -340,5 +341,5 @@ export async function replaceLineInFile(filePath: string, lineNumber: number, ne
   // Replace the specific line (1-based to 0-based index)
   lines[lineNumber - 1] = newContent;
 
-  await fs.writeFile(filePath, lines.join('\n'), 'utf8');
+  createOrOverwriteFile(filePath, lines.join('\n'));
 }

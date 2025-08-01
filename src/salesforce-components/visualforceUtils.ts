@@ -10,6 +10,7 @@ import { join } from 'path';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getTextEditor } from '../ui-interaction/textEditorView';
 import { getWorkbench } from '../ui-interaction/workbench';
+import { createOrOverwriteFile } from '../system-operations/fileSystem';
 
 /**
  * Creates a Visualforce page named 'FooPage' with a controller reference
@@ -51,11 +52,11 @@ export async function createVisualforcePage(folder: string): Promise<void> {
     await fs.mkdir(folder, { recursive: true });
 
     // Write the Visualforce page file using fs.writeFile
-    await fs.writeFile(filePath, pageText, 'utf8');
+    createOrOverwriteFile(filePath, pageText);
     log(`Visualforce page FooPage.page created successfully at ${filePath}`);
 
     // Write the metadata file using fs.writeFile
-    await fs.writeFile(metaFilePath, metaContent, 'utf8');
+    createOrOverwriteFile(metaFilePath, metaContent);
     log(`Visualforce page metadata FooPage.page-meta.xml created successfully at ${metaFilePath}`);
   } catch (error) {
     log(`Error creating Visualforce page FooPage: ${error}`);

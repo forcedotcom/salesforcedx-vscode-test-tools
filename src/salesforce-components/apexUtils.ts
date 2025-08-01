@@ -5,11 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import fs from 'fs/promises';
 import { join } from 'path';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getWorkbench } from '../ui-interaction/workbench';
 import { getTextEditor } from '../ui-interaction/textEditorView';
+import { createFolder, createOrOverwriteFile } from '../system-operations/fileSystem';
 
 /**
  * Creates an Apex class with the specified name and content
@@ -44,14 +44,14 @@ export async function createApexClass(name: string, folder: string, classText?: 
 
   try {
     // Ensure the folder exists before writing files
-    await fs.mkdir(folder, { recursive: true });
+    createFolder(folder);
 
     // Write the Apex class file using fs.writeFile
-    await fs.writeFile(filePath, content, 'utf8');
+    createOrOverwriteFile(filePath, content);
     log(`Apex Class ${name} created successfully at ${filePath}`);
 
     // Write the metadata file using fs.writeFile
-    await fs.writeFile(metaFilePath, metaContent, 'utf8');
+    createOrOverwriteFile(metaFilePath, metaContent);
     log(`Apex Class metadata ${name}.cls-meta.xml created successfully at ${metaFilePath}`);
   } catch (error) {
     log(`Error creating Apex Class ${name}: ${error}`);
@@ -165,7 +165,7 @@ export async function createAnonymousApexFile(folder: string): Promise<void> {
 
   try {
     // Write the Anonymous Apex file using fs.writeFile
-    await fs.writeFile(filePath, fileContent, 'utf8');
+    createOrOverwriteFile(filePath, fileContent);
     log(`Anonymous Apex file created successfully at ${filePath}`);
   } catch (error) {
     log(`Error creating Anonymous Apex file: ${error}`);

@@ -5,11 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import fs from 'fs/promises';
 import { join } from 'path';
 import { Duration, log, pause } from '../core/miscellaneous';
 import { getTextEditor } from '../ui-interaction/textEditorView';
 import { getWorkbench } from '../ui-interaction/workbench';
+import { createFolder, createOrOverwriteFile } from '../system-operations/fileSystem';
 
 /**
  * Creates a Lightning Web Component with the specified name
@@ -92,20 +92,20 @@ export async function createLwc(name: string, folder: string): Promise<void> {
 
   try {
     // Create the component directory and __tests__ subdirectory
-    await fs.mkdir(componentFolder, { recursive: true });
-    await fs.mkdir(testsFolder, { recursive: true });
+    createFolder(componentFolder);
+    createFolder(testsFolder);
 
     // Write all the LWC files using fs.writeFile
-    await fs.writeFile(jsFilePath, jsText, 'utf8');
+    createOrOverwriteFile(jsFilePath, jsText);
     log(`LWC JavaScript file ${name}.js created successfully at ${jsFilePath}`);
 
-    await fs.writeFile(htmlFilePath, htmlText, 'utf8');
+    createOrOverwriteFile(htmlFilePath, htmlText);
     log(`LWC HTML file ${name}.html created successfully at ${htmlFilePath}`);
 
-    await fs.writeFile(testFilePath, testText, 'utf8');
+    createOrOverwriteFile(testFilePath, testText);
     log(`LWC test file ${name}.test.js created successfully at ${testFilePath}`);
 
-    await fs.writeFile(metaFilePath, metaContent, 'utf8');
+    createOrOverwriteFile(metaFilePath, metaContent);
     log(`LWC metadata file ${name}.js-meta.xml created successfully at ${metaFilePath}`);
   } catch (error) {
     log(`Error creating LWC ${name}: ${error}`);
@@ -235,34 +235,34 @@ export async function createAura(name: string, folder: string): Promise<void> {
 
   try {
     // Create the component directory
-    await fs.mkdir(componentFolder, { recursive: true });
+    createFolder(componentFolder);
 
     // Write all the Aura component files using fs.writeFile
-    await fs.writeFile(componentFilePath, componentText, 'utf8');
+    createOrOverwriteFile(componentFilePath, componentText);
     log(`Aura component file ${name}.cmp created successfully at ${componentFilePath}`);
 
-    await fs.writeFile(metaFilePath, metaContent, 'utf8');
+    createOrOverwriteFile(metaFilePath, metaContent);
     log(`Aura component metadata file ${name}.cmp-meta.xml created successfully at ${metaFilePath}`);
 
-    await fs.writeFile(controllerFilePath, controllerText, 'utf8');
+    createOrOverwriteFile(controllerFilePath, controllerText);
     log(`Aura controller file ${name}Controller.js created successfully at ${controllerFilePath}`);
 
-    await fs.writeFile(helperFilePath, helperText, 'utf8');
+    createOrOverwriteFile(helperFilePath, helperText);
     log(`Aura helper file ${name}Helper.js created successfully at ${helperFilePath}`);
 
-    await fs.writeFile(rendererFilePath, rendererText, 'utf8');
+    createOrOverwriteFile(rendererFilePath, rendererText);
     log(`Aura renderer file ${name}Renderer.js created successfully at ${rendererFilePath}`);
 
-    await fs.writeFile(cssFilePath, cssText, 'utf8');
+    createOrOverwriteFile(cssFilePath, cssText);
     log(`Aura CSS file ${name}.css created successfully at ${cssFilePath}`);
 
-    await fs.writeFile(designFilePath, designText, 'utf8');
+    createOrOverwriteFile(designFilePath, designText);
     log(`Aura design file ${name}.design created successfully at ${designFilePath}`);
 
-    await fs.writeFile(auradocFilePath, auradocText, 'utf8');
+    createOrOverwriteFile(auradocFilePath, auradocText);
     log(`Aura documentation file ${name}.auradoc created successfully at ${auradocFilePath}`);
 
-    await fs.writeFile(svgFilePath, svgText, 'utf8');
+    createOrOverwriteFile(svgFilePath, svgText);
     log(`Aura SVG file ${name}.svg created successfully at ${svgFilePath}`);
   } catch (error) {
     log(`Error creating Aura component ${name}: ${error}`);
