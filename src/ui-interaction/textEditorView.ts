@@ -3,7 +3,7 @@ import { executeQuickPick } from './commandPrompt';
 import { Duration, log, openFile, pause } from '../core/miscellaneous';
 import { getBrowser } from './workbench';
 import { retryOperation } from '../retryUtils';
-import * as fs from 'node:fs/promises';
+import * as fs from 'fs/promises';
 import { createOrOverwriteFile } from '../system-operations/fileSystem';
 
 /**
