@@ -72,6 +72,13 @@ export const extensions: ExtensionType[] = [
     shouldVerifyActivation: true
   },
   {
+    extensionId: 'salesforcedx-vscode-apex-oas',
+    name: 'Apex OAS',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: false
+  },
+  {
     extensionId: 'salesforcedx-vscode-lightning',
     name: 'Lightning Web Components',
     vsixPath: '',
