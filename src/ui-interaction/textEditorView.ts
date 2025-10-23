@@ -234,7 +234,7 @@ export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName
     }
     log(`waitForAndGetCodeLens() - Code lens ${codeLensName} found`);
     return lens;
-  }, 3);
+  }, 10);
 }
 
 /**
