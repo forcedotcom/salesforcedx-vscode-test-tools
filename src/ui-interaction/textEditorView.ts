@@ -29,10 +29,14 @@ export async function getTextEditor(workbench: Workbench, fileName: string): Pro
   const editorView = workbench.getEditorView();
 
   // Add retry logic specifically around the openEditor call that fails
-  const textEditor = await retryOperation(async () => {
-    log('getTextEditor() - Attempting to open editor...');
-    return (await editorView.openEditor(fileName)) as TextEditor;
-  }, 3, 'Failed to open editor after retries');
+  const textEditor = await retryOperation(
+    async () => {
+      log('getTextEditor() - Attempting to open editor...');
+      return (await editorView.openEditor(fileName)) as TextEditor;
+    },
+    3,
+    'Failed to open editor after retries'
+  );
 
   await pause(Duration.seconds(2));
   return textEditor;
@@ -102,9 +106,7 @@ export async function waitForFileOpen(workbench: Workbench, fileName: string): P
         // Use a promise race to implement our own timeout for getActiveTab
         activeTab = await Promise.race([
           editorView.getActiveTab(),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('getActiveTab timeout')), 5000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('getActiveTab timeout')), 5000))
         ]);
       } catch (tabError) {
         log(`waitForFileOpen() - getActiveTab failed: ${tabError}`);
@@ -120,7 +122,9 @@ export async function waitForFileOpen(workbench: Workbench, fileName: string): P
                 const tabTitle = await tab.getTitle();
                 log(`waitForFileOpen() - Checking tab: "${tabTitle}"`);
                 if (tabTitle === fileName) {
-                  log(`waitForFileOpen() - SUCCESS: Found target file in open tabs after ${elapsedTime}ms and ${attemptCount} attempts`);
+                  log(
+                    `waitForFileOpen() - SUCCESS: Found target file in open tabs after ${elapsedTime}ms and ${attemptCount} attempts`
+                  );
                   return;
                 }
               } catch (titleError) {
@@ -143,7 +147,9 @@ export async function waitForFileOpen(workbench: Workbench, fileName: string): P
         log(`waitForFileOpen() - Active tab title: "${tabTitle}", Expected: "${fileName}"`);
 
         if (tabTitle === fileName) {
-          log(`waitForFileOpen() - SUCCESS: File ${fileName} is now open in editor after ${elapsedTime}ms and ${attemptCount} attempts`);
+          log(
+            `waitForFileOpen() - SUCCESS: File ${fileName} is now open in editor after ${elapsedTime}ms and ${attemptCount} attempts`
+          );
           return; // File is open, success!
         } else {
           log(`waitForFileOpen() - File not matched, continuing to wait...`);
@@ -219,16 +225,18 @@ export async function overrideTextInFile(textEditor: TextEditor, classText: stri
 export async function waitForAndGetCodeLens(textEditor: TextEditor, codeLensName: string): Promise<CodeLens> {
   log(`waitForAndGetCodeLens() - Waiting for code lens: ${codeLensName}`);
   return await retryOperation(async () => {
-    const lens = await textEditor.getCodeLens(codeLensName);
-    if (!lens) {
-      log(`waitForAndGetCodeLens() - Code lens ${codeLensName} NOT FOUND`);
-      throw new Error(`Code lens ${codeLensName} not found`);
+    const allCodeLenses = await textEditor.getCodeLenses();
+    for (const lens of allCodeLenses) {
+      log('current lens = ' + lens);
+      if ((await lens.getTooltip()) === codeLensName) {
+        return lens;
+      }
     }
-    log(`waitForAndGetCodeLens() - Code lens ${codeLensName} found`);
-    return lens;
+    // const lens = await textEditor.getCodeLens(codeLensName);
+    log(`waitForAndGetCodeLens() - Code lens ${codeLensName} NOT FOUND`);
+    throw new Error(`Code lens ${codeLensName} not found`);
   }, 3);
 }
-
 
 /**
  * Wrapper function for moveCursor with fallback mechanism using inputarea monaco-mouse-cursor-text selector
@@ -333,7 +341,7 @@ export const moveCursorWithFallback = async (textEditor: TextEditor, line: numbe
  * @param filePath - The path to the file to modify
  * @param lineNumber - The line number to replace (1-based index)
  * @param newContent - The new content to write
-*/
+ */
 export async function replaceLineInFile(filePath: string, lineNumber: number, newContent: string): Promise<void> {
   const fileContent = await fs.readFile(filePath, 'utf8');
   const lines = fileContent.split('\n');
