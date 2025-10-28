@@ -51,6 +51,13 @@ export const extensions: ExtensionType[] = [
     shouldVerifyActivation: true
   },
   {
+    extensionId: 'salesforcedx-vscode-org',
+    name: 'Salesforce Org Management',
+    vsixPath: '',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: false
+  },
+  {
     extensionId: 'salesforcedx-vscode-apex',
     name: 'Apex',
     vsixPath: '',
