@@ -1,3 +1,12 @@
+# [1.2.0](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.8...1.2.0) (2025-10-28)
+
+
+### Features
+
+* add org extension to extension utils ([#91](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/91)) ([e3a90d8](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/e3a90d84f1161f8faca81dd1d024e3f133058fa4))
+
+
+
 ## [1.1.8](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.7...1.1.8) (2025-10-20)
 
 
