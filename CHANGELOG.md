@@ -1,3 +1,7 @@
+## [1.2.1](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.2.0...1.2.1) (2025-10-31)
+
+
+
 # [1.2.0](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.1.8...1.2.0) (2025-10-28)
 
 
