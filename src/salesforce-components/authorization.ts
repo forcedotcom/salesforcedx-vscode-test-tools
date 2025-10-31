@@ -165,14 +165,14 @@ export async function createDefaultScratchOrg(): Promise<string> {
       if (failureNotificationWasFound === true) {
         if (
           await attemptToFindOutputPanelText(
-            'Salesforce CLI',
+            'Salesforce Org Management',
             'organization has reached its daily scratch org signup limit',
             5
           )
         ) {
           // This is a known issue...
           log('Warning - creating the scratch org failed, but the failure was due to the daily signup limit');
-        } else if (await attemptToFindOutputPanelText('Salesforce CLI', 'is enabled as a Dev Hub', 5)) {
+        } else if (await attemptToFindOutputPanelText('Salesforce Org Management', 'is enabled as a Dev Hub', 5)) {
           // This is a known issue...
           log('Warning - Make sure that the org is enabled as a Dev Hub.');
           log(
