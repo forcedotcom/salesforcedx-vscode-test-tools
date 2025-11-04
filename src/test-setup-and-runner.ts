@@ -2,7 +2,6 @@ import { ExTester } from 'vscode-extension-tester';
 import { EnvironmentSettings } from './environmentSettings';
 import path from 'path';
 import fs from 'fs/promises';
-import { extensions } from './testing/extensionUtils';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ReleaseQuality } from 'vscode-extension-tester/out/util/codeUtil';
@@ -10,7 +9,7 @@ import { expect } from 'chai';
 import { log } from 'console';
 import { orgLoginSfdxUrl, setAlias } from './system-operations/cliCommands';
 import { createOrOverwriteFile, getVsixFilesFromDir } from './system-operations';
-import { TestConfig } from './core/types';
+import { TestConfig, ExtensionConfig } from './core/types';
 import { createDefaultTestConfig, validateTestConfig, normalizePath } from './core/helpers';
 import { verifyAliasAndUserName } from './salesforce-components/authorization';
 import { retryOperation } from './retryUtils';
@@ -45,8 +44,12 @@ if (process.platform === 'linux') {
 }
 
 // Set Chrome-related environment variables early
-process.env.CHROME_OPTIONS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
-process.env.CHROMIUM_FLAGS = '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' + Date.now();
+process.env.CHROME_OPTIONS =
+  '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' +
+  Date.now();
+process.env.CHROMIUM_FLAGS =
+  '--no-sandbox --disable-dev-shm-usage --disable-gpu --remote-debugging-port=9222 --disable-web-security --disable-features=VizDisplayCompositor --single-process --no-zygote --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --user-data-dir=/tmp/chrome-user-data-' +
+  Date.now();
 process.env.CHROME_BIN = '/usr/bin/google-chrome';
 process.env.CHROMIUM_BIN = '/usr/bin/google-chrome';
 
@@ -69,16 +72,13 @@ if (process.platform === 'linux') {
 }
 
 class TestSetupAndRunner extends ExTester {
-  protected static _exTestor: TestSetupAndRunner;
+  protected static _exTester: TestSetupAndRunner;
   private testConfig: TestConfig;
   private spec: string | string[] | undefined;
   private static readonly MAX_RETRIES = 3;
   private static readonly RETRY_DELAY = 5000;
 
-  constructor(
-    testConfig?: Partial<TestConfig>,
-    spec?: string | string[] | undefined
-  ) {
+  constructor(testConfig?: Partial<TestConfig>, spec?: string | string[] | undefined) {
     log(`Init testConfig with testConfig: ${JSON.stringify(testConfig)}`);
     log(`Init testConfig with spec: ${spec}`);
     // Create config with defaults and overrides
@@ -166,7 +166,9 @@ class TestSetupAndRunner extends ExTester {
     process.env.GOOGLE_CHROME_OPTS = ubuntuChromeArgs;
 
     log(`Set Ubuntu Chrome driver arguments: ${ubuntuChromeArgs}`);
-    log(`Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`);
+    log(
+      `Environment variable VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS: ${process.env.VSCODE_EXTENSION_TESTER_CHROMEDRIVER_ARGS}`
+    );
 
     // Also try setting the user data dir in a more explicit way
     const userDataDir = tempDir;
@@ -208,7 +210,6 @@ class TestSetupAndRunner extends ExTester {
       // Wait a moment for processes to fully terminate
       await new Promise(resolve => setTimeout(resolve, 2000));
       log('Chrome process cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not kill Chrome processes: ${error}`);
     }
@@ -251,7 +252,6 @@ class TestSetupAndRunner extends ExTester {
       // Wait a moment for processes to fully terminate and release file locks
       await new Promise(resolve => setTimeout(resolve, 3000));
       log('VS Code process cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not kill VS Code processes: ${error}`);
     }
@@ -291,7 +291,6 @@ class TestSetupAndRunner extends ExTester {
       }
 
       log('Windows extension temp file cleanup completed');
-
     } catch (error) {
       log(`Warning: Could not cleanup Windows extension temp files: ${error}`);
     }
@@ -386,7 +385,6 @@ exec "${chromeExePath}" \\
 
       log(`Created Chrome wrapper at: ${wrapperPath}`);
       log(`Set CHROME_BIN to: ${wrapperPath}`);
-
     } catch (error) {
       log(`Warning: Could not create Chrome wrapper: ${error}`);
     }
@@ -466,7 +464,45 @@ exec "${chromeExePath}" \\
     await this.installVsix({ useYarn: false, vsixFile: extension });
   }
 
-  public async installExtensions(excludeExtensions: string[] = []): Promise<void> {
+  /**
+   * Installs a single VSIX file with platform-specific handling
+   * @param vsixPath - Path to the VSIX file to install
+   */
+  private async installSingleVsix(vsixPath: string): Promise<void> {
+    let resolvedVsixPath = path.resolve(vsixPath);
+
+    // Avoid Windows paths being parsed as URLs by the tester
+    if (process.platform === 'win32') {
+      resolvedVsixPath = resolvedVsixPath.replace(/\\/g, '/');
+      if (/^[a-zA-Z]:\//.test(resolvedVsixPath)) {
+        resolvedVsixPath = '/' + resolvedVsixPath; // Prevent `new URL()` from treating it as a URL
+      }
+    }
+
+    // Use retry logic for Windows to handle file locking issues
+    if (process.platform === 'win32') {
+      await retryOperation(
+        async () => {
+          await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
+          await this.installExtension(resolvedVsixPath);
+        },
+        TestSetupAndRunner.MAX_RETRIES,
+        `Failed to install extension ${path.basename(resolvedVsixPath)} after retries due to Windows file locking issues`
+      );
+    } else {
+      await this.installExtension(resolvedVsixPath);
+    }
+  }
+
+  /**
+   * Installs extensions from VSIX files
+   * @param excludeExtensions - Array of extension IDs to exclude from installation
+   * @param extensionConfigs - Optional array of extension configurations for validation and control
+   */
+  public async installExtensions(
+    excludeExtensions: string[] = [],
+    extensionConfigs?: ExtensionConfig[]
+  ): Promise<void> {
     const vsixToInstallDir = this.testConfig.vsixToInstallDir || EnvironmentSettings.getInstance().vsixToInstallDir;
     log(`Installing extension from vsixToInstallDir: ${vsixToInstallDir}`);
 
@@ -482,118 +518,123 @@ exec "${chromeExePath}" \\
       throw new Error(`VSIX_TO_INSTALL directory does not exist or is not accessible: ${vsixToInstallDir}`);
     }
 
-    // Check for already installed extensions
-    const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
-    const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
-      path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
-    );
-    const foundInstalledExtensions = await Promise.all(
-      extensionsDirEntries
-        .filter(async entry => {
-          try {
-            const stats = await fs.stat(entry);
-            return stats.isDirectory();
-          } catch (e) {
-            log(`stat failed for file ${entry}`);
-            return false;
-          }
-        })
-        .map(entry => {
-          const match = path.basename(entry).match(extensionPattern);
-          if (match?.groups) {
-            return {
-              publisher: match.groups.publisher,
-              extensionId: match.groups.extensionId,
-              version: match.groups.version,
-              path: entry
-            };
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .filter(ext =>
-          extensions.find(refExt => {
-            return refExt.extensionId === ext?.extensionId;
-          })
-        )
-    );
+    // If extension configs are provided, check for already installed extensions
+    if (extensionConfigs && extensionConfigs.length > 0) {
+      const extensionPattern = /^(?<publisher>.+?)\.(?<extensionId>.+?)-(?<version>\d+\.\d+\.\d+)(?:\.\d+)*$/;
+      const extensionsDirEntries = (await fs.readdir(vsixToInstallDir)).map(entry =>
+        path.resolve(normalizePath(path.join(vsixToInstallDir, entry)))
+      );
 
-    if (
-      foundInstalledExtensions.length > 0 &&
-      foundInstalledExtensions.every(ext => extensions.find(refExt => refExt.extensionId === ext?.extensionId))
-    ) {
-      log(`Found the following pre-installed extensions in dir ${vsixToInstallDir}, skipping installation of vsix`);
-      foundInstalledExtensions.forEach(ext => {
-        log(`Extension ${ext?.extensionId} version ${ext?.version}`);
-      });
-      return;
+      const foundInstalledExtensions = await Promise.all(
+        extensionsDirEntries
+          .filter(async entry => {
+            try {
+              const stats = await fs.stat(entry);
+              return stats.isDirectory();
+            } catch (e) {
+              log(`stat failed for file ${entry}`);
+              return false;
+            }
+          })
+          .map(entry => {
+            const match = path.basename(entry).match(extensionPattern);
+            if (match?.groups) {
+              return {
+                publisher: match.groups.publisher,
+                extensionId: match.groups.extensionId,
+                version: match.groups.version,
+                path: entry
+              };
+            }
+            return null;
+          })
+          .filter(Boolean)
+          .filter(ext =>
+            extensionConfigs.find(refExt => {
+              return refExt.extensionId === ext?.extensionId;
+            })
+          )
+      );
+
+      if (
+        foundInstalledExtensions.length > 0 &&
+        foundInstalledExtensions.every(ext => extensionConfigs.find(refExt => refExt.extensionId === ext?.extensionId))
+      ) {
+        log(`Found the following pre-installed extensions in dir ${vsixToInstallDir}, skipping installation of vsix`);
+        foundInstalledExtensions.forEach(ext => {
+          log(`Extension ${ext?.extensionId} version ${ext?.version}`);
+        });
+        return;
+      }
     }
 
     const extensionsVsixs = getVsixFilesFromDir(vsixToInstallDir);
     if (extensionsVsixs.length === 0) {
       log(`No vsix files were found in dir ${vsixToInstallDir}, skipping extension installation`);
-      return; // Skip installation instead of throwing an error
+      return;
     }
 
-    log(`VSIX files count: ${extensionsVsixs.length} were found in dir ${vsixToInstallDir}, skipping extension installation`);
+    log(`VSIX files count: ${extensionsVsixs.length} found in dir ${vsixToInstallDir}`);
 
+    // Build the merged exclude list
     const mergeExcluded = Array.from(
       new Set([
         ...excludeExtensions,
-        ...extensions.filter(ext => ext.shouldInstall === 'never').map(ext => ext.extensionId)
+        ...(extensionConfigs?.filter(ext => ext.shouldInstall === 'never').map(ext => ext.extensionId) || [])
       ])
     );
 
-    // Refactored part to use the extensions array
-    extensionsVsixs.forEach(vsix => {
-      const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
-      log(`Found extension: ${vsix} with match ${match}`)
-      if (match?.groups) {
-        const { extension, version } = match.groups;
-        const foundExtension = extensions.find(e => e.extensionId === extension);
-        if (foundExtension) {
-          foundExtension.vsixPath = vsix;
-          // assign 'never' to this extension if its id is included in excluedExtensions
-          foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId) ? 'never' : 'always';
-          // if not installing, don't verify, otherwise use default value
-          foundExtension.shouldVerifyActivation =
-            foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
-          log(`SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`);
-        } else {
-          log(`SetUp - Not found extension ${extension} version ${version}`);
+    // If extension configs are provided, use them for validation and filtering
+    if (extensionConfigs && extensionConfigs.length > 0) {
+      // Create a mutable copy of extension configs to update with vsixPath
+      const extensionConfigsMap = new Map(extensionConfigs.map(ext => [ext.extensionId, { ...ext }]));
+
+      // Match VSIX files against extension configs and update vsixPath
+      extensionsVsixs.forEach(vsix => {
+        const match = path.basename(vsix).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+        if (match?.groups) {
+          const { extension, version } = match.groups;
+          const foundExtension = extensionConfigsMap.get(extension);
+          if (foundExtension) {
+            foundExtension.vsixPath = vsix;
+            // Assign 'never' to this extension if its id is included in excludedExtensions
+            foundExtension.shouldInstall = mergeExcluded.includes(foundExtension.extensionId)
+              ? 'never'
+              : foundExtension.shouldInstall || 'always';
+            // If not installing, don't verify, otherwise use default value
+            foundExtension.shouldVerifyActivation =
+              foundExtension.shouldInstall === 'never' ? false : foundExtension.shouldVerifyActivation;
+            log(`SetUp - Found extension ${extension} version ${version} with vsixPath ${foundExtension.vsixPath}`);
+          } else {
+            log(`SetUp - Extension ${extension} version ${version} not in configured extensions list`);
+          }
+        }
+      });
+
+      // Install extensions that have vsixPath and shouldInstall !== 'never'
+      for (const extensionConfig of extensionConfigsMap.values()) {
+        if (extensionConfig.vsixPath && extensionConfig.shouldInstall !== 'never') {
+          await this.installSingleVsix(extensionConfig.vsixPath);
         }
       }
-    });
+    } else {
+      // No extension configs provided - install all VSIX files except excluded ones
+      for (const vsixPath of extensionsVsixs) {
+        // Extract extension ID from VSIX filename
+        const match = path.basename(vsixPath).match(/^(?<extension>.*?)(-(?<version>\d+\.\d+\.\d+))?\.vsix$/);
+        if (match?.groups) {
+          const { extension, version } = match.groups;
 
-    if (extensions.length === 0) {
-      log(`No extensions found, cannot proceed with install`);
-    }
+          // Skip if this extension is in the exclude list
+          if (mergeExcluded.includes(extension)) {
+            log(`SetUp - Skipping excluded extension ${extension} version ${version}`);
+            continue;
+          }
 
-    // Iterate over the extensions array to install extensions
-    for (const extensionObj of extensions.filter(ext => ext.vsixPath !== '' && ext.shouldInstall !== 'never')) {
-      let vsixPath = path.resolve(extensionObj.vsixPath);
-
-      // Avoid Windows paths being parsed as URLs by the tester
-      if (process.platform === 'win32') {
-        vsixPath = vsixPath.replace(/\\/g, '/');
-        if (/^[a-zA-Z]:\//.test(vsixPath)) {
-          vsixPath = '/' + vsixPath; // Prevent `new URL()` from treating it as a URL
+          log(`SetUp - Installing extension ${extension} version ${version}`);
         }
-      }
 
-      // Use retry logic for Windows to handle file locking issues
-      if (process.platform === 'win32') {
-        await retryOperation(
-          async () => {
-            // Add a small delay before each retry attempt to allow file handles to be released
-            await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
-            await this.installExtension(vsixPath);
-          },
-          TestSetupAndRunner.MAX_RETRIES,
-          `Failed to install extension ${path.basename(vsixPath)} after retries due to Windows file locking issues`
-        );
-      } else {
-        await this.installExtension(vsixPath);
+        await this.installSingleVsix(vsixPath);
       }
     }
   }
@@ -653,10 +694,10 @@ exec "${chromeExePath}" \\
 
   static get exTester(): TestSetupAndRunner {
     if (TestSetupAndRunner.exTester) {
-      return TestSetupAndRunner._exTestor;
+      return TestSetupAndRunner._exTester;
     }
-    TestSetupAndRunner._exTestor = new TestSetupAndRunner();
-    return TestSetupAndRunner._exTestor;
+    TestSetupAndRunner._exTester = new TestSetupAndRunner();
+    return TestSetupAndRunner._exTester;
   }
 
   private async setupVirtualDisplay(): Promise<void> {
@@ -681,7 +722,6 @@ exec "${chromeExePath}" \\
       });
 
       console.log('Virtual display setup completed');
-
     } catch (error) {
       console.warn('Failed to setup virtual display:', error);
     }
@@ -764,7 +804,9 @@ exec "${chromeExePath}" \\
     }
 
     if (!foundTestFiles && exitCode === 0) {
-      throw new Error(`No E2E test files were found for the provided spec: ${JSON.stringify(specFiles)}. This likely indicates a configuration issue - tests should not pass when no test files exist.`);
+      throw new Error(
+        `No E2E test files were found for the provided spec: ${JSON.stringify(specFiles)}. This likely indicates a configuration issue - tests should not pass when no test files exist.`
+      );
     }
 
     log('Test execution validation completed - test files were found and executed');
@@ -795,13 +837,14 @@ exec "${chromeExePath}" \\
       }
 
       // Clean up any leftover user data directories and lock files
-      await this.execShellCommand('rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver').catch(() => {
+      await this.execShellCommand(
+        'rm -rf /tmp/chrome-user-data-* /tmp/vscode-chrome-* ~/.config/Code/SingletonLock ~/.vscode/extensions/*/node_modules/.bin/chromedriver'
+      ).catch(() => {
         console.log('Failed to clean up leftover files, continuing anyway');
       });
 
       // Wait a moment for processes to fully terminate
       await new Promise(resolve => setTimeout(resolve, 3000));
-
     } catch (error) {
       console.warn('Failed to kill Chrome processes:', error);
     }
@@ -830,10 +873,10 @@ const argv = yargs(hideBin(process.argv))
     demandOption: false
   })
   .help().argv as {
-    spec: string | string[] | undefined;
-    workspacePath?: string;
-    vscodeVersion?: string;
-  };
+  spec: string | string[] | undefined;
+  workspacePath?: string;
+  vscodeVersion?: string;
+};
 
 // Create test config from command line arguments
 const testConfig: Partial<TestConfig> = {};

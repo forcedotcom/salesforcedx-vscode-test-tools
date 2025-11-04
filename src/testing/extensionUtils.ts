@@ -6,107 +6,13 @@
  */
 
 import { Duration, log, pause } from '../core/miscellaneous';
-import { ExtensionType, ExtensionActivation, ExtensionConfig } from '../core/types';
+import { ExtensionActivation, ExtensionConfig } from '../core/types';
 import { executeQuickPick } from '../ui-interaction/commandPrompt';
 import { By, Editor } from 'vscode-extension-tester';
 import { expect } from 'chai';
 import { getBrowser, getWorkbench, reloadWindow, enableAllExtensions, zoom, zoomReset } from '../ui-interaction';
 
 const VERIFY_EXTENSIONS_TIMEOUT = Duration.seconds(60);
-
-export const extensions: ExtensionType[] = [
-  {
-    extensionId: 'salesforcedx-vscode',
-    name: 'Salesforce Extension Pack',
-    vsixPath: '',
-    shouldInstall: 'never',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-expanded',
-    name: 'Salesforce Extension Pack (Expanded)',
-    vsixPath: '',
-    shouldInstall: 'never',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-soql',
-    name: 'SOQL',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-einstein-gpt',
-    name: 'Einstein for Developers (Beta)',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-core',
-    name: 'Salesforce CLI Integration',
-    vsixPath: '',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-org',
-    name: 'Salesforce Org Management',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex',
-    name: 'Apex',
-    vsixPath: '',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex-debugger',
-    name: 'Apex Interactive Debugger',
-    vsixPath: '',
-    shouldInstall: 'never',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex-replay-debugger',
-    name: 'Apex Replay Debugger',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-apex-oas',
-    name: 'Apex OAS',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: false
-  },
-  {
-    extensionId: 'salesforcedx-vscode-lightning',
-    name: 'Lightning Web Components',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-lwc',
-    name: 'Lightning Web Components',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  },
-  {
-    extensionId: 'salesforcedx-vscode-visualforce',
-    name: 'salesforcedx-vscode-visualforce',
-    vsixPath: '',
-    shouldInstall: 'optional',
-    shouldVerifyActivation: true
-  }
-];
 
 /**
  * Shows the list of running extensions in VS Code
@@ -143,18 +49,20 @@ export async function reloadAndEnableExtensions(): Promise<void> {
 
 /**
  * Gets a list of extensions that need to be verified as active
+ * @param extensions - Array of extensions to filter
  * @param predicate - Optional filter function to apply to the extensions
  * @returns Array of extensions that should be verified as active
  */
-export function getExtensionsToVerifyActive(
-  predicate: (ext: ExtensionType) => boolean = ext => !!ext
-): ExtensionType[] {
+export const getExtensionsToVerifyActive = (
+  extensions: ExtensionConfig[],
+  predicate: (ext: ExtensionConfig) => boolean = ext => !!ext
+): ExtensionConfig[] => {
   return extensions
     .filter(ext => {
       return ext.shouldVerifyActivation;
     })
     .filter(predicate);
-}
+};
 
 /**
  * Verifies that specified extensions are running in VS Code
@@ -281,14 +189,15 @@ export async function findExtensionsInRunningExtensionsList(extensionIds: string
 
 /**
  * Checks for uncaught errors in extensions and fails the test if any are found
+ * @param extensions - Array of extensions to check for errors
  */
-export async function checkForUncaughtErrors(): Promise<void> {
+export const checkForUncaughtErrors = async (extensions: ExtensionConfig[]): Promise<void> => {
   await showRunningExtensions();
   // Zoom out so all the extensions are visible
   await zoom('Out', 4, Duration.seconds(1));
 
   const uncaughtErrors = (
-    await findExtensionsInRunningExtensionsList(getExtensionsToVerifyActive().map(ext => ext.extensionId))
+    await findExtensionsInRunningExtensionsList(getExtensionsToVerifyActive(extensions).map(ext => ext.extensionId))
   ).filter(ext => ext.hasBug);
 
   await zoomReset();
@@ -298,4 +207,4 @@ export async function checkForUncaughtErrors(): Promise<void> {
   });
 
   expect(uncaughtErrors.length).equal(0);
-}
+};

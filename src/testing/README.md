@@ -6,12 +6,15 @@ This document describes how to configure extensions for automated VS Code testin
 
 The extension configuration system allows you to control which VS Code extensions are installed and verified during test setup. This makes it possible to run tests with different combinations of extensions based on test requirements.
 
+The framework is designed to be generic and reusable. Extension configurations are passed as parameters to testing functions rather than being hardcoded, allowing any project to use this framework with their own extension lists.
+
 ## Key Components
 
 - **TestReqConfig**: The main configuration type used for test setup
 - **ExtensionConfig**: Configuration for individual extensions
 - **TestSetup**: Class that handles setting up the test environment
-- **salesforceExtensions.ts**: Predefined Salesforce extensions (separated from core utilities)
+- **getExtensionsToVerifyActive**: Function to filter extensions that should be verified (accepts extensions parameter)
+- **checkForUncaughtErrors**: Function to check for errors in extensions (accepts extensions parameter)
 
 ## Using Extension Configurations
 
@@ -61,32 +64,122 @@ const testConfig: TestReqConfig = {
 
 ### Using Custom Extensions
 
-You can now specify any VS Code extension, not just the predefined Salesforce extensions:
+You can specify any VS Code extension, not just the predefined Salesforce extensions:
 
 ```typescript
 const extensionConfigs: ExtensionConfig[] = [
-  // Required core extension
-  {
-    extensionId: 'salesforcedx-vscode-core',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  // Custom third-party extension
-  {
-    extensionId: 'redhat.vscode-yaml',
-    name: 'YAML',
-    shouldInstall: 'always',
-    shouldVerifyActivation: true
-  },
-  // Custom extension from a VSIX file
   {
     extensionId: 'my-custom-extension',
-    name: 'My Custom Extension',
     shouldInstall: 'always',
     shouldVerifyActivation: true,
     vsixPath: '/path/to/my-extension.vsix'
   }
 ];
+```
+
+### Using Functions with Extension Parameters
+
+The framework functions now accept extension lists as parameters, making them reusable:
+
+```typescript
+import { getExtensionsToVerifyActive, checkForUncaughtErrors } from '@salesforce/salesforcedx-vscode-test-tools';
+
+// Get extensions to verify from your configured list
+const extensionsToVerify = getExtensionsToVerifyActive(myExtensionList);
+
+// Or use with a predicate filter
+const filteredExtensions = getExtensionsToVerifyActive(myExtensionList, ext =>
+  ext.extensionId.startsWith('salesforce')
+);
+
+// Check for uncaught errors in your configured extensions
+await checkForUncaughtErrors(myExtensionList);
+```
+
+## Migration Guide
+
+If you're upgrading from a previous version where extensions were hardcoded:
+
+### Before
+
+```typescript
+// Functions used the global extensions list
+const extensionsToVerify = getExtensionsToVerifyActive();
+await checkForUncaughtErrors();
+```
+
+### After
+
+```typescript
+// Functions now require extensions parameter
+const extensionsToVerify = getExtensionsToVerifyActive(myExtensionList);
+await checkForUncaughtErrors(myExtensionList);
+```
+
+New code should always pass extensions explicitly as parameters.
+
+## Best Practices
+
+1. **Define extensions in your project**: Create a constants file in your test project to define the extensions you need
+2. **Use ExtensionConfig type**: This type provides flexibility with optional fields like `name` and `vsixPath`
+3. **Pass extensions explicitly**: Always pass your extension list to functions - the framework has no hardcoded extension lists
+4. **Keep it simple**: Only include the fields you need - `name` and `vsixPath` are optional
+
+## Example Project Structure
+
+```
+my-project/
+├── test/
+│   ├── testData/
+│   │   └── constants.ts          # Define your extensions here
+│   └── specs/
+│       └── myTest.e2e.ts         # Use extensions in tests
+└── package.json
+```
+
+Example `constants.ts`:
+
+```typescript
+import { ExtensionConfig } from '@salesforce/salesforcedx-vscode-test-tools';
+
+// Example: Salesforce Extensions
+export const salesforceExtensions: ExtensionConfig[] = [
+  {
+    extensionId: 'salesforcedx-vscode-core',
+    name: 'Salesforce CLI Integration',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-apex',
+    name: 'Apex',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-lwc',
+    name: 'Lightning Web Components',
+    shouldInstall: 'optional',
+    shouldVerifyActivation: true
+  }
+];
+
+// Example: Custom third-party extension
+export const customExtension: ExtensionConfig = {
+  extensionId: 'redhat.vscode-yaml',
+  name: 'YAML',
+  shouldInstall: 'always',
+  shouldVerifyActivation: true
+};
+
+// Example: Extension from VSIX file
+export const vsixExtension: ExtensionConfig = {
+  extensionId: 'my-custom-extension',
+  name: 'My Custom Extension',
+  shouldInstall: 'always',
+  shouldVerifyActivation: true,
+  vsixPath: '/path/to/my-extension.vsix'
+};
 ```
 
 ### Excluding Extensions (Backward Compatibility)
@@ -130,17 +223,56 @@ const requiredExtensions = testSetup.getExtensionsToInstall('always');
 const optionalExtensions = testSetup.getExtensionsToInstall('optional');
 ```
 
-## Predefined Extensions
+## Complete Example
 
-The predefined Salesforce extensions are now defined in a separate file `salesforceExtensions.ts`, which makes it easier to maintain and customize. If you need to reference the default Salesforce extensions directly, you can import them:
+Here's a complete example showing how to set up tests with custom extensions:
 
 ```typescript
-import { salesforceExtensions } from './testing/salesforceExtensions';
+// test/testData/constants.ts
+import { ExtensionConfig } from '@salesforce/salesforcedx-vscode-test-tools';
+
+export const myExtensions: ExtensionConfig[] = [
+  {
+    extensionId: 'salesforcedx-vscode-core',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  },
+  {
+    extensionId: 'salesforcedx-vscode-apex',
+    shouldInstall: 'always',
+    shouldVerifyActivation: true
+  }
+];
+
+// test/specs/myTest.e2e.ts
+import { TestSetup, TestReqConfig, ProjectShapeOption } from '@salesforce/salesforcedx-vscode-test-tools';
+import { myExtensions } from '../testData/constants';
+
+describe('My Test Suite', () => {
+  let testSetup: TestSetup;
+
+  const testReqConfig: TestReqConfig = {
+    projectConfig: {
+      projectShape: ProjectShapeOption.NEW
+    },
+    isOrgRequired: false,
+    extensionConfigs: myExtensions,
+    testSuiteSuffixName: 'MyTest'
+  };
+
+  before('Set up the testing environment', async () => {
+    testSetup = await TestSetup.setUp(testReqConfig);
+  });
+
+  after('Tear down', async () => {
+    await testSetup?.tearDown();
+  });
+
+  it('should run my test', async () => {
+    // Your test code here
+  });
+});
 ```
-
-## Example Usage
-
-See `src/samples/extensionConfigExample.ts` for complete examples of different extension configuration scenarios.
 
 ## VSIX Installation Directory
 

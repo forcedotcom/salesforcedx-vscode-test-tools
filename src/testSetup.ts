@@ -16,14 +16,9 @@ import {
   gitRepoExists,
   getRepoNameFromUrl,
   getFolderName,
-  gitClone,
+  gitClone
 } from './system-operations';
-import {
-  verifyExtensionsAreRunning,
-  reloadAndEnableExtensions,
-  checkForUncaughtErrors,
-  extensions,
-} from './testing';
+import { verifyExtensionsAreRunning, reloadAndEnableExtensions, checkForUncaughtErrors } from './testing';
 import { executeQuickPick, reloadWindow, verifyProjectLoaded } from './ui-interaction';
 import { setUpScratchOrg } from './salesforce-components';
 import { retryOperation } from './retryUtils';
@@ -83,9 +78,9 @@ export class TestSetup {
    * @param testReqConfig Test requirement configuration
    */
   private configureExtensions(testReqConfig: core.TestReqConfig): void {
-    // Start with all default extensions from salesforceExtensions
+    // Use provided extensions or empty array if none provided
     this.configuredExtensions = testReqConfig.extensionConfigs || [];
-    testReqConfig.extensionConfigs = testReqConfig.extensionConfigs || extensions;
+    testReqConfig.extensionConfigs = testReqConfig.extensionConfigs || [];
 
     // If extensionConfigs is provided, configure the specific extensions
     if (testReqConfig.extensionConfigs) {
@@ -132,10 +127,6 @@ export class TestSetup {
       }
     }
 
-    // Update the global extensions variable to use our configured extensions
-    // This ensures compatibility with any code that still uses the global extensions
-    Object.assign(extensions, this.configuredExtensions);
-
     core.log(`${this.testSuiteSuffixName} - Configured ${this.configuredExtensions.length} extensions for testing`);
   }
 
@@ -155,7 +146,7 @@ export class TestSetup {
   }
 
   public async tearDown(shouldCheckForUncaughtErrors = true): Promise<void> {
-    if (shouldCheckForUncaughtErrors) await checkForUncaughtErrors();
+    if (shouldCheckForUncaughtErrors) await checkForUncaughtErrors(this.configuredExtensions);
     try {
       await deleteScratchOrg(this.scratchOrgAliasName);
     } catch (error) {
