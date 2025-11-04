@@ -465,36 +465,6 @@ exec "${chromeExePath}" \\
   }
 
   /**
-   * Installs a single VSIX file with platform-specific handling
-   * @param vsixPath - Path to the VSIX file to install
-   */
-  private async installSingleVsix(vsixPath: string): Promise<void> {
-    let resolvedVsixPath = path.resolve(vsixPath);
-
-    // Avoid Windows paths being parsed as URLs by the tester
-    if (process.platform === 'win32') {
-      resolvedVsixPath = resolvedVsixPath.replace(/\\/g, '/');
-      if (/^[a-zA-Z]:\//.test(resolvedVsixPath)) {
-        resolvedVsixPath = '/' + resolvedVsixPath; // Prevent `new URL()` from treating it as a URL
-      }
-    }
-
-    // Use retry logic for Windows to handle file locking issues
-    if (process.platform === 'win32') {
-      await retryOperation(
-        async () => {
-          await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
-          await this.installExtension(resolvedVsixPath);
-        },
-        TestSetupAndRunner.MAX_RETRIES,
-        `Failed to install extension ${path.basename(resolvedVsixPath)} after retries due to Windows file locking issues`
-      );
-    } else {
-      await this.installExtension(resolvedVsixPath);
-    }
-  }
-
-  /**
    * Installs extensions from VSIX files
    * @param excludeExtensions - Array of extension IDs to exclude from installation
    * @param extensionConfigs - Optional array of extension configurations for validation and control
@@ -612,9 +582,31 @@ exec "${chromeExePath}" \\
       });
 
       // Install extensions that have vsixPath and shouldInstall !== 'never'
-      for (const extensionConfig of extensionConfigsMap.values()) {
+      for (const [_, extensionConfig] of extensionConfigsMap) {
         if (extensionConfig.vsixPath && extensionConfig.shouldInstall !== 'never') {
-          await this.installSingleVsix(extensionConfig.vsixPath);
+          let vsixPath = path.resolve(extensionConfig.vsixPath);
+
+          // Avoid Windows paths being parsed as URLs by the tester
+          if (process.platform === 'win32') {
+            vsixPath = vsixPath.replace(/\\/g, '/');
+            if (/^[a-zA-Z]:\//.test(vsixPath)) {
+              vsixPath = '/' + vsixPath; // Prevent `new URL()` from treating it as a URL
+            }
+          }
+
+          // Use retry logic for Windows to handle file locking issues
+          if (process.platform === 'win32') {
+            await retryOperation(
+              async () => {
+                await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
+                await this.installExtension(vsixPath);
+              },
+              TestSetupAndRunner.MAX_RETRIES,
+              `Failed to install extension ${path.basename(vsixPath)} after retries due to Windows file locking issues`
+            );
+          } else {
+            await this.installExtension(vsixPath);
+          }
         }
       }
     } else {
@@ -634,7 +626,29 @@ exec "${chromeExePath}" \\
           log(`SetUp - Installing extension ${extension} version ${version}`);
         }
 
-        await this.installSingleVsix(vsixPath);
+        let resolvedVsixPath = path.resolve(vsixPath);
+
+        // Avoid Windows paths being parsed as URLs by the tester
+        if (process.platform === 'win32') {
+          resolvedVsixPath = resolvedVsixPath.replace(/\\/g, '/');
+          if (/^[a-zA-Z]:\//.test(resolvedVsixPath)) {
+            resolvedVsixPath = '/' + resolvedVsixPath; // Prevent `new URL()` from treating it as a URL
+          }
+        }
+
+        // Use retry logic for Windows to handle file locking issues
+        if (process.platform === 'win32') {
+          await retryOperation(
+            async () => {
+              await new Promise(resolve => setTimeout(resolve, TestSetupAndRunner.RETRY_DELAY));
+              await this.installExtension(resolvedVsixPath);
+            },
+            TestSetupAndRunner.MAX_RETRIES,
+            `Failed to install extension ${path.basename(resolvedVsixPath)} after retries due to Windows file locking issues`
+          );
+        } else {
+          await this.installExtension(resolvedVsixPath);
+        }
       }
     }
   }
