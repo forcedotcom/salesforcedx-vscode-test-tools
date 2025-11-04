@@ -72,7 +72,7 @@ if (process.platform === 'linux') {
 }
 
 class TestSetupAndRunner extends ExTester {
-  protected static _exTestor: TestSetupAndRunner;
+  protected static _exTester: TestSetupAndRunner;
   private testConfig: TestConfig;
   private spec: string | string[] | undefined;
   private static readonly MAX_RETRIES = 3;
@@ -694,10 +694,10 @@ exec "${chromeExePath}" \\
 
   static get exTester(): TestSetupAndRunner {
     if (TestSetupAndRunner.exTester) {
-      return TestSetupAndRunner._exTestor;
+      return TestSetupAndRunner._exTester;
     }
-    TestSetupAndRunner._exTestor = new TestSetupAndRunner();
-    return TestSetupAndRunner._exTestor;
+    TestSetupAndRunner._exTester = new TestSetupAndRunner();
+    return TestSetupAndRunner._exTester;
   }
 
   private async setupVirtualDisplay(): Promise<void> {
