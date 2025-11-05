@@ -146,6 +146,8 @@ async function findNotification(
       log(`Error opening notifications center: ${error}`);
       await executeQuickPick('Notifications: Show Notifications');
     }
+
+    // Try the standard API first
     const notifications = await workbench.getNotifications();
     for (const notification of notifications) {
       const notificationMessage = await notification.getMessage();
@@ -153,6 +155,26 @@ async function findNotification(
         return notification as unknown as Notification;
       }
     }
+
+    // Fallback: workbench.getNotifications() looks at .notifications-toasts (ephemeral),
+    // but notifications are in .notifications-center (persistent panel).
+    // Query the notifications-center directly as a workaround for VS Code 1.102+.
+    try {
+      const browser = getBrowser();
+      const centerElements = await browser.findElements(
+        By.css('.notifications-center .notification-list-item-message')
+      );
+      for (const element of centerElements) {
+        const text = await element.getText();
+        if (message.test(text)) {
+          // Found it! Return a minimal notification-like object
+          return { getMessage: async () => text } as unknown as Notification;
+        }
+      }
+    } catch {
+      // DOM query failed, fall through to return null
+    }
+
     return null;
   };
 
