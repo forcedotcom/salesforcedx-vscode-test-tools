@@ -37,3 +37,4 @@ yarn-error.log*
 .wireit
 /salesforcedx-vscode
 /.cursor
+/test-resources
