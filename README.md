@@ -33,8 +33,6 @@ The framework is organized into the following modules:
 
 ## Documentation
 
-The full API documentation is available at [https://forcedotcom.github.io/salesforcedx-vscode-test-tools](https://forcedotcom.github.io/salesforcedx-vscode-test-tools).
-
 ### Generating Documentation Locally
 
 To generate the documentation locally:
