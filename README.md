@@ -97,20 +97,24 @@ This repository is published and used as an npm module, currently imported by `s
 
 The following environment variables can be used to configure the automation tests. These are managed by the `EnvironmentSettings` class.
 
-| Environment Variable                  | Description                                                                                           | Default Value                                |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `VSCODE_VERSION`                      | VSCode version to use in tests                                                                        | `'latest'`                                   |
-| `SPEC_FILES`                          | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                                         |
-| `VSIX_TO_INSTALL`                     | Path to directory containing VSIX files to install                                                    | `undefined`                                  |
-| `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                |
-| `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | -                                            |
-| `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  |
-| `EXTENSION_PATH`                      | Path to extensions directory                                                                          | `{cwd}/../../salesforcedx-vscode/extensions` |
-| `SALESFORCEDX_VSCODE_EXTENSIONS_PATH` | Alternative path to extensions (takes precedence over EXTENSION_PATH)                                 | -                                            |
-| `THROTTLE_FACTOR`                     | Number to multiply timeouts by (used to slow down test execution)                                     | `1`                                          |
-| `JAVA_HOME`                           | Path to Java installation                                                                             | `undefined`                                  |
-| `USE_EXISTING_PROJECT_PATH`           | Path to an existing project to use instead of creating a new one                                      | `undefined`                                  |
-| `E2E_LOG_LEVEL`                       | Log level for test execution (one of the valid log levels: 'error', 'warn', 'info', 'debug', 'trace') | `'info'`                                     |
+| Environment Variable                  | Description                                                                                           | Default Value                                | Required? |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- | --------- |
+| `VSCODE_VERSION`                      | VSCode version to use in tests                                                                        | `'latest'`                                   | No        |
+| `SPEC_FILES`                          | Test spec filename(s) to run, will be prefixed with 'lib/specs/'                                      | `[]`                                         | No        |
+| `VSIX_TO_INSTALL`                     | Path to directory containing VSIX files to install                                                    | `undefined`                                  | Yes\*     |
+| `DEV_HUB_ALIAS_NAME`                  | Alias for the DevHub org                                                                              | `'vscodeOrg'`                                | Yes\*\*   |
+| `DEV_HUB_USER_NAME`                   | Username for the DevHub org                                                                           | -                                            | Yes\*\*   |
+| `SFDX_AUTH_URL`                       | URL for authenticating with Salesforce DX                                                             | `undefined`                                  | Yes\*\*   |
+| `EXTENSION_PATH`                      | Path to extensions directory                                                                          | `{cwd}/../../salesforcedx-vscode/extensions` | No        |
+| `SALESFORCEDX_VSCODE_EXTENSIONS_PATH` | Alternative path to extensions (takes precedence over EXTENSION_PATH)                                 | -                                            | No        |
+| `THROTTLE_FACTOR`                     | Number to multiply timeouts by (used to slow down test execution)                                     | `1`                                          | No        |
+| `JAVA_HOME`                           | Path to Java installation                                                                             | `undefined`                                  | No        |
+| `USE_EXISTING_PROJECT_PATH`           | Path to an existing project to use instead of creating a new one                                      | `undefined`                                  | Yes\*     |
+| `E2E_LOG_LEVEL`                       | Log level for test execution (one of the valid log levels: 'error', 'warn', 'info', 'debug', 'trace') | `'info'`                                     | No        |
+| `TEST_RESOURCES`                      | Path to workspace directory where VS Code and test artifacts are stored                               | `[project_root]/test-resources`              | Yes\*     |
+
+\* Required when used (conditional requirement)
+\*\* Required when org authorization is needed
 
 #### Usage Notes
 
@@ -118,9 +122,23 @@ The following environment variables can be used to configure the automation test
 
 - **EXTENSION_PATH**: If your folder structure does not match the standard folder structure shown in the Getting Started section, `EXTENSION_PATH` will need to be set to the correct relative path to 'salesforcedx-vscode/extensions'
 
-- **SFDX_AUTH_URL**: To obtain this URL, run `sf org display -o <myDevHub> --verbose --json` in your terminal and extract the value from the `sfdxAuthUrl` property
+- **DEV_HUB_USER_NAME**: **Required** when org authorization is needed. Missing this will cause an initialization error when `verifyAliasAndUserName()`, `setupAndAuthorizeOrg()`, or `authorizeDevHub()` are called.
 
-- **USE_EXISTING_PROJECT_PATH**: If specified, must point to a valid existing project directory. The test framework will use this project instead of creating a new one
+- **DEV_HUB_ALIAS_NAME**: **Required** when org authorization is needed. Has a default value of `'vscodeOrg'`, but must be set correctly to match an existing org. Missing this will cause an initialization error during org authorization setup.
+
+- **SFDX_AUTH_URL**: **Required** when:
+
+  - `orgLoginSfdxUrl()` is called directly
+  - `setupAndAuthorizeOrg()` is called and no existing authentication is found
+  - `authorizeDevHub()` is called (which calls `orgLoginSfdxUrl()`)
+
+  To obtain this URL, run `sf org display -o <myDevHub> --verbose --json` in your terminal and extract the value from the `sfdxAuthUrl` property. Missing this will cause an initialization error when attempting to authenticate with Salesforce.
+
+- **VSIX_TO_INSTALL**: **Required** when `installExtensions()` is called. If set, the directory must exist or an initialization error will be thrown.
+
+- **USE_EXISTING_PROJECT_PATH**: If specified, must point to a valid existing project directory. The test framework will use this project instead of creating a new one. **Required** when set - the path must exist or an initialization error will be thrown.
+
+- **TEST_RESOURCES**: **Required** when `validateTestConfig()` is called and neither `testResources` nor `workspacePath` is set. Has a default value, but if both are missing, an initialization error will be thrown.
 
 - **THROTTLE_FACTOR**: Useful for debugging tests by slowing down UI interactions. For example, setting to `2` will make tests run at half speed
 
