@@ -1,3 +1,12 @@
+## [1.2.4](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.2.3...1.2.4) (2025-11-28)
+
+
+### Bug Fixes
+
+* apex testing extension ([#97](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/97)) ([6a0a3f4](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/6a0a3f44f9c6da19959dc52c4b9488632709da97))
+
+
+
 ## [1.2.3](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.2.2...1.2.3) (2025-11-05)
 
 
