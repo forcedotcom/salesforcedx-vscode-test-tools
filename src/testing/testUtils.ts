@@ -90,7 +90,7 @@ export async function runTestCaseFromSideBar(
         Duration.TEN_MINUTES
       );
 
-    testResult = await attemptToFindOutputPanelText('Apex', '=== Test Results', 10);
+    testResult = await attemptToFindOutputPanelText('Apex Testing', '=== Test Results', 10);
   } else if (testSuite === 'LWC Tests') {
     testResult = await getTerminalViewText(workbench, 15);
   }
@@ -165,22 +165,30 @@ export async function verifyTestItemsInSideBar(
 }
 
 export async function continueDebugging(times: number, seconds = 5): Promise<void> {
-    const bar = await retryOperation(async () => {
+  const bar = await retryOperation(
+    async () => {
       log('Creating debug toolbar...');
       await pause(Duration.seconds(10));
       return await DebugToolbar.create();
-    }, 5, 'Failed to create debug toolbar after retries');
+    },
+    5,
+    'Failed to create debug toolbar after retries'
+  );
 
-    // Continue with the debug session
-    for (let i = 0; i < times; i++) {
-      await retryOperation(async () => {
+  // Continue with the debug session
+  for (let i = 0; i < times; i++) {
+    await retryOperation(
+      async () => {
         log('Waiting for debug toolbar to be ready...');
         await pause(Duration.seconds(10));
         await bar.wait();
         log('Continuing debugging...');
         await bar.continue();
         log('Continued debugging...');
-      }, 5, 'Failed to continue debugging - continue button not found');
-      await pause(Duration.seconds(seconds));
-    }
+      },
+      5,
+      'Failed to continue debugging - continue button not found'
+    );
+    await pause(Duration.seconds(seconds));
+  }
 }
