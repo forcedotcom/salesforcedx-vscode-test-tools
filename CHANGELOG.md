@@ -1,3 +1,12 @@
+## [1.2.5](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.2.4...1.2.5) (2025-12-11)
+
+
+### Bug Fixes
+
+* incorrect paths in package json ([#99](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/issues/99)) ([84595b3](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/commit/84595b394ba6be17137a63a3a5b829c633db6b1a))
+
+
+
 ## [1.2.4](https://github.com/forcedotcom/salesforcedx-vscode-automation-tests-redhat/compare/1.2.3...1.2.4) (2025-11-28)
 
 
