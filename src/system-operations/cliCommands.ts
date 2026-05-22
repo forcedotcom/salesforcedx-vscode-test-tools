@@ -127,24 +127,61 @@ export async function orgLoginSfdxUrl(): Promise<SfCommandRunResults> {
 }
 
 /**
- * Displays information about a Salesforce org
+ * Displays information about a Salesforce org, including sensitive credentials.
+ * Merges results from `sf org display` with the new dedicated credential commands
+ * (`sf org auth show-access-token` and `sf org auth show-sfdx-auth-url`) introduced
+ * in the May 27 2026 CLI security update that redacted secrets from `org display`.
  * @param usernameOrAlias - Username or alias of the org to display
- * @returns Results of the org display command
- * @throws Error if the command fails
+ * @returns Results of the org display command with accessToken and sfdxAuthUrl merged in
+ * @throws Error if any of the underlying commands fail
  */
 export async function orgDisplay(usernameOrAlias: string | undefined): Promise<SfCommandRunResults> {
   if (!usernameOrAlias) {
     throw new Error('No usernameOrAlias provided');
   }
 
-  const sfOrgDisplayResult = await runCliCommand('org:display', '--target-org', usernameOrAlias, '--verbose', '--json');
+  const [sfOrgDisplayResult, accessTokenResult, sfdxAuthUrlResult] = await Promise.all([
+    runCliCommand('org:display', '--target-org', usernameOrAlias, '--json'),
+    runCliCommand('org:auth:show-access-token', '--target-org', usernameOrAlias, '--json', '--no-prompt'),
+    runCliCommand('org:auth:show-sfdx-auth-url', '--target-org', usernameOrAlias, '--json', '--no-prompt')
+  ]);
+
   if (sfOrgDisplayResult.exitCode > 0) {
     const message = `sf org display failed with exit code: ${sfOrgDisplayResult.exitCode}.\n${sfOrgDisplayResult.stderr}`;
     log(message);
     throw new Error(message);
   }
-  debug(`orgDisplay results ${JSON.stringify(sfOrgDisplayResult)}`);
-  return sfOrgDisplayResult;
+  if (accessTokenResult.exitCode > 0) {
+    const message = `sf org auth show-access-token failed with exit code: ${accessTokenResult.exitCode}.\n${accessTokenResult.stderr}`;
+    log(message);
+    throw new Error(message);
+  }
+  if (sfdxAuthUrlResult.exitCode > 0) {
+    const message = `sf org auth show-sfdx-auth-url failed with exit code: ${sfdxAuthUrlResult.exitCode}.\n${sfdxAuthUrlResult.stderr}`;
+    log(message);
+    throw new Error(message);
+  }
+
+  const displayJson = JSON.parse(sfOrgDisplayResult.stdout);
+  const accessTokenJson = JSON.parse(accessTokenResult.stdout);
+  const sfdxAuthUrlJson = JSON.parse(sfdxAuthUrlResult.stdout);
+
+  const merged = {
+    ...displayJson,
+    result: {
+      ...displayJson.result,
+      accessToken: accessTokenJson.result?.accessToken,
+      sfdxAuthUrl: sfdxAuthUrlJson.result?.sfdxAuthUrl
+    }
+  };
+
+  const mergedResult: SfCommandRunResults = {
+    ...sfOrgDisplayResult,
+    stdout: JSON.stringify(merged)
+  };
+
+  debug(`orgDisplay results ${JSON.stringify(mergedResult)}`);
+  return mergedResult;
 }
 
 /**
